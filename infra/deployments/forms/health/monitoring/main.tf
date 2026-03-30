@@ -40,7 +40,7 @@ module "runner_scheduled_smoke_tests" {
     intermittent issue so continue to next step regardless
     - Check the application logs for errors.
     - If this is not a false alarm, begin an incident and follow the incident response at
-    https://github.com/alphagov/forms-team/wiki/Incident-Response.
+    https://github.com/govuk-forms/forms-team/wiki/Incident-Response.
     EOF
   codebuild_environment_variables = {
     SMOKE_TEST_FORM_URL = var.scheduled_smoke_tests_settings.form_url

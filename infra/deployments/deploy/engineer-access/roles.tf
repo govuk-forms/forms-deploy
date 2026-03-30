@@ -9,7 +9,7 @@ module "engineer_access" {
   readonly                  = module.users.with_role["deploy_readonly"]
   env_name                  = "deploy"
   environment_type          = "deploy"
-  codestar_connection_arn   = var.codestar_connection_arn.alphagov
+  codestar_connection_arn   = var.codestar_connection_arn.govuk-forms
   allow_ecs_task_usage      = false
   allow_rds_data_api_access = false
   state_file_bucket_name    = "gds-forms-deploy-tfstate"

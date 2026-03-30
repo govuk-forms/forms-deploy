@@ -2,9 +2,9 @@
 
 `forms-deploy` composes and deploys the different components of GOV.UK Forms to create a full environment. The major components of the repository are
 
-- [Infrastructure](https://github.com/alphagov/forms-deploy/blob/main/infra/README.md)
-- [Local development](https://github.com/alphagov/forms-deploy/blob/main/local/README.md)
-- [Supporting scripts](https://github.com/alphagov/forms-deploy/tree/main/support)
+- [Infrastructure](https://github.com/govuk-forms/forms-deploy/blob/main/infra/README.md)
+- [Local development](https://github.com/govuk-forms/forms-deploy/blob/main/local/README.md)
+- [Supporting scripts](https://github.com/govuk-forms/forms-deploy/tree/main/support)
 
 ## Table of contents
 
@@ -93,17 +93,17 @@ This will find the latest version of Terraform and all of the Terraform provider
 
 ### Architecture decision records
 
-https://github.com/alphagov/forms/tree/main/ADR
+https://github.com/govuk-forms/forms/tree/main/ADR
 
 [^1]: This should not be confused with `forms-cli` at `support/forms-cli`. `forms-cli` is intended for working with a deployment of GOV.UK Forms, not deploying it.
 
 ### Path to production for apps
 
-https://github.com/alphagov/forms-team/wiki/Deploying-to-production%3a-applications
+https://github.com/govuk-forms/forms-team/wiki/Deploying-to-production%3a-applications
 
 ### Path to production for Terraform
 
-https://github.com/alphagov/forms-team/wiki/Deploying-to-production%3a-Terraform
+https://github.com/govuk-forms/forms-team/wiki/Deploying-to-production%3a-Terraform
 
 ### Pipeline Visualiser
 

@@ -27,8 +27,8 @@ resource "aws_codepipeline" "deploy_pipeline_visualiser" {
       output_artifacts = ["forms_deploy"]
 
       configuration = {
-        ConnectionArn        = var.codestar_connection_arn.alphagov
-        FullRepositoryId     = "alphagov/forms-deploy"
+        ConnectionArn        = var.codestar_connection_arn.govuk-forms
+        FullRepositoryId     = "govuk-forms/forms-deploy"
         BranchName           = var.pipeline_source_branch
         DetectChanges        = true
         OutputArtifactFormat = "CODEBUILD_CLONE_REF"
@@ -109,7 +109,7 @@ module "pipeline_visualiser_docker_build" {
   docker_username_parameter_path = "/docker/username"
   docker_password_parameter_path = "/docker/password"
   artifact_store_arn             = module.pipeline_visualiser_artifact_bucket.arn
-  codestar_connection_arn        = var.codestar_connection_arn.alphagov
+  codestar_connection_arn        = var.codestar_connection_arn.govuk-forms
   ecr_repository_url             = data.terraform_remote_state.deploy_ecr.outputs.pipeline_visualiser_ecr_repository_url
 }
 

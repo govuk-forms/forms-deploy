@@ -9,7 +9,7 @@ variable "container_repository" {
 
 variable "source_repository" {
   type        = string
-  description = "Name of the source repository in GitHub from which to get the Dockerfile. E.g. alphagov/forms-deploy"
+  description = "Name of the source repository in GitHub from which to get the Dockerfile. E.g. govuk-forms/forms-deploy"
 
   validation {
     condition     = can(regex("[A-Za-z0-9-_]+/[A-Za-z0-9-_]+", var.source_repository))
