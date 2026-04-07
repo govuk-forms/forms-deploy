@@ -348,7 +348,7 @@ data "aws_iam_policy_document" "ses" {
       "sns:UntagResource",
     ]
     resources = [
-      "arn:aws:sns:eu-west-2:${var.account_id}:ses_bounces_and_complaints", # TODO: remove me once all envs use the new queues
+      "arn:aws:sns:eu-west-2:${var.account_id}:ses_bounces_and_complaints", # TODO: remove me once all envs use the new queues https://trello.com/c/BCDU9U7N/3456-remove-sesbouncesandcomplaints-sns-resource-if-all-environments-are-using-the-new-queues
       "arn:aws:sns:eu-west-2:${var.account_id}:auth0_ses_bounces_and_complaints",
       "arn:aws:sns:eu-west-2:${var.account_id}:submission_email_ses_bounces_and_complaints",
       "arn:aws:sns:eu-west-2:${var.account_id}:submission_email_ses_successful_deliveries",
