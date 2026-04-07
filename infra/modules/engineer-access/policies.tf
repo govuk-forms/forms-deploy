@@ -195,12 +195,12 @@ resource "aws_iam_policy" "manage_parameter_store" {
   })
 }
 
-resource "aws_iam_policy" "manage_dashboards" {
+resource "aws_iam_policy" "manage_dashboards_and_maintenance_page" {
   #checkov:skip=CKV_AWS_290: We're OK with unlimited access to CloudWatch dashboards
   #checkov:skip=CKV_AWS_355: We're OK with unlimited access to CloudWatch dashboards
-  name        = "manage-dashboards"
+  name        = "manage-dashboards-and-maintenance-page"
   path        = "/"
-  description = "Create, update and delete CloudWatch dashbaords"
+  description = "Manage CloudWatch dashboards and maintenance page"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -214,16 +214,7 @@ resource "aws_iam_policy" "manage_dashboards" {
         Resource = ["*"]
       }
     ]
-  })
-}
 
-resource "aws_iam_policy" "manage_maintenance_page" {
-  name        = "manage-maintenance-page"
-  path        = "/"
-  description = "Permission to manage maintenance page"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
     Statement = [
       {
         Action = [
@@ -326,6 +317,30 @@ resource "aws_iam_policy" "get_ux_customisation" {
         ]
         Effect   = "Allow"
         Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "get_sustainability_data" {
+  name = "allow-get-sustainability_data"
+  path = "/"
+
+  description = "Allow access to AWS Sustainability"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "sustainability:GetCarbonFootprintSummary",
+          "sustainability:GetEstimatedCarbonEmissions",
+          "sustainability:GetEstimatedCarbonEmissionsDimensionValues",
+        ]
+        Effect = "Allow"
+        Resource = [
+          "*"
+        ]
       }
     ]
   })
