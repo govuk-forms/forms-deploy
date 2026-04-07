@@ -26,13 +26,13 @@ module "support_role" {
     "arn:aws:iam::aws:policy/ReadOnlyAccess",
     aws_iam_policy.access_aws_support_centre.arn,
     aws_iam_policy.manage_parameter_store.arn,
-    aws_iam_policy.manage_dashboards.arn,
+    aws_iam_policy.manage_dashboards_and_maintenance_page.arn,
     aws_iam_policy.manage_deployments.arn,
-    aws_iam_policy.manage_maintenance_page.arn,
     aws_iam_policy.lock_state_files.arn,
     var.allow_rds_data_api_access ? [aws_iam_policy.query_rds_with_data_api[0].arn] : [],
     var.allow_ecs_task_usage ? [aws_iam_policy.manage_ecs_task[0].arn] : [],
     aws_iam_policy.get_ux_customisation.arn,
+    aws_iam_policy.get_sustainability_data.arn,
   ])
   ip_restrictions = local.vpn_ip_restrictions
 }
@@ -47,6 +47,7 @@ module "readonly_role" {
     "arn:aws:iam::aws:policy/ReadOnlyAccess",
     aws_iam_policy.lock_state_files.arn,
     aws_iam_policy.get_ux_customisation.arn,
+    aws_iam_policy.get_sustainability_data.arn,
   ]
   ip_restrictions = local.vpn_ip_restrictions
 }
