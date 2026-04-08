@@ -115,7 +115,7 @@ additional_dns_records = [
   {
     name    = "status"
     type    = "CNAME"
-    ttl     = 300 # TODO: Change to 86400 once confirmed the domain is working
+    ttl     = 86400
     records = ["pk3kdktj7wwp.stspg-customer.com"]
   }
 ]
