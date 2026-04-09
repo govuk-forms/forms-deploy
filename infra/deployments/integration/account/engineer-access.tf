@@ -57,6 +57,29 @@ resource "aws_iam_policy" "lock_state_files" {
   })
 }
 
+resource "aws_iam_policy" "get_sustainability_data" {
+  name = "allow-get-sustainability_data"
+  path = "/"
+
+  description = "Allow access to AWS Sustainability"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "sustainability:GetCarbonFootprintSummary",
+          "sustainability:GetEstimatedCarbonEmissions",
+          "sustainability:GetEstimatedCarbonEmissionsDimensionValues",
+        ]
+        Effect = "Allow"
+        Resource = [
+          "*"
+        ]
+      }
+    ]
+  })
+}
 
 
 module "admin_role" {
@@ -76,7 +99,8 @@ module "support_role" {
   email       = "${each.value}@digital.cabinet-office.gov.uk"
   role_suffix = "support"
   iam_policy_arns = [
-    aws_iam_policy.lock_state_files.arn
+    aws_iam_policy.lock_state_files.arn,
+    aws_iam_policy.get_sustainability_data.arn
   ]
   ip_restrictions = local.ip_restrictions
 }
@@ -89,7 +113,8 @@ module "readonly_role" {
   role_suffix = "readonly"
   iam_policy_arns = [
     "arn:aws:iam::aws:policy/ReadOnlyAccess",
-    aws_iam_policy.lock_state_files.arn
+    aws_iam_policy.lock_state_files.arn,
+    aws_iam_policy.get_sustainability_data.arn
   ]
   ip_restrictions = local.ip_restrictions
 }
