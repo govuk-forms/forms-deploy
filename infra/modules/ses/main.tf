@@ -88,6 +88,30 @@ resource "aws_sesv2_configuration_set_event_destination" "form_submissions_succe
   }
 }
 
+resource "aws_sesv2_configuration_set_event_destination" "form_submissions_delivery_tls_versions" {
+  configuration_set_name = aws_sesv2_configuration_set.form_submissions.configuration_set_name
+  event_destination_name = "form_submissions_delivery_tls_versions"
+
+  event_destination {
+    enabled              = true
+    matching_event_types = ["DELIVERY"]
+
+    cloud_watch_destination {
+      dimension_configuration {
+        default_dimension_value = aws_sesv2_configuration_set.form_submissions.configuration_set_name
+        dimension_name          = "ses:configuration-set"
+        dimension_value_source  = "MESSAGE_TAG"
+      }
+
+      dimension_configuration {
+        default_dimension_value = "unknown"
+        dimension_name          = "ses:outgoing-tls-version"
+        dimension_value_source  = "MESSAGE_TAG"
+      }
+    }
+  }
+}
+
 ##
 # SES v1 configuration
 #
