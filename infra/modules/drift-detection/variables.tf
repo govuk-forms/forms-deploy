@@ -11,7 +11,7 @@ variable "schedule_expression" {
 variable "git_repository_url" {
   description = "Git repository URL to clone"
   type        = string
-  default     = "https://github.com/alphagov/forms-deploy.git"
+  default     = "https://github.com/govuk-forms/forms-deploy.git"
 }
 
 variable "git_branch" {

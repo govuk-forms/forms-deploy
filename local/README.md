@@ -3,7 +3,7 @@
 This is a guide to getting the GOV.UK Forms development environment up and running.
 
 This repo lives at:
-https://github.com/alphagov/forms-deploy
+https://github.com/govuk-forms/forms-deploy
 
 The components which make up the service are:
 

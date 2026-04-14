@@ -107,7 +107,7 @@ jobs:
           after 5 minutes, there may be something wrong with the ECS task. You will need to go to the integration AWS account
           to debug, or otherwise ask an infrastructure person.
 
-          For the sign in details and more information, [see the review apps wiki page](https://github.com/alphagov/forms-team/wiki/Review-apps).
+          For the sign in details and more information, [see the review apps wiki page](https://github.com/govuk-forms/forms-team/wiki/Review-apps).
 
           $COMMENT_MARKER
           EOF
