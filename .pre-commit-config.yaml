@@ -43,7 +43,7 @@ repos:
         entry: ./pre-commit-checkov.sh
         language: python
         additional_dependencies:
-          - checkov==3.2.470
+          - checkov==3.2.500
         require_serial: true
         types_or:
           - hcl
