@@ -397,7 +397,7 @@ module "deploy_admin_end_to_end_tests" {
   artifact_store_arn      = module.artifact_bucket.arn
   service_role_arn        = data.aws_iam_role.deployer_role.arn
   deploy_account_id       = var.deploy_account_id
-  codestar_connection_arn = var.codestar_connection_arn.alphagov
+  codestar_connection_arn = var.codestar_connection_arn.govuk-forms
   aws_s3_role_arn         = var.end_to_end_test_settings.aws_s3_role_arn
   aws_s3_bucket           = var.end_to_end_test_settings.aws_s3_bucket
   s3_form_id              = var.end_to_end_test_settings.s3_form_id
