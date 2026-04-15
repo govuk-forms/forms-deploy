@@ -18,7 +18,7 @@ locals {
 
 module "forms_e2e_tests" {
   source                  = "../../../modules/e2e-image-pipeline"
-  codestar_connection_arn = var.codestar_connection_arn.govuk-forms
+  codestar_connection_arn = var.codestar_connection_arn
   ecr_repository_url      = data.terraform_remote_state.deploy_ecr.outputs.e2e_tests_ecr_repository_url
 }
 
