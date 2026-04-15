@@ -26,6 +26,7 @@ data "aws_iam_policy_document" "acm_cert_with_dns_validation" {
     ]
     resources = [
       # TODO: Why does it need both regions?
+      # https://trello.com/c/enOX8GRF/3454-investigate-why-policy-document-acmcertwithdnsvalidation-needs-access-to-both-eu-west-2-and-us-east-1
       "arn:aws:acm:eu-west-2:${var.account_id}:certificate/*",
       "arn:aws:acm:us-east-1:${var.account_id}:certificate/*"
     ]
@@ -104,6 +105,7 @@ data "aws_iam_policy_document" "cloudfront" {
       "wafv2:*RegexPatternSet",
     ]
     # TODO: The scope of this should be cloudfront but for some reason it needs global
+    # https://trello.com/c/JCyMcRip/3455-investigate-why-managewafv2webacl-needs-global-scope-instead-of-just-cloudfront
     resources = [
       "arn:aws:wafv2:us-east-1:${var.account_id}:global/webacl/cloudfront_waf_${var.environment_name}/*",
       "arn:aws:wafv2:eu-west-2:${var.account_id}:regional/webacl/alb_${var.environment_name}/*",

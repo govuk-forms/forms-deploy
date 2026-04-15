@@ -103,6 +103,7 @@ resource "aws_codepipeline" "apply_terroform" {
         FullRepositoryId = "govuk-forms/forms-e2e-tests"
         BranchName       = "main"
         # TODO: we should version this repository appropriately, so we can pick specific versions
+        # https://trello.com/c/CboxmYA2/3452-version-forms-e2e-tests-so-we-can-pick-specific-versions
         DetectChanges        = false
         OutputArtifactFormat = "CODEBUILD_CLONE_REF"
       }
