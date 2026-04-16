@@ -32,11 +32,8 @@ variable "private_internal_zone_id" {
 
 variable "codestar_connection_arn" {
   description = "It isn't possible to automate the creation of a CodeStar connection, so we must create it by hand once in each account and hardcode its ARN."
-  type = object({
-    alphagov    = string
-    govuk-forms = string
-  })
-  nullable = false
+  type        = string
+  nullable    = false
 }
 
 variable "admin_engineer_role_arns" {
