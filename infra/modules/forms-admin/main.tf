@@ -165,14 +165,6 @@ module "ecs_service" {
     {
       name  = "SETTINGS__ACT_AS_USER_ENABLED",
       value = var.act_as_user_enabled
-    },
-    {
-      name  = "SETTINGS__FEATURES__ORG_ADMIN_ALERTS_ENABLED",
-      value = var.org_admin_alerts_enabled
-    },
-    {
-      name  = "SETTINGS__FEATURES__WEEKLY_SUBMISSION_EMAILS_ENABLED",
-      value = var.weekly_submission_emails_enabled
     }
   ]
 

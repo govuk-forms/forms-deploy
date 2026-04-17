@@ -26,8 +26,6 @@ module "forms_admin" {
   enable_opentelemetry              = var.forms_admin_settings.enable_opentelemetry
   opentelemetry_head_sampler_ratio  = var.forms_runner_settings.opentelemetry_head_sampler_ratio
   act_as_user_enabled               = var.forms_admin_settings.act_as_user_enabled
-  org_admin_alerts_enabled          = var.forms_admin_settings.org_admin_alerts_enabled
-  weekly_submission_emails_enabled  = var.forms_admin_settings.weekly_submission_emails_enabled
   enable_mailchimp_sync             = var.forms_admin_settings.synchronize_to_mailchimp
   enable_organisations_sync         = var.forms_admin_settings.synchronize_orgs_from_govuk
   deploy_account_id                 = var.deploy_account_id

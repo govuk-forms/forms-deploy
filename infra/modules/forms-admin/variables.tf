@@ -90,17 +90,6 @@ variable "act_as_user_enabled" {
   default     = false
 }
 
-variable "org_admin_alerts_enabled" {
-  type        = bool
-  description = "Enables sending alerts to Org Admins about forms they control"
-  default     = false
-}
-
-variable "weekly_submission_emails_enabled" {
-  type        = bool
-  description = "Enables turning on weekly submission batch emails for forms"
-  default     = false
-}
 
 variable "enable_mailchimp_sync" {
   type        = bool
