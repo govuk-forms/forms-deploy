@@ -165,7 +165,11 @@ module "ecs_service" {
     {
       name  = "SETTINGS__ACT_AS_USER_ENABLED",
       value = var.act_as_user_enabled
-    }
+    },
+    {
+      name  = "SETTINGS__FEATURES__SEND_FILLER_ANSWERS",
+      value = var.send_filler_answers
+    },
   ]
 
   secrets = flatten([
