@@ -26,5 +26,5 @@ def main(event:, context:)
         longest_paused_stage.inbound_transition_state.last_changed_at,
         longest_paused_stage.inbound_transition_state.disabled_reason,
       )
-  end
+    end
 end
