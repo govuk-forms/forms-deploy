@@ -161,6 +161,7 @@ forms_runner_settings = {
   allow_human_readonly_roles_to_assume_submissions_to_runner_role = false
   ses_submission_email_from_email_address                         = "no-reply@forms.service.gov.uk"
   ses_submission_email_reply_to_email_address                     = "no-reply@forms.service.gov.uk"
+  govuk_one_login_base_url                                        = "https://oidc.account.gov.uk/"
   queue_worker_capacity                                           = 6
   disable_builtin_solidqueue_worker                               = true
   filler_answer_email_enabled                                     = false

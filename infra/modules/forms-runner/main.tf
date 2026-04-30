@@ -212,6 +212,10 @@ module "ecs_service" {
       value = var.ses_submission_email_reply_to_email_address
     },
     {
+      name  = "SETTINGS__GOVUK_ONE_LOGIN__BASE_URL",
+      value = var.govuk_one_login_base_url
+    },
+    {
       name  = "KMS_KEY_ID",
       value = aws_kms_alias.active_record_alias.name
     },

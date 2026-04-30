@@ -66,6 +66,7 @@ forms_runner_settings = {
   opentelemetry_head_sampler_ratio                                = "0.1"
   ses_submission_email_from_email_address                         = "no-reply@research.forms.service.gov.uk"
   ses_submission_email_reply_to_email_address                     = "no-reply@research.forms.service.gov.uk"
+  govuk_one_login_base_url                                        = "https://oidc.integration.account.gov.uk/"
   allow_human_readonly_roles_to_assume_submissions_to_s3_role     = false
   allow_human_readonly_roles_to_assume_submissions_to_runner_role = false
   queue_worker_capacity                                           = 0
