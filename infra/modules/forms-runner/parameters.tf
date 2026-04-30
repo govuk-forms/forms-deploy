@@ -47,3 +47,37 @@ resource "aws_ssm_parameter" "sentry_dsn" {
     ]
   }
 }
+
+# GOV.UK One Login client ID
+# The client ID for the GOV.UK One Login service
+resource "aws_ssm_parameter" "govuk_one_login_client_id" {
+  #checkov:skip=CKV_AWS_337:KMS managed key is fine
+
+  name        = "/forms-runner-${var.env_name}/govuk-one-login/client-id"
+  description = "The GOV.UK One Login client ID for forms-runner in the ${var.env_name} environment"
+  type        = "SecureString"
+  value       = "dummy-value"
+
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+}
+
+# GOV.UK One Login private key
+# The base64 encoded private key for the GOV.UK One Login service
+resource "aws_ssm_parameter" "govuk_one_login_private_key" {
+  #checkov:skip=CKV_AWS_337:KMS managed key is fine
+
+  name        = "/forms-runner-${var.env_name}/govuk-one-login/private-key"
+  description = "The base64 encoded GOV.UK One Login private key for forms-runner in the ${var.env_name} environment"
+  type        = "SecureString"
+  value       = "dummy-value"
+
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+}
