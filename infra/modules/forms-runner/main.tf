@@ -250,6 +250,14 @@ module "ecs_service" {
     {
       name      = "SETTINGS__SUBMISSION_STATUS_API__SECRET"
       valueFrom = "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/forms-runner-${var.env_name}/submission_status_api_shared_secret"
+    },
+    {
+      name      = "SETTINGS__GOVUK_ONE_LOGIN__CLIENT_ID"
+      valueFrom = "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/forms-runner-${var.env_name}/govuk-one-login/client-id"
+    },
+    {
+      name      = "SETTINGS__GOVUK_ONE_LOGIN__PRIVATE_KEY"
+      valueFrom = "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/forms-runner-${var.env_name}/govuk-one-login/private-key"
     }
   ]
 }
