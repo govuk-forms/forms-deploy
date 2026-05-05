@@ -175,6 +175,7 @@ variable "forms_runner_settings" {
     allow_human_readonly_roles_to_assume_submissions_to_runner_role = bool
     ses_submission_email_from_email_address                         = string
     ses_submission_email_reply_to_email_address                     = string
+    govuk_one_login_base_url                                        = string
     queue_worker_capacity                                           = string
     disable_builtin_solidqueue_worker                               = bool
     filler_answer_email_enabled                                     = bool

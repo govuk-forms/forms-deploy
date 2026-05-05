@@ -212,6 +212,10 @@ module "ecs_service" {
       value = var.ses_submission_email_reply_to_email_address
     },
     {
+      name  = "SETTINGS__GOVUK_ONE_LOGIN__BASE_URL",
+      value = var.govuk_one_login_base_url
+    },
+    {
       name  = "KMS_KEY_ID",
       value = aws_kms_alias.active_record_alias.name
     },
@@ -250,6 +254,14 @@ module "ecs_service" {
     {
       name      = "SETTINGS__SUBMISSION_STATUS_API__SECRET"
       valueFrom = "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/forms-runner-${var.env_name}/submission_status_api_shared_secret"
+    },
+    {
+      name      = "SETTINGS__GOVUK_ONE_LOGIN__CLIENT_ID"
+      valueFrom = "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/forms-runner-${var.env_name}/govuk-one-login/client-id"
+    },
+    {
+      name      = "SETTINGS__GOVUK_ONE_LOGIN__PRIVATE_KEY"
+      valueFrom = "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/forms-runner-${var.env_name}/govuk-one-login/private-key"
     }
   ]
 }

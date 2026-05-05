@@ -110,6 +110,11 @@ variable "ses_submission_configuration_set_name" {
   description = "The name of the configuration set to use when sending form submissions"
 }
 
+variable "govuk_one_login_base_url" {
+  type        = string
+  description = "The base URL for GOV.UK One Login authentication requests"
+}
+
 variable "elasticache_port" {
   type        = number
   description = "The port number for the Redis ElastiCache cluster"
