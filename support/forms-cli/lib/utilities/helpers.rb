@@ -9,14 +9,12 @@ module Helpers
     "498160065950" => "dev",
     "972536609845" => "staging",
     "443944947292" => "production",
-    "619109835131" => "user-research",
   }.freeze
 
   DOMAINS = {
     "dev" => "dev.forms.service.gov.uk",
     "staging" => "staging.forms.service.gov.uk",
     "production" => "forms.service.gov.uk",
-    "user-research" => "research.forms.service.gov.uk",
   }.freeze
 
   def aws_authenticated?

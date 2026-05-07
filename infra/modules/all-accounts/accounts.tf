@@ -2,10 +2,9 @@ locals {
   deploy_account_id      = "711966560482"
   integration_account_id = "842676007477"
   environment_accounts = {
-    "development"   = "498160065950",
-    "staging"       = "972536609845",
-    "production"    = "443944947292"
-    "user-research" = "619109835131"
+    "development" = "498160065950",
+    "staging"     = "972536609845",
+    "production"  = "443944947292"
   }
 }
 

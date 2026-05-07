@@ -1,5 +1,5 @@
 deploy-forms-product-page-container = {
-  trigger_on_tag_patterns  = ["stg-*"] # User-research uses the same images as prod
+  trigger_on_tag_patterns  = ["stg-*"]
   retag_image_on_success   = false
   retagging_sed_expression = ""
   apply_latest_tag         = false
@@ -8,7 +8,7 @@ deploy-forms-product-page-container = {
 }
 
 deploy-forms-runner-container = {
-  trigger_on_tag_patterns  = ["stg-*"] # User-research uses the same images as prod
+  trigger_on_tag_patterns  = ["stg-*"]
   retag_image_on_success   = false
   retagging_sed_expression = ""
   apply_latest_tag         = false
@@ -18,7 +18,7 @@ deploy-forms-runner-container = {
 
 
 deploy-forms-admin-container = {
-  trigger_on_tag_patterns  = ["stg-*"] # User-research uses the same images as prod
+  trigger_on_tag_patterns  = ["stg-*"]
   retag_image_on_success   = false
   retagging_sed_expression = ""
   apply_latest_tag         = false

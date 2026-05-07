@@ -24,11 +24,6 @@ prod production:
 	$(eval export TARGET_ENVIRONMENT = production)
 	@true
 
-.PHONY: user-research
-user-research:
-	$(eval export TARGET_ENVIRONMENT = user-research)
-	@true
-
 .PHONY: deploy
 deploy:
 	$(eval export TARGET_ENVIRONMENT = deploy)
@@ -362,7 +357,6 @@ ENVIRONMENTS
 
 	dev/development		The development environment
 	staging			The staging environment
-	user-research		The user-research environment
 	prod/production		The production environment
 
 endef

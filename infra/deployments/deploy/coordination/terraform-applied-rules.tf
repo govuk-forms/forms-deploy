@@ -34,17 +34,6 @@ resource "aws_cloudwatch_event_target" "terraform_applied_development_to_product
   }
 }
 
-resource "aws_cloudwatch_event_target" "terraform_applied_development_to_userresearch" {
-  target_id = "from-development-to-userresearch"
-  rule      = aws_cloudwatch_event_rule.terraform_applied["development"].name
-  role_arn  = aws_iam_role.eventbridge_actor.arn
-  arn       = "arn:aws:events:eu-west-2:${module.other_accounts.environment_accounts_id["user-research"]}:event-bus/default"
-
-  dead_letter_config {
-    arn = aws_sqs_queue.event_bridge_dlq.arn
-  }
-}
-
 resource "aws_cloudwatch_event_target" "terraform_applied_staging_to_development" {
   target_id = "from-staging-to-development"
   rule      = aws_cloudwatch_event_rule.terraform_applied["staging"].name
@@ -67,17 +56,6 @@ resource "aws_cloudwatch_event_target" "terraform_applied_staging_to_production"
   }
 }
 
-resource "aws_cloudwatch_event_target" "terraform_applied_staging_to_userresearch" {
-  target_id = "from-staging-to-userresearch"
-  rule      = aws_cloudwatch_event_rule.terraform_applied["staging"].name
-  role_arn  = aws_iam_role.eventbridge_actor.arn
-  arn       = "arn:aws:events:eu-west-2:${module.other_accounts.environment_accounts_id["user-research"]}:event-bus/default"
-
-  dead_letter_config {
-    arn = aws_sqs_queue.event_bridge_dlq.arn
-  }
-}
-
 resource "aws_cloudwatch_event_target" "terraform_applied_production_to_development" {
   target_id = "from-production-to-development"
   rule      = aws_cloudwatch_event_rule.terraform_applied["production"].name
@@ -94,50 +72,6 @@ resource "aws_cloudwatch_event_target" "terraform_applied_production_to_staging"
   rule      = aws_cloudwatch_event_rule.terraform_applied["production"].name
   role_arn  = aws_iam_role.eventbridge_actor.arn
   arn       = "arn:aws:events:eu-west-2:${module.other_accounts.environment_accounts_id["staging"]}:event-bus/default"
-
-  dead_letter_config {
-    arn = aws_sqs_queue.event_bridge_dlq.arn
-  }
-}
-
-resource "aws_cloudwatch_event_target" "terraform_applied_production_to_userresearch" {
-  target_id = "from-production-to-userresearch"
-  rule      = aws_cloudwatch_event_rule.terraform_applied["production"].name
-  role_arn  = aws_iam_role.eventbridge_actor.arn
-  arn       = "arn:aws:events:eu-west-2:${module.other_accounts.environment_accounts_id["user-research"]}:event-bus/default"
-
-  dead_letter_config {
-    arn = aws_sqs_queue.event_bridge_dlq.arn
-  }
-}
-
-resource "aws_cloudwatch_event_target" "terraform_applied_userresearch_to_development" {
-  target_id = "from-userresearch-to-development"
-  rule      = aws_cloudwatch_event_rule.terraform_applied["user-research"].name
-  role_arn  = aws_iam_role.eventbridge_actor.arn
-  arn       = "arn:aws:events:eu-west-2:${module.other_accounts.environment_accounts_id["development"]}:event-bus/default"
-
-  dead_letter_config {
-    arn = aws_sqs_queue.event_bridge_dlq.arn
-  }
-}
-
-resource "aws_cloudwatch_event_target" "terraform_applied_userresearch_to_staging" {
-  target_id = "from-userresearch-to-staging"
-  rule      = aws_cloudwatch_event_rule.terraform_applied["user-research"].name
-  role_arn  = aws_iam_role.eventbridge_actor.arn
-  arn       = "arn:aws:events:eu-west-2:${module.other_accounts.environment_accounts_id["staging"]}:event-bus/default"
-
-  dead_letter_config {
-    arn = aws_sqs_queue.event_bridge_dlq.arn
-  }
-}
-
-resource "aws_cloudwatch_event_target" "terraform_applied_userresearch_to_production" {
-  target_id = "from-userresearch-to-production"
-  rule      = aws_cloudwatch_event_rule.terraform_applied["user-research"].name
-  role_arn  = aws_iam_role.eventbridge_actor.arn
-  arn       = "arn:aws:events:eu-west-2:${module.other_accounts.environment_accounts_id["production"]}:event-bus/default"
 
   dead_letter_config {
     arn = aws_sqs_queue.event_bridge_dlq.arn

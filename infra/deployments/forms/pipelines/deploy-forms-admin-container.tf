@@ -282,8 +282,8 @@ resource "aws_codepipeline" "deploy_admin_container" {
     }
 
     # It isn't possible to conditionally skip or disable an action in CodePipeline
-    # but we need to be able to do so because we can't run the end-to-end tests in the user-research
-    # environment. We don't want to make the end-to-end tests module responsible for skipping itself
+    # but we need to be able to do so because we can't run the end-to-end tests in environments without
+    # Auth0 configured. We don't want to make the end-to-end tests module responsible for skipping itself
     # because that's not its responsibility, and CodePipeline doesn't give us a lightweight way to wrap
     # something a little bit of Bash.
     #

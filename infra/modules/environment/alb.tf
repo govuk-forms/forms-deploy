@@ -4,18 +4,12 @@ locals {
   # domain_names and zone_names can be combined after the migration.
   # Used to lookup the domain name for the ALB record and certificate.
   domain_names = {
-    user-research = "research.",
-    dev           = "dev."
-    staging       = "staging.",
-    production    = ""
+    dev        = "dev."
+    staging    = "staging.",
+    production = ""
   }
 
   subject_alternative_names = {
-    user-research = [
-      "admin.research.forms.service.gov.uk",
-      "submit.research.forms.service.gov.uk",
-      "www.research.forms.service.gov.uk",
-    ],
     dev = [
       "admin.dev.forms.service.gov.uk",
       "submit.dev.forms.service.gov.uk",

@@ -65,7 +65,7 @@ gds aws forms-dev-admin -- make dev deployer_role forms/rds apply
 > - You must include `deployer_role` in the same command as your Terraform action
 
 > [!NOTE]
-> This is primarily for testing permissions and validating changes in dev. All other environments (staging, production, user-research) should only be deployed through the CI pipeline.
+> This is primarily for testing permissions and validating changes in dev. All other environments (staging, production) should only be deployed through the CI pipeline.
 
 #### Updating Terraform
 

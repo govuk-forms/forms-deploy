@@ -197,8 +197,8 @@ resource "aws_codepipeline" "apply_terroform" {
     }
 
     # It isn't possible to conditionally skip or disable an action in CodePipeline
-    # but we need to be able to do so because we can't run the end-to-end tests in the user-research
-    # environment. We don't want to make the end-to-end tests module responsible for skipping itself
+    # but we need to be able to do so because we can't run the end-to-end tests in environments without
+    # Auth0 configured. We don't want to make the end-to-end tests module responsible for skipping itself
     # because that's not its responsibility, and CodePipeline doesn't give us a lightweight way to wrap
     # something a little bit of Bash.
     #
@@ -289,7 +289,8 @@ module "await_ecs_deployments" {
 
 module "run_end_to_end_tests" {
   # Don't run end-to-end tests in the use-research environment
-  # because we can't run the end-to-end tests in the user-research environment.
+  # because we can't run the end-to-end tests in the environments without
+  # Auth0 configured.
   count                   = var.apply-terraform.disable_end_to_end_tests ? 0 : 1
   source                  = "../../../modules/code-build-run-e2e-tests"
   app_name                = "post-terraform-apply"

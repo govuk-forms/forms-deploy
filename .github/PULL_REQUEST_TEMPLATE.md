@@ -19,5 +19,5 @@ Trello card: <!-- link -->
 
 If you've made changes to the deployer role (files in `modules/deployer-access`):
 
-* Remember to run `make <environment> forms/account apply` on the relevant environments (`dev`, `staging`, `user-research`, and/or `prod`)
+* Remember to run `make <environment> forms/account apply` on the relevant environments (`dev`, `staging` and/or `prod`)
 * Check the #govuk-forms-deployment-notifications Slack channel to ensure the `apply-forms-terraform-<environment>` pipelines have run successfully
