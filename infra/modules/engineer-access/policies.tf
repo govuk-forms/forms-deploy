@@ -322,11 +322,11 @@ resource "aws_iam_policy" "get_ux_customisation" {
   })
 }
 
-resource "aws_iam_policy" "get_sustainability_data" {
-  name = "allow-get-sustainability_data"
+resource "aws_iam_policy" "get_usage_data" {
+  name = "allow-get-usage_data"
   path = "/"
 
-  description = "Allow access to AWS Sustainability"
+  description = "Allow access to AWS Sustainability and usage of Cost Explorer"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -336,6 +336,15 @@ resource "aws_iam_policy" "get_sustainability_data" {
           "sustainability:GetCarbonFootprintSummary",
           "sustainability:GetEstimatedCarbonEmissions",
           "sustainability:GetEstimatedCarbonEmissionsDimensionValues",
+        ]
+        Effect = "Allow"
+        Resource = [
+          "*"
+        ]
+      },
+      {
+        Action = [
+          "ce:GetCommitmentPurchaseAnalysis",
         ]
         Effect = "Allow"
         Resource = [
