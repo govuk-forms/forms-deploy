@@ -8,35 +8,29 @@ roles:
     gds_cli_role: forms-prod-support
   - role: arn:aws:iam::972536609845:role/codepipeline-readonly
     gds_cli_role: forms-staging-support
-  - role: arn:aws:iam::619109835131:role/codepipeline-readonly
-    gds_cli_role: forms-user-research-support
 
 groups:
   "Apply Terraform":
     - "apply-forms-terraform-staging"
     - "apply-forms-terraform-production"
-    - "apply-forms-terraform-user-research"
     - "apply-forms-terraform-dev"
 
   "Product pages":
     - "forms-product-page-image-builder"
     - "deploy-forms-product-page-container-staging"
     - "deploy-forms-product-page-container-production"
-    - "deploy-forms-product-page-container-user-research"
     - "deploy-forms-product-page-container-dev"
 
   "Admin":
     - "forms-admin-image-builder"
     - "deploy-forms-admin-container-staging"
     - "deploy-forms-admin-container-production"
-    - "deploy-forms-admin-container-user-research"
     - "deploy-forms-admin-container-dev"
 
   "Runner":
     - "forms-runner-image-builder"
     - "deploy-forms-runner-container-staging"
     - "deploy-forms-runner-container-production"
-    - "deploy-forms-runner-container-user-research"
     - "deploy-forms-runner-container-dev"
 
   "Pipeline visualiser":

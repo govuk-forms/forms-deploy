@@ -13,8 +13,8 @@ variable "environment_type" {
   type        = string
   nullable    = false
   validation {
-    condition     = contains(["development", "staging", "production", "user_research", "ithc"], var.environment_type)
-    error_message = "variable 'environment_type' must be one of dev, staging, production, user_research, or ithc"
+    condition     = contains(["development", "staging", "production", "ithc"], var.environment_type)
+    error_message = "variable 'environment_type' must be one of dev, staging, production, or ithc"
   }
 }
 

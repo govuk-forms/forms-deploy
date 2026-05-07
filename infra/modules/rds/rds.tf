@@ -26,11 +26,6 @@ locals {
 
 locals {
   serverlessv2_scaling_profiles = {
-    user-research = {
-      min_capacity             = 0
-      max_capacity             = 1
-      seconds_until_auto_pause = 300
-    }
 
     dev = {
       # 0.5 is the lowest value that keeps the cluster warm (no cold start on first connection).
@@ -103,7 +98,6 @@ resource "aws_rds_cluster" "cluster_aurora_v2" {
       min_capacity = serverlessv2_scaling_configuration.value.min_capacity
       max_capacity = serverlessv2_scaling_configuration.value.max_capacity
 
-      # Only present for user-research omitted for all others
       seconds_until_auto_pause = try(serverlessv2_scaling_configuration.value.seconds_until_auto_pause, null)
     }
   }

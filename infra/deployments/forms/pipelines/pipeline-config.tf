@@ -15,8 +15,8 @@ variable "deploy-forms-product-page-container" {
     # Typically this will only be enabled in production.
     apply_latest_tag = bool
 
-    # It isn't possible to perform the end-to-end tests in the user-research environment because
-    # it doesn't have Auth0 configured. Therefore we need to be able disable that step there.
+    # It isn't possible to perform the end-to-end tests in environments without
+    # Auth0 configured. Therefore we need to be able disable that step there.
     disable_end_to_end_tests = bool
 
     # The AWS CodePipeline execution mode to use for this pipeline.
@@ -47,8 +47,8 @@ variable "deploy-forms-runner-container" {
     # Typically this will only be enabled in production.
     apply_latest_tag = bool
 
-    # It isn't possible to perform the end-to-end tests in the user-research environment because
-    # it doesn't have Auth0 configured. Therefore we need to be able disable that step there.
+    # It isn't possible to perform the end-to-end tests in environments
+    # without Auth0 configured. Therefore we need to be able disable that step there.
     disable_end_to_end_tests = bool
 
     # The AWS CodePipeline execution mode to use for this pipeline.
@@ -80,8 +80,8 @@ variable "deploy-forms-admin-container" {
     # Typically this will only be enabled in production.
     apply_latest_tag = bool
 
-    # It isn't possible to perform the end-to-end tests in the user-research environment because
-    # it doesn't have Auth0 configured. Therefore we need to be able disable that step there.
+    # It isn't possible to perform the end-to-end tests in environments
+    # without Auth0 configured. Therefore we need to be able disable that step there.
     disable_end_to_end_tests = bool
 
     # The AWS CodePipeline execution mode to use for this pipeline.
@@ -116,8 +116,8 @@ variable "apply-terraform" {
     # The name of the pipeline whose success will trigger the pipeline when pipeline_trigger = EVENT
     previous_stage_name = string
 
-    # It isn't possible to perform the end-to-end tests in the user-research environment because
-    # it doesn't have Auth0 configured. Therefore we need to be able disable that step there.
+    # It isn't possible to perform the end-to-end tests in environments
+    # without Auth0 configured. Therefore we need to be able disable that step there.
     disable_end_to_end_tests = bool
   })
 

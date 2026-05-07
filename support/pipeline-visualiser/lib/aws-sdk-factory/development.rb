@@ -14,8 +14,6 @@ class DevelopmentAWSSDKFactory
       production_env_client
     when "arn:aws:iam::972536609845:role/codepipeline-readonly"
       staging_env_client
-    when "arn:aws:iam::619109835131:role/codepipeline-readonly"
-      user_research_env_client
     else
       raise "Unknown role arn. Consider adding it to the development fixtures."
     end
@@ -179,13 +177,6 @@ class DevelopmentAWSSDKFactory
     end
 
     client
-  end
-
-  def self.user_research_env_client
-    stub_all_as_passing(
-      Aws::CodePipeline::Client.new(stub_responses: true),
-      %w[apply-forms-terraform-user-research deploy-forms-product-page-container-user-research deploy-forms-runner-container-user-research],
-    )
   end
 
   def self.stub_list_pipelines(client, pipeline_names)

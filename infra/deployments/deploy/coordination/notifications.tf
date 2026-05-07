@@ -225,6 +225,6 @@ module "slack_notifications" {
   account_name                    = each.key
   dead_letter_queue_arn           = aws_sqs_queue.event_bridge_dlq.arn
   pipeline_completion_topic_arn   = aws_sns_topic.deployments_topic.arn
-  pipeline_failure_topic_arn      = each.key == "development" || each.key == "user-research" ? aws_sns_topic.deployments_topic.arn : aws_sns_topic.alerts_topic.arn
-  run_e2e_tests_failure_topic_arn = each.key == "development" || each.key == "user-research" ? aws_sns_topic.deployments_topic.arn : aws_sns_topic.alerts_topic.arn
+  pipeline_failure_topic_arn      = each.key == "development" ? aws_sns_topic.deployments_topic.arn : aws_sns_topic.alerts_topic.arn
+  run_e2e_tests_failure_topic_arn = each.key == "development" ? aws_sns_topic.deployments_topic.arn : aws_sns_topic.alerts_topic.arn
 }

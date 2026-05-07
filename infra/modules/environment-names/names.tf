@@ -3,7 +3,6 @@ locals {
     "dev" : "dev",
     "staging" : "staging",
     "production" : "production",
-    "user-research" : "ur"
   }
 }
 
