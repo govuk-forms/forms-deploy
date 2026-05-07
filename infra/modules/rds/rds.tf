@@ -24,29 +24,6 @@ locals {
   performance_insights_retention_period = var.enable_advanced_database_insights ? 465 : null
 }
 
-locals {
-  serverlessv2_scaling_profiles = {
-
-    dev = {
-      # 0.5 is the lowest value that keeps the cluster warm (no cold start on first connection).
-      # Setting min_capacity = 0 would enable auto-pause but cause ~20-30s wake-up delays.
-      min_capacity = 0.5
-      max_capacity = 2
-    }
-
-    default = {
-      min_capacity = var.min_capacity
-      max_capacity = var.max_capacity
-    }
-  }
-
-  serverlessv2_scaling = lookup(
-    local.serverlessv2_scaling_profiles,
-    var.env_name,
-    local.serverlessv2_scaling_profiles["default"]
-  )
-}
-
 resource "aws_rds_cluster" "cluster_aurora_v2" {
   #checkov:skip=CKV2_AWS_8:AWS RDS inbuilt backup process is sufficient
   #checkov:skip=CKV2_AWS_27:Query logging is not required at this time
@@ -91,15 +68,9 @@ resource "aws_rds_cluster" "cluster_aurora_v2" {
   performance_insights_enabled          = var.enable_advanced_database_insights
   performance_insights_retention_period = local.performance_insights_retention_period
 
-  dynamic "serverlessv2_scaling_configuration" {
-    for_each = [local.serverlessv2_scaling]
-
-    content {
-      min_capacity = serverlessv2_scaling_configuration.value.min_capacity
-      max_capacity = serverlessv2_scaling_configuration.value.max_capacity
-
-      seconds_until_auto_pause = try(serverlessv2_scaling_configuration.value.seconds_until_auto_pause, null)
-    }
+  serverlessv2_scaling_configuration {
+    max_capacity = var.max_capacity
+    min_capacity = var.min_capacity
   }
 
   lifecycle {
