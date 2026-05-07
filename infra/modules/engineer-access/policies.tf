@@ -344,7 +344,10 @@ resource "aws_iam_policy" "get_usage_data" {
       },
       {
         Action = [
-          "ce:GetCommitmentPurchaseAnalysis",
+          "ce:*PurchaseAnalysis*",
+          "ce:GetReservation*",
+          "ce:GetRightsizingRecommendation",
+          "ce:*SavingsPlan*"
         ]
         Effect = "Allow"
         Resource = [
