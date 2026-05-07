@@ -40,6 +40,8 @@ environmental_settings = {
   ]
   forms_product_page_support_url      = "https://www.forms.service.gov.uk/support"
   rds_maintenance_window              = "wed:04:00-wed:04:30"
+  rds_minimum_capacity_acus           = 2
+  rds_maxium_capacity_acus            = 10
   ips_to_block                        = []
   rate_limit_bypass_cidrs             = []
   enable_shield_advanced_healthchecks = true

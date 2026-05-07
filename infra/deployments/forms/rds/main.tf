@@ -16,6 +16,8 @@ module "rds" {
 
   apply_immediately        = var.apply_immediately
   rds_maintenance_window   = var.environmental_settings.rds_maintenance_window
+  min_capacity             = var.environmental_settings.rds_minimum_capacity_acus
+  max_capacity             = var.environmental_settings.rds_maxium_capacity_acus
   auto_pause               = var.environmental_settings.pause_databases_on_inactivity
   seconds_until_auto_pause = var.environmental_settings.pause_databases_after_inactivity_seconds
   backup_retention_period  = var.environmental_settings.database_backup_retention_period_days
@@ -40,6 +42,8 @@ module "forms_runner_rds" {
 
   apply_immediately        = var.apply_immediately
   rds_maintenance_window   = var.environmental_settings.rds_maintenance_window
+  min_capacity             = var.environmental_settings.rds_minimum_capacity_acus
+  max_capacity             = var.environmental_settings.rds_maxium_capacity_acus
   auto_pause               = var.environmental_settings.pause_databases_on_inactivity
   seconds_until_auto_pause = var.environmental_settings.pause_databases_after_inactivity_seconds
   backup_retention_period  = var.environmental_settings.database_backup_retention_period_days
