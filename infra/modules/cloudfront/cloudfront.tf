@@ -41,6 +41,10 @@ module "cloudfront_waf_protection" {
   send_logs_to_cyber            = var.send_logs_to_cyber
   rate_limit_bypass_cidrs       = var.rate_limit_bypass_cidrs
   kinesis_subscription_role_arn = var.kinesis_subscription_role_arn
+  anti_ddos_exempt_uri_regular_expressions = [
+    "^/up$",
+    "^/api(/.*)?$",
+  ]
 
   providers = {
     aws           = aws
