@@ -442,6 +442,48 @@ resource "aws_wafv2_web_acl" "this" {
   }
 
   rule {
+    name     = "AWS-AWSManagedRulesAntiDDoSRuleSet"
+    priority = 15
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesAntiDDoSRuleSet"
+        vendor_name = "AWS"
+
+        managed_rule_group_configs {
+          aws_managed_rules_anti_ddos_rule_set {
+            sensitivity_to_block = "LOW"
+
+            client_side_action_config {
+              challenge {
+                usage_of_action = "ENABLED"
+                sensitivity     = "HIGH"
+
+                dynamic "exempt_uri_regular_expression" {
+                  for_each = var.anti_ddos_exempt_uri_regular_expressions
+                  content {
+                    regex_string = exempt_uri_regular_expression.value
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWS-AWSManagedRulesAntiDDoSRuleSet"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
     name     = "OriginIPRateLimit"
     priority = 100
 
