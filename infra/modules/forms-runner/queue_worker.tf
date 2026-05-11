@@ -140,6 +140,14 @@ resource "aws_security_group" "queue_worker" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  egress {
+    description = "Permit outbound to internal ALB on port 80"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr_block]
+  }
 }
 
 resource "aws_iam_role" "ecs_task_exec_role" {
