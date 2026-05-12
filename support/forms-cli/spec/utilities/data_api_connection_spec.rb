@@ -11,7 +11,7 @@ describe DataApiConnection do
     secrets_manager_mock = instance_double(Aws::SecretsManager::Client)
     allow(secrets_manager_mock)
       .to receive(:describe_secret)
-      .with(hash_including(secret_id: "data-api/dev/forms-admin/rds-credentials"))
+      .with(hash_including(secret_id: "rds-db-credentials/cluster-resource-id/forms-admin"))
       .and_return(SecretsManagerFixtures.describe_secret)
 
     secrets_manager_mock
@@ -56,7 +56,7 @@ describe DataApiConnection do
       .to have_received(:execute_statement)
       .with(hash_including(
               resource_arn: "cluster-arn",
-              secret_arn: "arn:aws:secretsmanager:eu-west-2:123456789012:secret:data-api/dev/forms-admin/rds-credentials-AbCdEf",
+              secret_arn: "arn:aws:secretsmanager:eu-west-2:123456789012:secret:rds-db-credentials/cluster-resource-id/forms-admin-AbCdEf",
             ))
       .at_least(:once)
   end
@@ -77,7 +77,7 @@ describe DataApiConnection do
 
     expect(secrets_manager_mock)
       .to have_received(:describe_secret)
-      .with(hash_including(secret_id: "data-api/dev/forms-admin/rds-credentials"))
+      .with(hash_including(secret_id: "rds-db-credentials/cluster-resource-id/forms-admin"))
       .at_least(:once)
   end
 
@@ -111,7 +111,7 @@ describe DataApiConnection do
       secrets_manager_mock_no_secret = instance_double(Aws::SecretsManager::Client)
       allow(secrets_manager_mock_no_secret)
         .to receive(:describe_secret)
-        .with(hash_including(secret_id: "data-api/dev/forms-admin/rds-credentials"))
+        .with(hash_including(secret_id: "rds-db-credentials/cluster-resource-id/forms-admin"))
         .and_raise(Aws::SecretsManager::Errors::ResourceNotFoundException.new("context", "Secret not found"))
 
       secrets_manager_mock_no_secret
@@ -126,7 +126,7 @@ describe DataApiConnection do
     it "raises an error about missing secret" do
       expect {
         described_class.new("dev", "forms-admin", "cluster-name").execute_statement("select * from testing;")
-      }.to raise_error(/Data API credential secret 'data-api\/dev\/forms-admin\/rds-credentials' was not found/)
+      }.to raise_error(/Data API credential secret 'rds-db-credentials\/cluster-resource-id\/forms-admin' was not found/)
     end
   end
 end

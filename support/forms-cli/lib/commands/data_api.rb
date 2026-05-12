@@ -13,7 +13,7 @@ class DataApi
     parse_options
     return unless aws_authenticated? && valid_options?
 
-    @connection = DataApiConnection.new(fetch_environment, @options[:database], @options[:cluster])
+    @connection = DataApiConnection.new(fetch_environment, @options[:database], @options[:cluster], @options[:user])
 
     begin
       print execute_statement
@@ -73,6 +73,10 @@ private
 
       opts.on("-sSTATEMENT", "--statement=STATEMENT", "[Mandatory] The statement to execute") do |statement|
         @options[:statement] = statement
+      end
+
+      opts.on("-uUSER", "--user=USER", "The database user to connect as") do |user|
+        @options[:user] = user
       end
     }.parse!
   end

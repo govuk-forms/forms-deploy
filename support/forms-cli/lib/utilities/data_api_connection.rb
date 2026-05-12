@@ -9,10 +9,11 @@ require "aws-sdk-rdsdataservice"
 
 # Executes statements on AWS RDS using the Data API.
 class DataApiConnection
-  def initialize(env, database_name, cluster_name)
+  def initialize(env, database_name, cluster_name, database_user = nil)
     @env = env
     @database_name = database_name
     @cluster_name = cluster_name || default_cluster_name
+    @database_user = database_user || database_name
 
     @data_service = Aws::RDSDataService::Client.new
     @rds = Aws::RDS::Client.new
@@ -43,8 +44,7 @@ private
   end
 
   def query_credential_arn
-    secret_name = "rds-db-credentials/#{query_database_resource_id}/#{@database_name}"
-    # secret_name = "data-api/#{@env}/#{@database_name}/rds-credentials"
+    secret_name = "rds-db-credentials/#{query_database_resource_id}/#{@database_user}"
 
     begin
       secret = @secrets_manager.describe_secret({ secret_id: secret_name })
