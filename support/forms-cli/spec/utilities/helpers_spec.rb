@@ -7,12 +7,10 @@ describe Helpers do
 
   describe ".aws_authenticated?" do
     context "when not authenticated" do
-      it "returns false" do
-        expect(dummy_class.new.aws_authenticated?).to be false
-      end
-
-      it "prints warning to stdout" do
-        expect { dummy_class.new.aws_authenticated? }.to output(/You must be authenticated/).to_stdout
+      it "returns false and prints warning to stdout" do
+        result = nil
+        expect { result = dummy_class.new.aws_authenticated? }.to output(/You must be authenticated/).to_stdout
+        expect(result).to be false
       end
     end
 
