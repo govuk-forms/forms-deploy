@@ -45,6 +45,10 @@ resource "aws_wafv2_regex_pattern_set" "admin_extended_post_pages" {
   regular_expression {
     regex_string = "^/forms/\\d+/welsh-translation$"
   }
+
+  regular_expression {
+    regex_string = "^/forms/\\d+/routes$"
+  }
 }
 
 resource "aws_wafv2_rule_group" "admin_body_size_limits" {
