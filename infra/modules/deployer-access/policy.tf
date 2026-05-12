@@ -929,7 +929,7 @@ data "aws_iam_policy_document" "cloud_control_api" {
 
 data "aws_iam_policy_document" "secrets_manager" {
   statement {
-    sid = "ManageSecretsManagerSecrets"
+    sid = "ManageRdsDbCredentialSecrets"
     actions = [
       "secretsmanager:CreateSecret",
       "secretsmanager:DeleteSecret",
@@ -939,10 +939,22 @@ data "aws_iam_policy_document" "secrets_manager" {
       "secretsmanager:PutSecretValue",
       "secretsmanager:UpdateSecretVersionStage",
       "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:ListSecretVersionIds",
     ]
     resources = [
       "arn:aws:secretsmanager:eu-west-2:${var.account_id}:secret:data-api/${var.environment_name}/*",
+      "arn:aws:secretsmanager:eu-west-2:${var.account_id}:secret:rds-db-credentials/cluster-*",
     ]
     effect = "Allow"
+  }
+
+  statement {
+    sid = "ListRdsDbCredentialSecrets"
+    actions = [
+      "secretsmanager:ListSecrets",
+    ]
+    resources = ["*"]
+    effect    = "Allow"
   }
 }

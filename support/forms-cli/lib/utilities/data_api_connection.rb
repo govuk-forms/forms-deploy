@@ -43,7 +43,8 @@ private
   end
 
   def query_credential_arn
-    secret_name = "data-api/#{@env}/#{@database_name}/rds-credentials"
+    secret_name = "rds-db-credentials/#{query_database_resource_id}/#{@database_name}"
+    # secret_name = "data-api/#{@env}/#{@database_name}/rds-credentials"
 
     begin
       secret = @secrets_manager.describe_secret({ secret_id: secret_name })
@@ -60,5 +61,14 @@ private
     raise "Database cluster was not be found" if arn.nil?
 
     arn
+  end
+
+  def query_database_resource_id
+    params = { db_cluster_identifier: @cluster_name }
+    resource_id = @rds.describe_db_clusters(params)&.db_clusters&.[](0)&.db_cluster_resource_id
+
+    raise "Database cluster was not found" if resource_id.nil?
+
+    resource_id
   end
 end

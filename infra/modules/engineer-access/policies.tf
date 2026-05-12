@@ -111,7 +111,7 @@ resource "aws_iam_policy" "query_rds_with_data_api" {
         ]
         Effect = "Allow"
         Resource = [
-          "arn:aws:secretsmanager:eu-west-2:${local.account_id}:secret:data-api/${var.env_name}/*"
+          "arn:aws:secretsmanager:eu-west-2:${local.account_id}:secret:rds-db-credentials/cluster-*/forms-*" // allow access to secrets for any cluster with the name prefix `forms-`. ie. don't allow access to `root` credentials, while allowing access to app creds.
         ]
       },
     ]
