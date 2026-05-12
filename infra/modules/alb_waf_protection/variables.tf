@@ -28,3 +28,9 @@ variable "kinesis_subscription_role_arn" {
   description = "The arn of the role that is allowed to subscribe to the kinesis stream"
   type        = string
 }
+
+variable "anti_ddos_exempt_uri_regular_expressions" {
+  description = "Regular expressions matching URIs that cannot handle the WAF Challenge action (e.g. API endpoints). Requests to these paths can only be blocked by the DDoSRequests rule, not challenged, during a DDoS event."
+  type        = list(string)
+  default     = ["^/up$"]
+}
