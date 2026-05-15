@@ -32,8 +32,8 @@ module SecretsManagerFixtures
   def self.describe_secret
     @secrets_manager_stub.stub_data(:describe_secret,
                                     {
-                                      arn: "arn:aws:secretsmanager:eu-west-2:123456789012:secret:data-api/dev/forms-admin/rds-credentials-AbCdEf",
-                                      name: "data-api/dev/forms-admin/rds-credentials",
+                                      arn: "arn:aws:secretsmanager:eu-west-2:123456789012:secret:rds-db-credentials/cluster-resource-id/forms-admin-AbCdEf",
+                                      name: "rds-db-credentials/cluster-resource-id/forms-admin",
                                       description: "Data API credentials for forms-admin in dev environment",
                                     })
   end

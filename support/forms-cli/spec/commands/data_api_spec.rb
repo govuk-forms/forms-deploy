@@ -38,7 +38,7 @@ describe DataApi do
 
       expect(DataApiConnection)
         .to have_received(:new)
-        .with("dev", "forms-admin", "cluster-name")
+        .with("dev", "forms-admin", "cluster-name", nil)
         .at_least(:once)
     end
 
