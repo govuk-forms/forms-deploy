@@ -36,6 +36,7 @@ module "forms_admin" {
   eventbridge_dead_letter_queue_arn = data.terraform_remote_state.forms_environment.outputs.eventbridge_dead_letter_queue_arn
   zendesk_sns_topic_arn             = data.terraform_remote_state.forms_environment.outputs.zendesk_alert_eu_west_2_topic_arn
   ecs_cluster_arn                   = data.terraform_remote_state.forms_environment.outputs.ecs_cluster_arn
+  ecs_events_role_arn               = data.terraform_remote_state.forms_environment.outputs.ecs_events_role_arn
   alb_arn_suffix                    = data.terraform_remote_state.forms_environment.outputs.alb_arn_suffix
   alb_listener_arn                  = data.terraform_remote_state.forms_environment.outputs.alb_main_listener_arn
   internal_alb_listener_arn         = data.terraform_remote_state.forms_environment.outputs.internal_alb_listener_arn

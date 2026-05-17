@@ -138,6 +138,11 @@ variable "ecs_cluster_arn" {
   description = "The arn for the ECS cluster"
 }
 
+variable "ecs_events_role_arn" {
+  type        = string
+  description = "The arn for the shared ECS Events role used by scheduled tasks"
+}
+
 variable "alb_arn_suffix" {
   type        = string
   description = "The suffix of the Application Load Balancer ARN. Used with CloudWatch metrics"
