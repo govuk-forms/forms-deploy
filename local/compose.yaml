@@ -23,6 +23,7 @@ services:
     environment:
       - BINDING=0.0.0.0
       - DATABASE_URL=postgres://postgres:postgres@postgres
+      - EMAIL=${EMAIL:-example@example.com}
       - GOVUK_APP_DOMAIN=example.org
       - NODE_ENV=development
       - RACK_ENV=development
