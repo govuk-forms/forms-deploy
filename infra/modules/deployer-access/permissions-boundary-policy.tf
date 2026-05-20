@@ -1,4 +1,5 @@
 resource "aws_iam_policy" "permissions_boundary" {
+  name        = "deployer-${var.environment_name}-boundary"
   policy      = data.aws_iam_policy_document.permissions_boundary.json
   description = "Permissions boundary for non-human role"
   path        = "/permissions_boundaries/"
@@ -49,5 +50,28 @@ data "aws_iam_policy_document" "permissions_boundary" {
       "wafv2:*",
     ]
 
+  }
+
+  statement {
+    sid    = "DenyBoundaryPolicyModification"
+    effect = "Deny"
+    actions = [
+      "iam:CreatePolicyVersion",
+      "iam:DeletePolicy",
+      "iam:DeletePolicyVersion",
+      "iam:SetDefaultPolicyVersion"
+    ]
+    resources = [
+    "arn:aws:iam::${var.account_id}:policy/permissions_boundaries/deployer-${var.environment_name}-boundary"]
+  }
+
+  statement {
+    sid    = "DenyBoundaryRemoval"
+    effect = "Deny"
+    actions = [
+      "iam:DeleteRolePermissionsBoundary",
+      "iam:DeleteUserPermissionBoundary"
+    ]
+    resources = ["*"]
   }
 }
