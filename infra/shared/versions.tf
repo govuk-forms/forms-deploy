@@ -3,31 +3,31 @@ terraform {
   required_providers {
     archive = {
       source  = "hashicorp/archive"
-      version = "2.7.1"
+      version = "2.8.0"
     }
     aws = {
       source  = "hashicorp/aws"
-      version = "6.43.0"
+      version = "6.45.0"
     }
     awscc = {
       source  = "hashicorp/awscc"
-      version = "1.82.0"
+      version = "1.84.0"
     }
     auth0 = {
       source  = "auth0/auth0"
-      version = "1.45.0"
+      version = "1.46.0"
     }
     random = {
       source  = "hashicorp/random"
-      version = "3.8.1"
+      version = "3.9.0"
     }
     null = {
       source  = "hashicorp/null"
-      version = "3.2.4"
+      version = "3.3.0"
     }
     local = {
       source  = "hashicorp/local"
-      version = "2.8.0"
+      version = "2.9.0"
     }
   }
 }
