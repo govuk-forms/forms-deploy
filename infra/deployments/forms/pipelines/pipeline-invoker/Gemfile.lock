@@ -16,11 +16,11 @@ GEM
       uri (>= 0.13.1)
     ast (2.4.3)
     aws-eventstream (1.4.0)
-    aws-partitions (1.1231.0)
-    aws-sdk-codepipeline (1.113.0)
-      aws-sdk-core (~> 3, >= 3.244.0)
+    aws-partitions (1.1252.0)
+    aws-sdk-codepipeline (1.114.0)
+      aws-sdk-core (~> 3, >= 3.247.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-core (3.244.0)
+    aws-sdk-core (3.247.0)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.992.0)
       aws-sigv4 (~> 1.9)
@@ -119,7 +119,7 @@ PLATFORMS
   x86_64-linux-gnu
 
 DEPENDENCIES
-  aws-sdk-codepipeline (~> 1.113)
+  aws-sdk-codepipeline (~> 1.114)
   rspec (~> 3.13)
   rubocop-govuk (~> 5.2)
 
@@ -127,12 +127,13 @@ CHECKSUMS
   activesupport (8.1.3) sha256=21a5e0dfbd4c3ddd9e1317ec6a4d782fa226e7867dc70b0743acda81a1dca20e
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
   aws-eventstream (1.4.0) sha256=116bf85c436200d1060811e6f5d2d40c88f65448f2125bc77ffce5121e6e183b
-  aws-partitions (1.1231.0) sha256=5142ba78d5226deb5dff6c8d17dfc52b0bcec3451d47fcb70fbe8b744b85d004
-  aws-sdk-codepipeline (1.113.0) sha256=99b92d90508673b4421e3bb7b320f76dcc46a2259d998c9dd5be4238d09363ef
-  aws-sdk-core (3.244.0) sha256=3e458c078b0c5bdee95bc370c3a483374b3224cf730c1f9f0faf849a5d9a18ea
+  aws-partitions (1.1252.0) sha256=b44c74136ebd634d35f3fb8fd37def5214db21b9375f22c6954dbe7a7f2a449d
+  aws-sdk-codepipeline (1.114.0) sha256=a10527cbb0ae5a11187fc32e15a526dd5c8adf3743da0f4c7778f43c56a9446a
+  aws-sdk-core (3.247.0) sha256=789864594ce8cef05ee3d81fa8ed506099280bda6ea12a7612b8b7c5e5e62851
   aws-sigv4 (1.12.1) sha256=6973ff95cb0fd0dc58ba26e90e9510a2219525d07620c8babeb70ef831826c00
   base64 (0.3.0) sha256=27337aeabad6ffae05c265c450490628ef3ebd4b67be58257393227588f5a97b
   bigdecimal (4.1.2) sha256=53d217666027eab4280346fba98e7d5b66baaae1b9c3c1c0ffe89d48188a3fbd
+  bundler (4.0.12) sha256=7f8b757d28dfb636e7b24fba2344ac6dd13b5b24f4b46d62573d483f211825ac
   concurrent-ruby (1.3.6) sha256=6b56837e1e7e5292f9864f34b69c5a2cbc75c0cf5338f1ce9903d10fa762d5ab
   connection_pool (3.0.2) sha256=33fff5ba71a12d2aa26cb72b1db8bba2a1a01823559fb01d29eb74c286e62e0a
   diff-lcs (1.6.2) sha256=9ae0d2cba7d4df3075fe8cd8602a8604993efc0dfa934cff568969efb1909962
