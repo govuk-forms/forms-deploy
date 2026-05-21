@@ -53,6 +53,19 @@ data "aws_iam_policy_document" "permissions_boundary" {
   }
 
   statement {
+    sid    = "AllowAssumeRoleOnSpecificRoles"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = [
+      // Include only specific roles - do we just hardcode these? either way, we should make sure the roles themselves have a permissions boundary
+      // does this include human roles and the end-to-end-test role?
+      //specific roles in own account. Other accounts *
+    ]
+  }
+
+  statement {
     sid    = "DenyBoundaryPolicyModification"
     effect = "Deny"
     actions = [
