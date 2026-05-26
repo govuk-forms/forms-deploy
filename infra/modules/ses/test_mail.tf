@@ -22,23 +22,19 @@ data "aws_iam_policy_document" "test_mail_bucket" {
   }
 }
 
-resource "aws_s3_bucket" "test_mail_bucket" {
-  #checkov:skip=CKV2_AWS_62:No event notifications are needed for this temporary test email bucket
-  #checkov:skip=CKV_AWS_145:Amazon managed S3 encryption is sufficient for temporary test emails
-  #checkov:skip=CKV_AWS_18:Access logging is not needed for this temporary test email bucket
-  #checkov:skip=CKV_AWS_144:Cross-region replication is not needed for temporary test emails
-  #checkov:skip=CKV2_AWS_6:Public access is controlled by the bucket policy for SES writes only
-  #checkov:skip=CKV_AWS_21:Versioning is not needed for temporary test emails that expire after 7 days
-  bucket = local.test_mail_bucket_name
-}
+module "test_mail_bucket" {
+  source = "../secure-bucket"
 
-resource "aws_s3_bucket_policy" "test_mail_bucket" {
-  bucket = aws_s3_bucket.test_mail_bucket.id
-  policy = data.aws_iam_policy_document.test_mail_bucket.json
+  name                   = local.test_mail_bucket_name
+  versioning_enabled     = false
+  access_logging_enabled = false
+  extra_bucket_policies = [
+    data.aws_iam_policy_document.test_mail_bucket.json
+  ]
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "test_mail_bucket" {
-  bucket = aws_s3_bucket.test_mail_bucket.id
+  bucket = module.test_mail_bucket.name
 
   rule {
     id     = "expire-test-emails"
@@ -73,12 +69,12 @@ resource "aws_ses_receipt_rule" "test_confirmation_emails_to_s3" {
   tls_policy    = "Require"
 
   s3_action {
-    bucket_name       = aws_s3_bucket.test_mail_bucket.id
+    bucket_name       = module.test_mail_bucket.name
     object_key_prefix = "confirmation-emails/"
     position          = 1
   }
 
-  depends_on = [aws_s3_bucket_policy.test_mail_bucket]
+  depends_on = [module.test_mail_bucket]
 }
 
 resource "aws_ses_receipt_rule" "test_copy_of_answers_emails_to_s3" {
@@ -90,12 +86,12 @@ resource "aws_ses_receipt_rule" "test_copy_of_answers_emails_to_s3" {
   tls_policy    = "Require"
 
   s3_action {
-    bucket_name       = aws_s3_bucket.test_mail_bucket.id
+    bucket_name       = module.test_mail_bucket.name
     object_key_prefix = "copy-of-answers-emails/"
     position          = 1
   }
 
-  depends_on = [aws_s3_bucket_policy.test_mail_bucket]
+  depends_on = [module.test_mail_bucket]
 }
 
 resource "aws_ses_receipt_rule" "test_submission_emails_to_s3" {
@@ -107,10 +103,10 @@ resource "aws_ses_receipt_rule" "test_submission_emails_to_s3" {
   tls_policy    = "Require"
 
   s3_action {
-    bucket_name       = aws_s3_bucket.test_mail_bucket.id
+    bucket_name       = module.test_mail_bucket.name
     object_key_prefix = "submissions/"
     position          = 1
   }
 
-  depends_on = [aws_s3_bucket_policy.test_mail_bucket]
+  depends_on = [module.test_mail_bucket]
 }

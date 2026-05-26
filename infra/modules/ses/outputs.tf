@@ -20,5 +20,5 @@ output "submission_email_successful_deliveries_kms_key_arn" {
 }
 
 output "test_mail_bucket_name" {
-  value = aws_s3_bucket.test_mail_bucket.id
+  value = module.test_mail_bucket.name
 }
