@@ -42,12 +42,6 @@ variable "codestar_connection_arn" {
   description = "the arn of the deploy account github connection"
 }
 
-variable "service_role_arn" {
-  type        = string
-  description = "The arn of the service role to use"
-  nullable    = false
-}
-
 variable "auth0_user_name_parameter_name" {
   type        = string
   description = "The parameter name for the username for Auth0 login into forms-admin"
@@ -61,6 +55,12 @@ variable "auth0_user_password_parameter_name" {
 variable "notify_api_key_parameter_name" {
   type        = string
   description = "The parameter name for the Notify API key to use when checking for form submissions"
+}
+
+variable "service_role_arn" {
+  type        = string
+  description = "The ARN of the IAM role for the CodeBuild service"
+  nullable    = false
 }
 
 variable "deploy_account_id" {

@@ -300,7 +300,7 @@ module "run_end_to_end_tests" {
   product_pages_url       = "https://${var.root_domain}"
   forms_runner_url        = "https://submit.${var.root_domain}"
   artifact_store_arn      = module.artifact_bucket.arn
-  service_role_arn        = data.aws_iam_role.deployer_role.arn
+  service_role_arn        = aws_iam_role.e2e_service_role.arn
   deploy_account_id       = var.deploy_account_id
   codestar_connection_arn = var.codestar_connection_arn
   aws_s3_role_arn         = var.end_to_end_test_settings.aws_s3_role_arn
