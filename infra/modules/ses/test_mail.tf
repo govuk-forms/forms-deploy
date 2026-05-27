@@ -1,5 +1,5 @@
 locals {
-  test_mail_bucket_name = "govuk-forms-${replace(lower(var.environment_name), "_", "-")}-test-emails"
+  test_mail_bucket_name             = "govuk-forms-${replace(lower(var.environment_name), "_", "-")}-test-emails"
   test_mail_receipt_rule_source_arn = "arn:${data.aws_partition.current.partition}:ses:${data.aws_region.current.name}:${local.aws_account_id}:receipt-rule-set/${aws_ses_receipt_rule_set.test_mail.rule_set_name}:receipt-rule/*"
 }
 
