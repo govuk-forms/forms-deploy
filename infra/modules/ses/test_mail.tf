@@ -1,6 +1,11 @@
 locals {
   test_mail_bucket_name = "forms-${replace(lower(var.environment_name), "_", "-")}-test-emails"
+  test_mail_receipt_rule_source_arn = "arn:${data.aws_partition.current.partition}:ses:${data.aws_region.current.name}:${local.aws_account_id}:receipt-rule-set/${aws_ses_receipt_rule_set.test_mail.rule_set_name}:receipt-rule/*"
 }
+
+data "aws_partition" "current" {}
+
+data "aws_region" "current" {}
 
 data "aws_iam_policy_document" "test_mail_bucket" {
   statement {
@@ -16,8 +21,14 @@ data "aws_iam_policy_document" "test_mail_bucket" {
 
     condition {
       test     = "StringEquals"
-      variable = "aws:Referer"
+      variable = "aws:SourceAccount"
       values   = [local.aws_account_id]
+    }
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = [local.test_mail_receipt_rule_source_arn]
     }
   }
 }
