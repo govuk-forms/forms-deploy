@@ -916,6 +916,8 @@ data "aws_iam_policy_document" "s3" {
       "arn:aws:s3:::govuk-forms-*-pipeline-invoker-access-logs/*",
 
       "arn:aws:s3:::govuk-forms-${var.environment_name}-file-upload*",
+      "arn:aws:s3:::govuk-forms-${var.environment_name}-test-emails",
+      "arn:aws:s3:::govuk-forms-${var.environment_name}-test-emails/*",
 
       "arn:aws:s3:::gds-forms-${var.environment_type}-tfstate-access-logs",
       "arn:aws:s3:::gds-forms-${var.environment_type}-tfstate-access-logs/*",
@@ -987,6 +989,22 @@ data "aws_iam_policy_document" "ses" {
       "*"
     ]
     sid = "ManageSESConfigurationSet"
+  }
+
+  statement {
+    actions = [
+      "ses:CreateReceiptRule",
+      "ses:CreateReceiptRuleSet",
+      "ses:DeleteReceiptRule",
+      "ses:DeleteReceiptRuleSet",
+      "ses:SetActiveReceiptRuleSet",
+      "ses:UpdateReceiptRule"
+    ]
+    effect = "Allow"
+    resources = [
+      "*"
+    ]
+    sid = "ManageSESReceiptRules"
   }
 
   statement {

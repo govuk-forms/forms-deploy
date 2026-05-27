@@ -18,3 +18,7 @@ output "submission_email_bounces_and_complaints_kms_key_arn" {
 output "submission_email_successful_deliveries_kms_key_arn" {
   value = module.submission_email_successful_deliveries_sqs.kms_key_arn
 }
+
+output "test_mail_bucket_name" {
+  value = module.test_mail_bucket.name
+}
