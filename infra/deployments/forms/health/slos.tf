@@ -76,10 +76,10 @@ locals {
   submission_delivery_slos = {
     submission_delivery_latency = {
       name            = "submission-delivery-latency"
-      description     = "99% of submitted submissions are delivered under 5 minutes."
-      attainment_goal = 99
+      description     = "95% of submission deliveries complete within 1 hour of delivery being triggered."
+      attainment_goal = 95
       service         = "forms-runner"
-      threshold       = "300000"
+      threshold       = "3600000" # 1 hour in milliseconds
     }
   }
 }
