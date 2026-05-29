@@ -54,7 +54,7 @@ module "forms_runner" {
   deploy_account_id                               = var.deploy_account_id
   ses_submission_email_from_email_address         = var.forms_runner_settings.ses_submission_email_from_email_address
   ses_submission_email_reply_to_email_address     = var.forms_runner_settings.ses_submission_email_reply_to_email_address
-  ses_submission_configuration_set_name           = data.terraform_remote_state.forms_ses.outputs.form_submissions_configuration_set_name
+  ses_submissions_configuration_set_name          = data.terraform_remote_state.forms_ses.outputs.form_submissions_configuration_set_name
   ses_confirmations_configuration_set_name        = data.terraform_remote_state.forms_ses.outputs.form_confirmations_configuration_set_name
   govuk_one_login_base_url                        = var.forms_runner_settings.govuk_one_login_base_url
   additional_submissions_to_s3_role_assumers      = local.allowed_submissions_to_s3_role_assumers

@@ -203,7 +203,7 @@ module "ecs_service" {
     },
     {
       name  = "SETTINGS__AWS__SES_SUBMISSION_EMAIL_CONFIGURATION_SET_NAME",
-      value = var.ses_submission_configuration_set_name
+      value = var.ses_submissions_configuration_set_name
     },
     {
       name  = "SETTINGS__AWS__SES_CONFIRMATION_EMAIL_CONFIGURATION_SET_NAME",
