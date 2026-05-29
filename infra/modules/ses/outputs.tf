@@ -8,8 +8,20 @@ output "form_confirmations_configuration_set_name" {
   value       = aws_sesv2_configuration_set.form_confirmations.configuration_set_name
 }
 
+output "submission_email_bounces_and_complaints_queue_name" {
+  value = module.submission_email_bounces_and_complaints_sqs.queue_name
+}
+
+output "submission_email_successful_deliveries_queue_name" {
+  value = module.submission_email_successful_deliveries_sqs.queue_name
+}
+
 output "submission_email_bounces_and_complaints_dlq_name" {
   value = module.submission_email_bounces_and_complaints_sqs.dlq_name
+}
+
+output "confirmation_email_bounces_and_complaints_queue_name" {
+  value = module.confirmation_email_bounces_and_complaints_sqs.queue_name
 }
 
 output "auth0_email_bounces_and_complaints_queue_name" {
