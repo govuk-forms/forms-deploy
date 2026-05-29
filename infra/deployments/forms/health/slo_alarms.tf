@@ -14,30 +14,38 @@ locals {
   )
 
   # Burn rate alarm configurations; thresholds computed inline per alarm
+  # Note: both alarms in a composite pair, the threshold should be calculated
+  # using the longer look-back window of that pair — not each alarm's own window.
   burn_rate_configs = {
     fast_1hour = {
-      window_minutes = 60
-      budget_percent = 2
+      window_minutes           = 60
+      threshold_window_minutes = 60
+      budget_percent           = 2
     }
     fast_5min = {
-      window_minutes = 5
-      budget_percent = 2
+      window_minutes           = 5
+      threshold_window_minutes = 60 # Uses the longer look-back window of the pair (1 hour)
+      budget_percent           = 2
     }
     medium_6hour = {
-      window_minutes = 360
-      budget_percent = 5
+      window_minutes           = 360
+      threshold_window_minutes = 360
+      budget_percent           = 5
     }
     medium_30min = {
-      window_minutes = 30
-      budget_percent = 5
+      window_minutes           = 30
+      threshold_window_minutes = 360 # Uses the longer look-back window of the pair (6 hours)
+      budget_percent           = 5
     }
     slow_3day = {
-      window_minutes = 4320
-      budget_percent = 10
+      window_minutes           = 4320
+      threshold_window_minutes = 4320
+      budget_percent           = 10
     }
     slow_6hour = {
-      window_minutes = 360
-      budget_percent = 10
+      window_minutes           = 360
+      threshold_window_minutes = 4320 # Uses the longer look-back window of the pair (3 days)
+      budget_percent           = 10
     }
   }
 }
@@ -64,7 +72,8 @@ resource "aws_cloudwatch_metric_alarm" "slo_burn_rate_alarms" {
   period              = 60
   statistic           = "Average"
   # Burn rate threshold = X% * SLO interval length / look-back window size
-  threshold          = (each.value.config.budget_percent / 100.0) * local.slo_interval_minutes / each.value.config.window_minutes
+  # For both alarms in a composite pair, we use the longer look-back window of that pair per AWS guidelines
+  threshold          = (each.value.config.budget_percent / 100.0) * local.slo_interval_minutes / each.value.config.threshold_window_minutes
   treat_missing_data = "notBreaching"
 
   # These individual alarms don't send notifications directly - they are used by composite alarms
