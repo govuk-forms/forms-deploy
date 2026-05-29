@@ -13,6 +13,12 @@ locals {
     [for k, v in local.submission_delivery_slos : v.name]
   )
 
+  slo_descriptions = merge(
+    { for k, v in local.availability_slos : v.name => v.description },
+    { for k, v in local.latency_slos : v.name => v.description },
+    { for k, v in local.submission_delivery_slos : v.name => v.description }
+  )
+
   # Burn rate alarm configurations; thresholds computed inline per alarm
   # Note: both alarms in a composite pair, the threshold should be calculated
   # using the longer look-back window of that pair — not each alarm's own window.
@@ -64,7 +70,7 @@ resource "aws_cloudwatch_metric_alarm" "slo_burn_rate_alarms" {
   }
 
   alarm_name          = "slo-burn-rate-${each.value.slo_name}-${replace(each.value.config_key, "_", "-")}"
-  alarm_description   = "Burn rate alarm for ${each.value.slo_name} with ${each.value.config.window_minutes} minute window"
+  alarm_description   = "Internal burn-rate signal for SLO ${each.value.slo_name} (${each.value.config.window_minutes} min window). Used by composite SLO alarms only — notifications go to the fast/medium/slow composite alarm for this SLO."
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "BurnRate"
@@ -105,9 +111,14 @@ resource "aws_cloudwatch_composite_alarm" "slo_burn_rate_fast_alarms" {
 
   alarm_name        = each.value.alarm_name
   alarm_description = <<EOF
-    Fast burn rate detection for ${each.value.slo_name} (1-hour and 5-minute windows)
+    SLO: ${each.value.slo_name}
+    ${local.slo_descriptions[each.value.slo_name]}
 
-    NEXT STEP: Begin incident process immediately.
+    This SLO is at high risk of being missed in the next 48 hours.
+
+    Treat as a likely live incident.
+
+    Environment: ${var.environment_name}
 EOF
   alarm_rule        = "ALARM(slo-burn-rate-${each.value.slo_name}-fast-1hour) AND ALARM(slo-burn-rate-${each.value.slo_name}-fast-5min)"
   alarm_actions     = [module.alerts.alert_severity.eu_west_2.high]
@@ -132,9 +143,14 @@ resource "aws_cloudwatch_composite_alarm" "slo_burn_rate_medium_alarms" {
 
   alarm_name        = each.value.alarm_name
   alarm_description = <<EOF
-    Medium burn rate detection for ${each.value.slo_name} (6-hour and 30-minute windows)
+    SLO: ${each.value.slo_name}
+    ${local.slo_descriptions[each.value.slo_name]}
 
-    NEXT STEP: Begin incident process upon picking up ticket.
+    This SLO is at risk of being missed in the next week.
+
+    Treat as a likely live incident, but use your judgment on whether out-of-hours action is necessary.
+
+    Environment: ${var.environment_name}
 EOF
   alarm_rule        = "ALARM(slo-burn-rate-${each.value.slo_name}-medium-6hour) AND ALARM(slo-burn-rate-${each.value.slo_name}-medium-30min)"
   alarm_actions     = [module.alerts.alert_severity.eu_west_2.info]
@@ -159,10 +175,15 @@ resource "aws_cloudwatch_composite_alarm" "slo_burn_rate_slow_alarms" {
 
   alarm_name        = each.value.alarm_name
   alarm_description = <<EOF
-    Slow burn rate detection for ${each.value.slo_name} (3-day and 6-hour windows)"
+    SLO: ${each.value.slo_name}
+    ${local.slo_descriptions[each.value.slo_name]}
 
-    NEXT STEP: Investigate as support ticket or create Trello card to investigate during next sprint.
- EOF
+    This SLO is at risk of being missed in the next 28 days.
+
+    This usually indicates a gradual or recurring problem, not a sudden outage. Investigate as a backlog item for the next sprint.
+
+    Environment: ${var.environment_name}
+EOF
   alarm_rule        = "ALARM(slo-burn-rate-${each.value.slo_name}-slow-3day) AND ALARM(slo-burn-rate-${each.value.slo_name}-slow-6hour)"
   alarm_actions     = [module.alerts.alert_severity.eu_west_2.info]
   actions_enabled   = true
