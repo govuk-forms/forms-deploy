@@ -112,6 +112,28 @@ resource "aws_sesv2_configuration_set_event_destination" "form_submissions_deliv
   }
 }
 
+resource "aws_sesv2_configuration_set" "form_confirmations" {
+  configuration_set_name = "${var.environment_name}_form_confirmations"
+
+  reputation_options {
+    reputation_metrics_enabled = true
+  }
+}
+
+resource "aws_sesv2_configuration_set_event_destination" "form_confirmations_bounces_and_complaints" {
+  configuration_set_name = aws_sesv2_configuration_set.form_confirmations.configuration_set_name
+  event_destination_name = "form_confirmations_bounces_and_complaints"
+
+  event_destination {
+    enabled              = true
+    matching_event_types = ["BOUNCE", "COMPLAINT", "REJECT"]
+
+    sns_destination {
+      topic_arn = module.confirmation_email_bounces_and_complaints_sqs.aws_sns_topic
+    }
+  }
+}
+
 ##
 # SES v1 configuration
 #
