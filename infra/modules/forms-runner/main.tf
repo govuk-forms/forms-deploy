@@ -68,7 +68,8 @@ data "aws_iam_policy_document" "ecs_task_role_permissions" {
     ]
     resources = [
       "arn:aws:sqs:eu-west-2:${data.aws_caller_identity.current.account_id}:submission_email_ses_bounces_and_complaints_queue",
-      "arn:aws:sqs:eu-west-2:${data.aws_caller_identity.current.account_id}:submission_email_ses_successful_deliveries_queue"
+      "arn:aws:sqs:eu-west-2:${data.aws_caller_identity.current.account_id}:submission_email_ses_successful_deliveries_queue",
+      "arn:aws:sqs:eu-west-2:${data.aws_caller_identity.current.account_id}:confirmation_email_ses_bounces_and_complaints_queue"
     ]
   }
 
@@ -82,6 +83,7 @@ data "aws_iam_policy_document" "ecs_task_role_permissions" {
     resources = [
       var.bounces_and_complaints_kms_key_arn,
       var.deliveries_kms_key_arn,
+      var.confirmation_bounces_and_complaints_kms_key_arn,
     ]
   }
 }
@@ -202,6 +204,10 @@ module "ecs_service" {
     {
       name  = "SETTINGS__AWS__SES_SUBMISSION_EMAIL_CONFIGURATION_SET_NAME",
       value = var.ses_submission_configuration_set_name
+    },
+    {
+      name  = "SETTINGS__AWS__SES_CONFIRMATION_EMAIL_CONFIGURATION_SET_NAME",
+      value = var.ses_confirmations_configuration_set_name
     },
     {
       name  = "SETTINGS__SES_SUBMISSION_EMAIL__FROM_EMAIL_ADDRESS",

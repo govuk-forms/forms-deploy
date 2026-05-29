@@ -110,6 +110,12 @@ variable "ses_submission_configuration_set_name" {
   description = "The name of the configuration set to use when sending form submissions"
 }
 
+variable "ses_confirmations_configuration_set_name" {
+  type        = string
+  description = "The name of the configuration set to use when sending form confirmation emails"
+}
+
+
 variable "govuk_one_login_base_url" {
   type        = string
   description = "The base URL for GOV.UK One Login authentication requests"
@@ -177,6 +183,11 @@ variable "bounces_and_complaints_kms_key_arn" {
 variable "deliveries_kms_key_arn" {
   type        = string
   description = "The ARN of the KMS key to decrypt messages on the submission deliveries SQS queue"
+}
+
+variable "confirmation_bounces_and_complaints_kms_key_arn" {
+  type        = string
+  description = "The ARN of the KMS key to decrypt messages on the confirmation email bounces and complaints SQS queue"
 }
 
 variable "queue_worker_capacity" {
