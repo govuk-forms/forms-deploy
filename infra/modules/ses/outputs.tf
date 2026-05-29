@@ -24,6 +24,10 @@ output "confirmation_email_bounces_and_complaints_queue_name" {
   value = module.confirmation_email_bounces_and_complaints_sqs.queue_name
 }
 
+output "confirmation_email_bounces_and_complaints_dlq_name" {
+  value = module.confirmation_email_bounces_and_complaints_sqs.dlq_name
+}
+
 output "auth0_email_bounces_and_complaints_queue_name" {
   value = module.auth0_bounces_and_complaints_sqs.queue_name
 }
