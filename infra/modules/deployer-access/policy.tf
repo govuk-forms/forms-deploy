@@ -489,6 +489,11 @@ data "aws_iam_policy_document" "iam" {
       "iam:PutRolePolicy",
       "iam:TagRole"
     ]
+    condition {
+      variable = "iam:PermissionsBoundary"
+      test     = "StringEquals"
+      values   = [aws_iam_policy.permissions_boundary.arn]
+    }
     effect = "Allow"
     resources = [
       "arn:aws:iam::${var.account_id}:policy/codebuild-*",
@@ -513,6 +518,11 @@ data "aws_iam_policy_document" "iam" {
       "iam:UpdateAssumeRolePolicy",
       "iam:TagRole"
     ]
+    condition {
+      variable = "iam:PermissionsBoundary"
+      test     = "StringEquals"
+      values   = [aws_iam_policy.permissions_boundary.arn]
+    }
     effect = "Allow"
     resources = [
       "arn:aws:iam::${var.account_id}:role/${var.environment_name}-forms-admin-ecs-task",
@@ -539,6 +549,11 @@ data "aws_iam_policy_document" "iam" {
       "iam:TagRole",
       "iam:UpdateRole"
     ]
+    condition {
+      variable = "iam:PermissionsBoundary"
+      test     = "StringEquals"
+      values   = [aws_iam_policy.permissions_boundary.arn]
+    }
     effect = "Allow"
     resources = [
       "arn:aws:iam::${var.account_id}:role/shield-response-team",
@@ -560,6 +575,11 @@ data "aws_iam_policy_document" "iam" {
       "iam:UpdateAssumeRolePolicy",
       "iam:UpdateRole"
     ]
+    condition {
+      variable = "iam:PermissionsBoundary"
+      test     = "StringEquals"
+      values   = [aws_iam_policy.permissions_boundary.arn]
+    }
     effect = "Allow"
     resources = [
       "arn:aws:iam::${var.account_id}:role/govuk-forms-submissions-to-s3-${var.environment_name}",
