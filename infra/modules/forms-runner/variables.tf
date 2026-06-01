@@ -105,9 +105,29 @@ variable "ses_submission_email_reply_to_email_address" {
   description = "The reply-to email address for submission emails send by SES"
 }
 
-variable "ses_submission_configuration_set_name" {
+variable "ses_submissions_configuration_set_name" {
   type        = string
   description = "The name of the configuration set to use when sending form submissions"
+}
+
+variable "ses_confirmations_configuration_set_name" {
+  type        = string
+  description = "The name of the configuration set to use when sending form confirmation emails"
+}
+
+variable "submission_bounces_and_complaints_sqs_queue_name" {
+  type        = string
+  description = "The name of the SQS queue to which SES sends notifications of bounces and complaints for submission emails"
+}
+
+variable "submission_deliveries_sqs_queue_name" {
+  type        = string
+  description = "The name of the SQS queue to which SES sends notifications of successful deliveries for submission emails"
+}
+
+variable "confirmation_bounces_and_complaints_sqs_queue_name" {
+  type        = string
+  description = "The name of the SQS queue to which SES sends notifications of bounces and complaints for confirmation emails"
 }
 
 variable "govuk_one_login_base_url" {
@@ -169,14 +189,19 @@ variable "send_logs_to_cyber" {
   description = "Whether logs should be sent to cyber"
 }
 
-variable "bounces_and_complaints_kms_key_arn" {
+variable "submission_bounces_and_complaints_kms_key_arn" {
   type        = string
   description = "The ARN of the KMS key to decrypt messages on the submission bounces and complaints SQS queue"
 }
 
-variable "deliveries_kms_key_arn" {
+variable "submission_deliveries_kms_key_arn" {
   type        = string
   description = "The ARN of the KMS key to decrypt messages on the submission deliveries SQS queue"
+}
+
+variable "confirmation_bounces_and_complaints_kms_key_arn" {
+  type        = string
+  description = "The ARN of the KMS key to decrypt messages on the confirmation email bounces and complaints SQS queue"
 }
 
 variable "queue_worker_capacity" {

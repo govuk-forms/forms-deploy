@@ -67,8 +67,9 @@ data "aws_iam_policy_document" "ecs_task_role_permissions" {
       "sqs:ReceiveMessage"
     ]
     resources = [
-      "arn:aws:sqs:eu-west-2:${data.aws_caller_identity.current.account_id}:submission_email_ses_bounces_and_complaints_queue",
-      "arn:aws:sqs:eu-west-2:${data.aws_caller_identity.current.account_id}:submission_email_ses_successful_deliveries_queue"
+      "arn:aws:sqs:eu-west-2:${data.aws_caller_identity.current.account_id}:${var.submission_bounces_and_complaints_sqs_queue_name}",
+      "arn:aws:sqs:eu-west-2:${data.aws_caller_identity.current.account_id}:${var.submission_deliveries_sqs_queue_name}",
+      "arn:aws:sqs:eu-west-2:${data.aws_caller_identity.current.account_id}:${var.confirmation_bounces_and_complaints_sqs_queue_name}"
     ]
   }
 
@@ -80,8 +81,9 @@ data "aws_iam_policy_document" "ecs_task_role_permissions" {
       "kms:Decrypt",
     ]
     resources = [
-      var.bounces_and_complaints_kms_key_arn,
-      var.deliveries_kms_key_arn,
+      var.submission_bounces_and_complaints_kms_key_arn,
+      var.submission_deliveries_kms_key_arn,
+      var.confirmation_bounces_and_complaints_kms_key_arn,
     ]
   }
 }
@@ -201,7 +203,23 @@ module "ecs_service" {
     },
     {
       name  = "SETTINGS__AWS__SES_SUBMISSION_EMAIL_CONFIGURATION_SET_NAME",
-      value = var.ses_submission_configuration_set_name
+      value = var.ses_submissions_configuration_set_name
+    },
+    {
+      name  = "SETTINGS__AWS__SES_CONFIRMATION_EMAIL_CONFIGURATION_SET_NAME",
+      value = var.ses_confirmations_configuration_set_name
+    },
+    {
+      name  = "SETTINGS__AWS__SUBMISSION_EMAIL_BOUNCES_AND_COMPLAINTS_SQS_QUEUE_NAME",
+      value = var.submission_bounces_and_complaints_sqs_queue_name
+    },
+    {
+      name  = "SETTINGS__AWS__SUBMISSION_EMAIL_DELIVERIES_SQS_QUEUE_NAME",
+      value = var.submission_deliveries_sqs_queue_name
+    },
+    {
+      name  = "SETTINGS__AWS__CONFIRMATION_EMAIL_BOUNCES_AND_COMPLAINTS_SQS_QUEUE_NAME",
+      value = var.confirmation_bounces_and_complaints_sqs_queue_name
     },
     {
       name  = "SETTINGS__SES_SUBMISSION_EMAIL__FROM_EMAIL_ADDRESS",
