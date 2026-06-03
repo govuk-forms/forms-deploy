@@ -1,6 +1,32 @@
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
+locals {
+  main_container_definition = merge(
+    var.base_task_container_definition,
+    {
+      name    = "main"
+      command = var.command
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          awslogs-group         = var.application_log_group_name,
+          awslogs-region        = data.aws_region.current.id,
+          awslogs-stream-prefix = var.task_name
+        }
+      },
+      # Override dependsOn from the app task definition; scheduled tasks have no otel sidecar.
+      dependsOn = [],
+      # Strip OTEL env vars so tracing is not enabled without the collector sidecar.
+      environment = [
+        for env in var.base_task_container_definition.environment :
+        env
+        if !startswith(env.name, "OTEL_") && !endswith(env.name, "_OTEL")
+      ]
+    }
+  )
+}
+
 resource "aws_ecs_task_definition" "this" {
   family = var.task_name
 
@@ -17,21 +43,7 @@ resource "aws_ecs_task_definition" "this" {
     cpu_architecture        = "ARM64"
   }
 
-  container_definitions = jsonencode([merge(
-    var.base_task_container_definition,
-    {
-      name    = "main"
-      command = var.command
-      logConfiguration = {
-        logDriver = "awslogs",
-        options = {
-          awslogs-group         = var.application_log_group_name,
-          awslogs-region        = data.aws_region.current.name,
-          awslogs-stream-prefix = var.task_name
-        }
-      }
-    }
-  )])
+  container_definitions = jsonencode([local.main_container_definition])
 }
 
 resource "aws_cloudwatch_event_rule" "this" {
@@ -47,7 +59,7 @@ resource "aws_cloudwatch_event_target" "this" {
 
   ecs_target {
     # EventBridge must target task family ARN without revision to always run latest.
-    task_definition_arn = "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task-definition/${aws_ecs_task_definition.this.family}"
+    task_definition_arn = "arn:aws:ecs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:task-definition/${aws_ecs_task_definition.this.family}"
     launch_type         = "FARGATE"
     platform_version    = var.platform_version
 
