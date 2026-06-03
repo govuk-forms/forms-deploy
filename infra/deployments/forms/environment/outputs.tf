@@ -79,6 +79,10 @@ output "ecs_cluster_name" {
   value = module.environment.ecs_cluster_name
 }
 
+output "ecs_events_role_arn" {
+  value = module.environment.ecs_events_role_arn
+}
+
 output "private_internal_zone_id" {
   value = module.environment.private_internal_zone_id
 }
