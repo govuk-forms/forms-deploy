@@ -17,15 +17,6 @@ updates:
         patterns:
           - "*"
 
-  # Maintain Python dependencies (for Checkov)
-  - package-ecosystem: "pip"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    cooldown:
-      default-days: 7
-    open-pull-requests-limit: 10
-
   # Maintain Ruby dependencies
   - package-ecosystem: "bundler"
     directories:
