@@ -9,7 +9,7 @@ resource "aws_ecs_cluster" "forms" {
 
 
 ## ECS Events Role
-## This a common role used by EventBridge to run ECS tasks. Only needs to be created once per account.
+## This is a common role used by EventBridge to run ECS tasks. Only needs to be created once per account.
 
 data "aws_iam_policy_document" "ecs_events_assume_role" {
   statement {
