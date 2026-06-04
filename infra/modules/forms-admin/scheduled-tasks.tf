@@ -20,8 +20,8 @@ module "scheduled_tasks" {
   execution_role_arn                = module.ecs_service.task_definition.execution_role_arn
   task_role_arn                     = module.ecs_service.task_definition.task_role_arn
   requires_compatibilities          = module.ecs_service.task_definition.requires_compatibilities
-  cpu                               = module.ecs_service.task_definition.cpu
-  memory                            = module.ecs_service.task_definition.memory
+  cpu                               = var.cpu
+  memory                            = var.memory
   network_security_groups           = module.ecs_service.service.network_configuration[0].security_groups
   network_subnets                   = module.ecs_service.service.network_configuration[0].subnets
 }
