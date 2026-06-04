@@ -1,6 +1,29 @@
-variable "task_name" {
+variable "task_family" {
   type        = string
-  description = "The scheduled task name."
+  description = "ECS task definition family name."
+}
+
+variable "schedule_rule_name" {
+  type        = string
+  description = "EventBridge schedule rule name."
+}
+
+variable "schedule_rule_description" {
+  type        = string
+  description = "Optional EventBridge schedule rule description."
+  default     = null
+}
+
+variable "container_name" {
+  type        = string
+  description = "Container name in the task definition."
+  default     = "main"
+}
+
+variable "log_stream_prefix" {
+  type        = string
+  description = "CloudWatch Logs stream prefix; defaults to task_family when unset."
+  default     = null
 }
 
 variable "schedule_expression" {
@@ -77,4 +100,25 @@ variable "platform_version" {
   type        = string
   description = "ECS Fargate platform version."
   default     = "1.4.0"
+}
+
+variable "failure_alert" {
+  type = object({
+    rule_name      = string
+    description    = string
+    input_template = string
+  })
+  default     = null
+  description = "Optional EventBridge rule and SNS alert when the scheduled ECS task exits non-zero."
+}
+
+variable "zendesk_sns_topic_arn" {
+  type        = string
+  default     = null
+  description = "Zendesk SNS topic ARN for failure alerts. Required when failure_alert is set."
+
+  validation {
+    condition     = var.failure_alert == null || var.zendesk_sns_topic_arn != null
+    error_message = "zendesk_sns_topic_arn must be set when failure_alert is configured."
+  }
 }

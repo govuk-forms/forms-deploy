@@ -2,17 +2,19 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
+  log_stream_prefix = coalesce(var.log_stream_prefix, var.task_family)
+
   main_container_definition = merge(
     var.base_task_container_definition,
     {
-      name    = "main"
+      name    = var.container_name
       command = var.command
       logConfiguration = {
         logDriver = "awslogs",
         options = {
           awslogs-group         = var.application_log_group_name,
-          awslogs-region        = data.aws_region.current.id,
-          awslogs-stream-prefix = var.task_name
+          awslogs-region        = data.aws_region.current.region,
+          awslogs-stream-prefix = local.log_stream_prefix
         }
       },
       # Override dependsOn from the app task definition; scheduled tasks have no otel sidecar.
@@ -25,10 +27,15 @@ locals {
       ]
     }
   )
+
+  schedule_rule_description = coalesce(
+    var.schedule_rule_description,
+    "Trigger the ${var.task_family} ECS task on a schedule"
+  )
 }
 
 resource "aws_ecs_task_definition" "this" {
-  family = var.task_name
+  family = var.task_family
 
   execution_role_arn       = var.execution_role_arn
   task_role_arn            = var.task_role_arn
@@ -47,8 +54,8 @@ resource "aws_ecs_task_definition" "this" {
 }
 
 resource "aws_cloudwatch_event_rule" "this" {
-  name                = var.task_name
-  description         = "Trigger the ${var.task_name} ECS task on a schedule"
+  name                = var.schedule_rule_name
+  description         = local.schedule_rule_description
   schedule_expression = var.schedule_expression
 }
 
@@ -59,7 +66,7 @@ resource "aws_cloudwatch_event_target" "this" {
 
   ecs_target {
     # EventBridge must target task family ARN without revision to always run latest.
-    task_definition_arn = "arn:aws:ecs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:task-definition/${aws_ecs_task_definition.this.family}"
+    task_definition_arn = "arn:aws:ecs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:task-definition/${aws_ecs_task_definition.this.family}"
     launch_type         = "FARGATE"
     platform_version    = var.platform_version
 
