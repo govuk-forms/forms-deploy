@@ -7,7 +7,7 @@ module "scheduled_tasks" {
     for task_name, task in local.scheduled_tasks : task_name => task
     if task.enabled
   }
-  source   = "../ecs-scheduled-task"
+  source = "../ecs-scheduled-task"
 
   task_name                         = "forms-admin-${replace(each.key, "_", "-")}"
   schedule_expression               = each.value.schedule_expression
