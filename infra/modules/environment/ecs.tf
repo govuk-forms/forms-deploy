@@ -24,7 +24,7 @@ data "aws_iam_policy_document" "ecs_events_assume_role" {
 }
 
 resource "aws_iam_role" "ecs_events" {
-  name               = "ecsEventsRole"
+  name               = "ecs-events-role"
   assume_role_policy = data.aws_iam_policy_document.ecs_events_assume_role.json
 }
 

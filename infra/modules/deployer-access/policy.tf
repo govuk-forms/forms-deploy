@@ -495,7 +495,7 @@ data "aws_iam_policy_document" "iam" {
       "arn:aws:iam::${var.account_id}:role/codebuild-*",
       "arn:aws:iam::${var.account_id}:role/${var.environment_name}-event-bridge-*",
       "arn:aws:iam::${var.account_id}:role/event-bridge-actor",
-      "arn:aws:iam::${var.account_id}:role/ecsEventsRole",
+      "arn:aws:iam::${var.account_id}:role/ecs-events-role",
       "arn:aws:iam::${var.account_id}:role/deployer-${var.environment_name}",
       "arn:aws:iam::${var.account_id}:role/malware-protection-for-s3"
     ]
