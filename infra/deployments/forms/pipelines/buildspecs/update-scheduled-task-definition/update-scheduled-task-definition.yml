@@ -1,0 +1,32 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+      - |
+        if [[ "${IMAGE_URI}" = "MUST_BE_SET" ]]; then
+          echo "The IMAGE_URI has not been set by the caller. The value of IMAGE_URI is \"${IMAGE_URI}\""
+          exit 1
+        fi
+      - |
+        if [[ -z "${TASK_DEFINITION_FAMILIES}" || "${TASK_DEFINITION_FAMILIES}" = "[]" ]]; then
+          echo "No scheduled task families to update."
+          exit 0
+        fi
+  build:
+    commands:
+      - |
+        set -e
+        set -o pipefail
+        while read -r TASK_DEFINITION_NAME; do
+          echo "Updating scheduled task definition family: ${TASK_DEFINITION_NAME}"
+
+          ECS_TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition "${TASK_DEFINITION_NAME}" --include TAGS)
+          TAGS=$(echo "${ECS_TASK_DEFINITION}" | jq -c '.tags // []')
+          echo "Preserving tags: ${TAGS}"
+
+          NEW_ECS_TASK_DEFINITION=$(echo "${ECS_TASK_DEFINITION}" | jq --arg "INPUT_IMAGE_URI" "${IMAGE_URI}" '.taskDefinition | .containerDefinitions[0].image = $INPUT_IMAGE_URI | del(.taskDefinitionArn) | del(.revision) | del(.status) | del(.requiresAttributes) | del(.compatibilities) | del(.registeredAt) | del(.registeredBy)')
+          echo "Replaced image uri with ${IMAGE_URI}"
+
+          NEW_ECS_TASK_DEFINITION_ARN=$(aws ecs register-task-definition --cli-input-json "$NEW_ECS_TASK_DEFINITION" --tags "$TAGS" | jq -r '.taskDefinition.taskDefinitionArn')
+          echo "New task definition ARN for ${TASK_DEFINITION_NAME}: ${NEW_ECS_TASK_DEFINITION_ARN}"
+        done < <(echo "${TASK_DEFINITION_FAMILIES}" | jq -r '.[]')
