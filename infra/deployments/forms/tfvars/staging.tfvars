@@ -17,6 +17,7 @@ environmental_settings = {
     ".gov.uk",
   ]
   enable_alert_actions                = true
+  enable_slo_burn_rate_alert_actions  = false
   forms_product_page_support_url      = "https://www.staging.forms.service.gov.uk/support"
   rds_maintenance_window              = "wed:04:00-wed:04:30"
   rds_minimum_capacity_acus           = 1

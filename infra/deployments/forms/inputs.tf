@@ -193,6 +193,7 @@ variable "environmental_settings" {
     database_backup_retention_period_days    = number
     allow_authentication_from_email_domains  = list(string)
     enable_alert_actions                     = bool
+    enable_slo_burn_rate_alert_actions       = bool
     forms_product_page_support_url           = string
     rds_maintenance_window                   = string
     rds_minimum_capacity_acus                = number
