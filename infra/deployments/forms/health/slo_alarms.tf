@@ -54,6 +54,8 @@ locals {
       budget_percent           = 10
     }
   }
+
+  slo_composite_alarm_actions_enabled = var.environmental_settings.enable_alert_actions && var.environmental_settings.enable_slo_burn_rate_alert_actions
 }
 
 # Individual burn rate alarms
@@ -121,8 +123,8 @@ resource "aws_cloudwatch_composite_alarm" "slo_burn_rate_fast_alarms" {
     Environment: ${var.environment_name}
 EOF
   alarm_rule        = "ALARM(slo-burn-rate-${each.value.slo_name}-fast-1hour) AND ALARM(slo-burn-rate-${each.value.slo_name}-fast-5min)"
-  alarm_actions     = [module.alerts.alert_severity.eu_west_2.high]
-  actions_enabled   = true
+  alarm_actions     = local.slo_composite_alarm_actions_enabled ? [module.alerts.alert_severity.eu_west_2.high] : []
+  actions_enabled   = local.slo_composite_alarm_actions_enabled
   depends_on        = [aws_cloudwatch_metric_alarm.slo_burn_rate_alarms]
 
   tags = {
@@ -153,8 +155,8 @@ resource "aws_cloudwatch_composite_alarm" "slo_burn_rate_medium_alarms" {
     Environment: ${var.environment_name}
 EOF
   alarm_rule        = "ALARM(slo-burn-rate-${each.value.slo_name}-medium-6hour) AND ALARM(slo-burn-rate-${each.value.slo_name}-medium-30min)"
-  alarm_actions     = [module.alerts.alert_severity.eu_west_2.info]
-  actions_enabled   = true
+  alarm_actions     = local.slo_composite_alarm_actions_enabled ? [module.alerts.alert_severity.eu_west_2.info] : []
+  actions_enabled   = local.slo_composite_alarm_actions_enabled
   depends_on        = [aws_cloudwatch_metric_alarm.slo_burn_rate_alarms]
 
   tags = {
@@ -185,8 +187,8 @@ resource "aws_cloudwatch_composite_alarm" "slo_burn_rate_slow_alarms" {
     Environment: ${var.environment_name}
 EOF
   alarm_rule        = "ALARM(slo-burn-rate-${each.value.slo_name}-slow-3day) AND ALARM(slo-burn-rate-${each.value.slo_name}-slow-6hour)"
-  alarm_actions     = [module.alerts.alert_severity.eu_west_2.info]
-  actions_enabled   = true
+  alarm_actions     = local.slo_composite_alarm_actions_enabled ? [module.alerts.alert_severity.eu_west_2.info] : []
+  actions_enabled   = local.slo_composite_alarm_actions_enabled
   depends_on        = [aws_cloudwatch_metric_alarm.slo_burn_rate_alarms]
 
   tags = {

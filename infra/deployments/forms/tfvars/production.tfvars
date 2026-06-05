@@ -15,6 +15,7 @@ environmental_settings = {
   # Set to 24 hours for inactivity just in case the pause_database_on_inactivity flag is inverted or ignored
   database_backup_retention_period_days = 30
   enable_alert_actions                  = true
+  enable_slo_burn_rate_alert_actions    = true
   allow_authentication_from_email_domains = [
     ".gov.scot",
     ".gov.uk",

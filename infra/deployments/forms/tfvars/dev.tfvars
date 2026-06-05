@@ -15,6 +15,7 @@ environmental_settings = {
   database_backup_retention_period_days    = 30
   allow_authentication_from_email_domains  = [".gov.uk"]
   enable_alert_actions                     = false
+  enable_slo_burn_rate_alert_actions       = false
   forms_product_page_support_url           = "https://www.dev.forms.service.gov.uk/support"
   rds_maintenance_window                   = "wed:04:00-wed:04:30"
   rds_minimum_capacity_acus                = 0.5
