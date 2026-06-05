@@ -276,9 +276,12 @@ module "deploy_product_pages_end_to_end_tests" {
   aws_s3_bucket           = var.end_to_end_test_settings.aws_s3_bucket
   s3_form_id              = var.end_to_end_test_settings.s3_form_id
 
-  auth0_user_name_parameter_name     = module.automated_test_parameters[0].auth0_user_name_parameter_name
-  auth0_user_password_parameter_name = module.automated_test_parameters[0].auth0_user_password_parameter_name
-  notify_api_key_parameter_name      = module.automated_test_parameters[0].notify_api_key_parameter_name
+  auth0_user_name_parameter_name               = module.automated_test_parameters[0].auth0_user_name_parameter_name
+  auth0_user_password_parameter_name           = module.automated_test_parameters[0].auth0_user_password_parameter_name
+  notify_api_key_parameter_name                = module.automated_test_parameters[0].notify_api_key_parameter_name
+  one_login_user_email_parameter_name          = module.automated_test_parameters[0].one_login_user_email_parameter_name
+  one_login_user_password_parameter_name       = module.automated_test_parameters[0].one_login_user_password_parameter_name
+  one_login_user_otp_secret_key_parameter_name = module.automated_test_parameters[0].one_login_user_otp_secret_key_parameter_name
 }
 
 module "pull_forms_product_page_image_retag_and_push" {

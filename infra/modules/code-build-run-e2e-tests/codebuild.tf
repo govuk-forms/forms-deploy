@@ -97,6 +97,24 @@ resource "aws_codebuild_project" "e2e" {
       type  = "PARAMETER_STORE"
       value = "/forms-runner-${var.environment_name}/submission_status_api_shared_secret"
     }
+
+    environment_variable {
+      name  = "SETTINGS__GOVUK_ONE_LOGIN__USER_EMAIL"
+      value = var.one_login_user_email_parameter_name
+      type  = "PARAMETER_STORE"
+    }
+
+    environment_variable {
+      name  = "SETTINGS__GOVUK_ONE_LOGIN__USER_PASSWORD"
+      value = var.one_login_user_password_parameter_name
+      type  = "PARAMETER_STORE"
+    }
+
+    environment_variable {
+      name  = "SETTINGS__GOVUK_ONE_LOGIN__USER_OTP_SECRET_KEY"
+      value = var.one_login_user_otp_secret_key_parameter_name
+      type  = "PARAMETER_STORE"
+    }
   }
 
   source {

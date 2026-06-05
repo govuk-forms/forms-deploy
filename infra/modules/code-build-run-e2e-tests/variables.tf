@@ -57,6 +57,21 @@ variable "notify_api_key_parameter_name" {
   description = "The parameter name for the Notify API key to use when checking for form submissions"
 }
 
+variable "one_login_user_email_parameter_name" {
+  type        = string
+  description = "The parameter name for the email address for logging in to One Login as a test user"
+}
+
+variable "one_login_user_password_parameter_name" {
+  type        = string
+  description = "The parameter name for the password for logging in to One Login as a test user"
+}
+
+variable "one_login_user_otp_secret_key_parameter_name" {
+  type        = string
+  description = "The parameter name for the secret for generating OTP codes for logging in to One Login as a test user"
+}
+
 variable "service_role_arn" {
   type        = string
   description = "The ARN of the IAM role for the CodeBuild service"
