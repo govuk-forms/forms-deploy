@@ -26,4 +26,5 @@ module "alerts" {
   auth0_email_bounces_and_complaints_queue_name      = data.terraform_remote_state.forms_ses.outputs.auth0_email_bounces_and_complaints_queue_name
   submission_email_bounces_and_complaints_dlq_name   = data.terraform_remote_state.forms_ses.outputs.submission_email_bounces_and_complaints_dlq_name
   confirmation_email_bounces_and_complaints_dlq_name = data.terraform_remote_state.forms_ses.outputs.confirmation_email_bounces_and_complaints_dlq_name
+  form_confirmations_configuration_set_name          = data.terraform_remote_state.forms_ses.outputs.form_confirmations_configuration_set_name
 }
