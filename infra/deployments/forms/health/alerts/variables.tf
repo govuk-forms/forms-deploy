@@ -65,3 +65,8 @@ variable "confirmation_email_bounces_and_complaints_dlq_name" {
   type        = string
   description = "The name of the SQS queue for dead letters on the confirmation emails bounces and complaints queue"
 }
+
+variable "form_confirmations_configuration_set_name" {
+  description = "SES configuration set name for form confirmation emails"
+  type        = string
+}
