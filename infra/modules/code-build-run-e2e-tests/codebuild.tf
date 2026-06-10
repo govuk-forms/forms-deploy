@@ -67,13 +67,13 @@ resource "aws_codebuild_project" "e2e" {
     }
 
     environment_variable {
-      name  = "SETTINGS__AWS__S3_SUBMISSION_IAM_ROLE_ARN"
-      value = var.aws_s3_role_arn
+      name  = "SETTINGS__AWS__S3_SUBMISSION_BUCKET_NAME"
+      value = var.aws_s3_bucket
     }
 
     environment_variable {
-      name  = "SETTINGS__AWS__FILE_UPLOAD_S3_BUCKET_NAME"
-      value = var.aws_s3_bucket
+      name  = "SETTINGS__AWS__S3_SUBMISSION_IAM_ROLE_ARN"
+      value = var.aws_s3_role_arn
     }
 
     environment_variable {

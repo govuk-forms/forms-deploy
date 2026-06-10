@@ -115,7 +115,7 @@ module "docker_build" {
       type  = "PLAINTEXT"
     },
     {
-      name  = "SETTINGS__AWS__FILE_UPLOAD_S3_BUCKET_NAME"
+      name  = "SETTINGS__AWS__S3_SUBMISSION_BUCKET_NAME"
       value = "govuk-forms-submissions-to-s3-test"
       type  = "PLAINTEXT"
     },
