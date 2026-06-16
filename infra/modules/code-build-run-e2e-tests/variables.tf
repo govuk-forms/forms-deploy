@@ -98,3 +98,8 @@ variable "s3_form_id" {
   type        = string
   description = "The id of the form that you want to run the s3 submission type end to end tests against"
 }
+
+variable "email_receiver_s3_bucket_name" {
+  type        = string
+  description = "The name of the S3 bucket that SES will deliver test submission and confirmation emails to"
+}

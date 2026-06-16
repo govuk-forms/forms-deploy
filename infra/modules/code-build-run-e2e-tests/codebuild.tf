@@ -115,6 +115,11 @@ resource "aws_codebuild_project" "e2e" {
       value = var.one_login_user_otp_secret_key_parameter_name
       type  = "PARAMETER_STORE"
     }
+
+    environment_variable {
+      name  = "SETTINGS__AWS__EMAIL_RECEIVER_S3_BUCKET_NAME"
+      value = var.email_receiver_s3_bucket_name
+    }
   }
 
   source {
