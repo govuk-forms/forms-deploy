@@ -176,7 +176,8 @@ scheduled_smoke_tests_settings = {
   enable_alerting              = true
 }
 end_to_end_test_settings = {
-  aws_s3_role_arn = "arn:aws:iam::443944947292:role/govuk-s3-end-to-end-test-production"
-  aws_s3_bucket   = "govuk-forms-submissions-to-s3-test"
-  s3_form_id      = "5086"
+  aws_s3_role_arn               = "arn:aws:iam::443944947292:role/govuk-s3-end-to-end-test-production"
+  aws_s3_bucket                 = "govuk-forms-submissions-to-s3-test"
+  s3_form_id                    = "5086"
+  email_receiver_s3_bucket_name = "govuk-forms-production-test-emails"
 }

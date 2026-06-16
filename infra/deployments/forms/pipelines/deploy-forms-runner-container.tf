@@ -349,21 +349,22 @@ module "generate_forms_runner_container_image_defs" {
 }
 
 module "deploy_runner_end_to_end_tests" {
-  count                   = var.deploy-forms-runner-container.disable_end_to_end_tests == false ? 1 : 0
-  source                  = "../../../modules/code-build-run-e2e-tests"
-  app_name                = "forms-runner"
-  environment_name        = var.environment_name
-  container_registry      = var.container_registry
-  forms_admin_url         = "https://admin.${var.root_domain}"
-  product_pages_url       = "https://${var.root_domain}"
-  forms_runner_url        = "https://submit.${var.root_domain}"
-  artifact_store_arn      = module.artifact_bucket.arn
-  service_role_arn        = aws_iam_role.e2e_service_role.arn
-  deploy_account_id       = var.deploy_account_id
-  codestar_connection_arn = var.codestar_connection_arn
-  aws_s3_role_arn         = var.end_to_end_test_settings.aws_s3_role_arn
-  aws_s3_bucket           = var.end_to_end_test_settings.aws_s3_bucket
-  s3_form_id              = var.end_to_end_test_settings.s3_form_id
+  count                         = var.deploy-forms-runner-container.disable_end_to_end_tests == false ? 1 : 0
+  source                        = "../../../modules/code-build-run-e2e-tests"
+  app_name                      = "forms-runner"
+  environment_name              = var.environment_name
+  container_registry            = var.container_registry
+  forms_admin_url               = "https://admin.${var.root_domain}"
+  product_pages_url             = "https://${var.root_domain}"
+  forms_runner_url              = "https://submit.${var.root_domain}"
+  artifact_store_arn            = module.artifact_bucket.arn
+  service_role_arn              = aws_iam_role.e2e_service_role.arn
+  deploy_account_id             = var.deploy_account_id
+  codestar_connection_arn       = var.codestar_connection_arn
+  aws_s3_role_arn               = var.end_to_end_test_settings.aws_s3_role_arn
+  aws_s3_bucket                 = var.end_to_end_test_settings.aws_s3_bucket
+  s3_form_id                    = var.end_to_end_test_settings.s3_form_id
+  email_receiver_s3_bucket_name = var.end_to_end_test_settings.email_receiver_s3_bucket_name
 
   auth0_user_name_parameter_name               = module.automated_test_parameters[0].auth0_user_name_parameter_name
   auth0_user_password_parameter_name           = module.automated_test_parameters[0].auth0_user_password_parameter_name

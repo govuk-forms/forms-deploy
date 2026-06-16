@@ -148,6 +148,11 @@ module "docker_build" {
       name  = "SETTINGS__GOVUK_ONE_LOGIN__USER_OTP_SECRET_KEY"
       value = "/staging/automated-tests/e2e/one-login/user-otp-secret-key"
       type  = "PARAMETER_STORE"
+    },
+    {
+      name  = "SETTINGS__AWS__EMAIL_RECEIVER_S3_BUCKET_NAME"
+      value = "govuk-forms-staging-test-emails"
+      type  = "PLAINTEXT"
     }
   ]
 }
