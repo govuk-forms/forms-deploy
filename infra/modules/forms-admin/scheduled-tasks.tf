@@ -79,12 +79,12 @@ module "scheduled_tasks" {
   memory                            = var.memory
   network_security_groups           = module.ecs_service.service.network_configuration[0].security_groups
   network_subnets                   = module.ecs_service.service.network_configuration[0].subnets
-  failure_alert = {
+  failure_alert = try(each.value.failure_alert, null) != null ? {
     rule_name      = "${var.env_name}-forms-admin-${each.value.failure_alert.rule_name_suffix}"
     description    = each.value.failure_alert.description
     input_template = each.value.failure_alert.input_template
-  }
-  zendesk_sns_topic_arn = var.zendesk_sns_topic_arn
+  } : null
+  zendesk_sns_topic_arn = try(each.value.failure_alert, null) != null ? var.zendesk_sns_topic_arn : null
 }
 
 moved {
