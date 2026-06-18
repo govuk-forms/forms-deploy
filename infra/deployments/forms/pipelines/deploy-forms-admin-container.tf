@@ -1,3 +1,11 @@
+locals {
+  # `scheduled_task_families` is read from the forms-admin remote state. On a fresh account, or on the
+  # first apply of this change, the pipelines deployment is applied before the forms-admin deployment,
+  # so this output may not exist yet. Default to an empty list to avoid an "unsupported attribute"
+  # error; the update-scheduled-task-definitions action is then omitted until forms-admin exports it.
+  scheduled_task_families = try(data.terraform_remote_state.forms_admin.outputs.scheduled_task_families, [])
+}
+
 ## Triggers
 resource "aws_cloudwatch_event_rule" "admin_on_image_tag" {
   name        = "admin-on-${var.environment_name}-image-tag"
@@ -224,14 +232,14 @@ resource "aws_codepipeline" "deploy_admin_container" {
     }
 
     dynamic "action" {
-      for_each = length(data.terraform_remote_state.forms_admin.outputs.scheduled_task_families) > 0 ? [1] : []
+      for_each = length(local.scheduled_task_families) > 0 ? [1] : []
       content {
-        name            = "update-scheduled-task-definitions"
-        category        = "Build"
-        owner           = "AWS"
-        provider        = "CodeBuild"
-        version         = "1"
-        run_order       = 2
+        name      = "update-scheduled-task-definitions"
+        category  = "Build"
+        owner     = "AWS"
+        provider  = "CodeBuild"
+        version   = "1"
+        run_order = 2
         # AWS requires an input artifact; using buildspec_source as a relevant default.
         input_artifacts = ["buildspec_source"]
         configuration = {
@@ -239,7 +247,7 @@ resource "aws_codepipeline" "deploy_admin_container" {
           EnvironmentVariables = jsonencode([
             {
               name  = "TASK_DEFINITION_FAMILIES"
-              value = jsonencode(data.terraform_remote_state.forms_admin.outputs.scheduled_task_families)
+              value = jsonencode(local.scheduled_task_families)
               type  = "PLAINTEXT"
             },
             {
