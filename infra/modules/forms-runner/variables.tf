@@ -80,6 +80,12 @@ variable "analytics_enabled" {
   default     = false
 }
 
+variable "copy_of_answers_enabled" {
+  type        = bool
+  description = "Globally enables/disables asking people if they want a copy of their answers. If enabled, users are only asked if the form creator has enabled it for the form."
+  default     = true
+}
+
 variable "deploy_account_id" {
   type        = string
   description = "the account number for the deploy account"

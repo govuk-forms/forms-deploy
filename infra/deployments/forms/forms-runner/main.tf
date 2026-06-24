@@ -49,6 +49,7 @@ module "forms_runner" {
   enable_maintenance_mode                            = var.forms_runner_settings.enable_maintenance_mode
   cloudwatch_metrics_enabled                         = var.forms_runner_settings.cloudwatch_metrics_enabled
   analytics_enabled                                  = var.forms_runner_settings.analytics_enabled
+  copy_of_answers_enabled                            = var.forms_runner_settings.copy_of_answers_enabled
   enable_opentelemetry                               = var.forms_runner_settings.enable_opentelemetry
   opentelemetry_head_sampler_ratio                   = var.forms_runner_settings.opentelemetry_head_sampler_ratio
   deploy_account_id                                  = var.deploy_account_id

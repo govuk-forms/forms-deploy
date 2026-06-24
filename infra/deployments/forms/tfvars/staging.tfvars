@@ -66,6 +66,7 @@ forms_runner_settings = {
   enable_maintenance_mode                                         = false
   cloudwatch_metrics_enabled                                      = true
   analytics_enabled                                               = true
+  copy_of_answers_enabled                                         = true
   enable_opentelemetry                                            = true
   opentelemetry_head_sampler_ratio                                = "0.1"
   allow_human_readonly_roles_to_assume_submissions_to_s3_role     = false

@@ -194,6 +194,10 @@ module "ecs_service" {
       value = var.analytics_enabled
     },
     {
+      name  = "SETTINGS__COPY_OF_ANSWERS_ENABLED",
+      value = var.copy_of_answers_enabled
+    },
+    {
       name  = "SETTINGS__AWS__S3_SUBMISSION_IAM_ROLE_ARN",
       value = aws_iam_role.submissions_to_s3_role.arn
     },
