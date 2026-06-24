@@ -168,6 +168,7 @@ variable "forms_runner_settings" {
     enable_maintenance_mode                                         = bool
     cloudwatch_metrics_enabled                                      = bool
     analytics_enabled                                               = bool
+    copy_of_answers_enabled                                         = bool
     enable_opentelemetry                                            = optional(bool, false)
     opentelemetry_head_sampler_ratio                                = string
     allow_human_readonly_roles_to_assume_submissions_to_s3_role     = bool
@@ -177,7 +178,6 @@ variable "forms_runner_settings" {
     govuk_one_login_base_url                                        = string
     queue_worker_capacity                                           = string
     disable_builtin_solidqueue_worker                               = bool
-    filler_answer_email_enabled                                     = bool
   })
 }
 

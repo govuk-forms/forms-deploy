@@ -80,6 +80,12 @@ variable "analytics_enabled" {
   default     = false
 }
 
+variable "copy_of_answers_enabled" {
+  type        = bool
+  description = "Globally enables/disables asking people if they want a copy of their answers. If enabled, users are only asked if the form creator has enabled it for the form."
+  default     = true
+}
+
 variable "deploy_account_id" {
   type        = string
   description = "the account number for the deploy account"
@@ -237,10 +243,4 @@ variable "opentelemetry_head_sampler_ratio" {
   type        = string
   description = "Sampling ratio configuration in OpenTelemetry. This tells the Ruby SDK to sample spans such that only this ratio of traces gets exported. This assumes we are using a `TraceIdRatioBased` sampler. By default all spans are sampled"
   default     = "1"
-}
-
-variable "filler_answer_email_enabled" {
-  type        = bool
-  description = "Enables the flag to send offer fillers an email containing the answers from a form submission"
-  default     = false
 }

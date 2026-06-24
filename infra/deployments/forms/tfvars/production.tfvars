@@ -157,6 +157,7 @@ forms_runner_settings = {
   enable_maintenance_mode                                         = false
   cloudwatch_metrics_enabled                                      = true
   analytics_enabled                                               = true
+  copy_of_answers_enabled                                         = true
   enable_opentelemetry                                            = true
   opentelemetry_head_sampler_ratio                                = "0.1"
   allow_human_readonly_roles_to_assume_submissions_to_s3_role     = false
@@ -167,7 +168,6 @@ forms_runner_settings = {
   govuk_one_login_base_url          = "https://oidc.integration.account.gov.uk/"
   queue_worker_capacity             = 6
   disable_builtin_solidqueue_worker = true
-  filler_answer_email_enabled       = false
 }
 scheduled_smoke_tests_settings = {
   enable_scheduled_smoke_tests = true
