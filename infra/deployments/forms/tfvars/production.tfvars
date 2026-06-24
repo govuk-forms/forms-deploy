@@ -168,7 +168,6 @@ forms_runner_settings = {
   govuk_one_login_base_url          = "https://oidc.integration.account.gov.uk/"
   queue_worker_capacity             = 6
   disable_builtin_solidqueue_worker = true
-  filler_answer_email_enabled       = false
 }
 scheduled_smoke_tests_settings = {
   enable_scheduled_smoke_tests = true
