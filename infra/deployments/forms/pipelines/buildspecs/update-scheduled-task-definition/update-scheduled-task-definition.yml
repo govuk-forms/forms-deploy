@@ -24,8 +24,8 @@ phases:
           TAGS=$(echo "${ECS_TASK_DEFINITION}" | jq -c '.tags // []')
           echo "Preserving tags: ${TAGS}"
 
-          NEW_ECS_TASK_DEFINITION=$(echo "${ECS_TASK_DEFINITION}" | jq --arg "INPUT_IMAGE_URI" "${IMAGE_URI}" '.taskDefinition | .containerDefinitions[0].image = $INPUT_IMAGE_URI | del(.taskDefinitionArn) | del(.revision) | del(.status) | del(.requiresAttributes) | del(.compatibilities) | del(.registeredAt) | del(.registeredBy)')
-          echo "Replaced image uri with ${IMAGE_URI}"
+          NEW_ECS_TASK_DEFINITION=$(echo "${ECS_TASK_DEFINITION}" | jq --arg "INPUT_IMAGE_URI" "${IMAGE_URI}" --arg "APP_NAME" "${APP_NAME}" '.taskDefinition | .containerDefinitions |= map(if .name == $APP_NAME then .image = $INPUT_IMAGE_URI else . end) | del(.taskDefinitionArn) | del(.revision) | del(.status) | del(.requiresAttributes) | del(.compatibilities) |  del(.registeredAt)  | del(.registeredBy)')
+          echo "Replaced image uri with ${IMAGE_URI} for container ${APP_NAME}"
 
           NEW_ECS_TASK_DEFINITION_ARN=$(aws ecs register-task-definition --cli-input-json "$NEW_ECS_TASK_DEFINITION" --tags "$TAGS" | jq -r '.taskDefinition.taskDefinitionArn')
           echo "New task definition ARN for ${TASK_DEFINITION_NAME}: ${NEW_ECS_TASK_DEFINITION_ARN}"
