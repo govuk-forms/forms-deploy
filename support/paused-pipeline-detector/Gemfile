@@ -3,7 +3,7 @@
 source "https://rubygems.org"
 
 gem "aws-sdk-codepipeline", "~> 1.117"
-gem "aws-sdk-sns", "~> 1.116"
+gem "aws-sdk-sns", "~> 1.117"
 
 group :development, :test do
   gem "rexml", "~> 3.4"
