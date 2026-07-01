@@ -48,6 +48,7 @@ data "aws_iam_policy_document" "permissions_boundary" {
       "sqs:*",
       "ssm:*",
       "wafv2:*",
+      "xray:*",
     ]
 
   }
@@ -58,10 +59,10 @@ data "aws_iam_policy_document" "permissions_boundary" {
     actions = [
       "sts:AssumeRole"
     ]
+    # forms-runner-ecs-task assumes submissions-to-s3; codebuild-e2e-tests assumes s3-end-to-end-test
     resources = [
-      // Include only specific roles - do we just hardcode these? either way, we should make sure the roles themselves have a permissions boundary
-      // does this include human roles and the end-to-end-test role?
-      //specific roles in own account. Other accounts *
+      "arn:aws:iam::${var.account_id}:role/govuk-forms-submissions-to-s3-*",
+      "arn:aws:iam::${var.account_id}:role/govuk-s3-end-to-end-test-*",
     ]
   }
 
