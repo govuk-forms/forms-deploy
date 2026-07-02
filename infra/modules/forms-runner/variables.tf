@@ -234,7 +234,7 @@ variable "kinesis_subscription_role_arn" {
 
 variable "enable_opentelemetry" {
   type        = bool
-  description = "Enable AWS Distro for OpenTelemetry (ADOT) sidecar for distributed tracing to X-Ray"
+  description = "Enable AWS Distro for OpenTelemetry (ADOT) sidecar for distributed tracing to X-Ray and OTLP metrics export to CloudWatch"
   default     = false
 }
 
