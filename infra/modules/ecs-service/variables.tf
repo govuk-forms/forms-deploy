@@ -210,7 +210,7 @@ variable "adot_collector_config" {
 variable "adot_image" {
   type        = string
   description = "ADOT collector container image URI"
-  default     = "public.ecr.aws/aws-observability/aws-otel-collector:v0.46.0" # Latest as-of 2026-01-19
+  default     = "public.ecr.aws/aws-observability/aws-otel-collector:v0.48.0" # Latest as-of 2026-05-21
 }
 
 variable "opentelemetry_head_sampler_ratio" {
