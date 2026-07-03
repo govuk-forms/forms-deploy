@@ -116,17 +116,20 @@ locals {
     ] : []
   }
 
-  # ADOT collector sidecar container
-  adot_container_definition = {
+  # ADOT collector sidecar container (only evaluated when OpenTelemetry is enabled)
+  adot_container_definition = var.enable_opentelemetry ? {
     name                   = "aws-otel-collector",
     image                  = var.adot_image,
     essential              = false,
     readonlyRootFilesystem = true,
-    command = [
-      "--config=${var.adot_collector_config}"
+    cpu                    = var.adot_sidecar_cpu,
+    memory                 = var.adot_sidecar_memory,
+    secrets = [
+      {
+        name      = "AOT_CONFIG_CONTENT"
+        valueFrom = aws_ssm_parameter.adot_collector_config[0].arn
+      }
     ],
-    cpu    = var.adot_sidecar_cpu,
-    memory = var.adot_sidecar_memory,
     logConfiguration = {
       logDriver = "awslogs",
       options = {
@@ -145,7 +148,7 @@ locals {
       retries     = 5,
       startPeriod = 10
     },
-  }
+  } : null
 
   # Conditional container array composition
   container_definitions = var.enable_opentelemetry ? jsonencode([

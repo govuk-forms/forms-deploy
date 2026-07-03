@@ -32,8 +32,9 @@ output "adot_image" {
   value = var.adot_image
 }
 
-output "adot_collector_config" {
-  value = var.adot_collector_config
+output "adot_collector_config_parameter_arn" {
+  value       = try(aws_ssm_parameter.adot_collector_config[0].arn, null)
+  description = "SSM parameter ARN containing the ADOT collector configuration"
 }
 
 output "adot_sidecar_cpu" {

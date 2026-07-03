@@ -96,10 +96,13 @@ data "aws_iam_policy_document" "ecs_task_exec_additional_policies" {
     actions = [
       "ssm:GetParameters"
     ]
-    resources = [
-      for secret in flatten(var.secrets) : secret.valueFrom
-      if startswith(secret.valueFrom, "arn:aws:ssm")
-    ]
+    resources = concat(
+      [
+        for secret in flatten(var.secrets) : secret.valueFrom
+        if startswith(secret.valueFrom, "arn:aws:ssm")
+      ],
+      var.enable_opentelemetry ? [aws_ssm_parameter.adot_collector_config[0].arn] : []
+    )
     effect = "Allow"
   }
 }

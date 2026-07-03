@@ -185,7 +185,7 @@ variable "kinesis_subscription_role_arn" {
 
 variable "enable_opentelemetry" {
   type        = bool
-  description = "Enable AWS Distro for OpenTelemetry (ADOT) collector sidecar and enable OpenTelemetry in the application"
+  description = "Enable AWS Distro for OpenTelemetry (ADOT) collector sidecar and enable OpenTelemetry in the application. Traces are exported to X-Ray; metrics are exported to CloudWatch via the OTLP endpoint."
   default     = false
 }
 
@@ -199,12 +199,6 @@ variable "adot_sidecar_memory" {
   type        = number
   description = "Memory in MB to allocate to ADOT sidecar"
   default     = 512
-}
-
-variable "adot_collector_config" {
-  type        = string
-  description = "ADOT collector configuration file path. By default this uses the ECS-provided config at /etc/ecs/ecs-default-config.yaml, which enables basic trace collection and export to AWS X-Ray using the AWS Distro for OpenTelemetry (ADOT) defaults (including receivers, exporters, and sampling configuration managed by AWS)."
-  default     = "/etc/ecs/ecs-default-config.yaml"
 }
 
 variable "adot_image" {

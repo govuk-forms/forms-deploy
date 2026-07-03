@@ -1,5 +1,6 @@
 # IAM permissions for AWS Distro for OpenTelemetry sidecar
-# These permissions allow the ADOT collector to send traces to X-Ray
+# These permissions allow the ADOT collector to send traces to X-Ray and metrics
+# to CloudWatch via the OTLP endpoint.
 # Note: Container logs are handled by the task execution role, not the task role
 
 data "aws_iam_policy_document" "adot_permissions" {
@@ -15,6 +16,16 @@ data "aws_iam_policy_document" "adot_permissions" {
       "xray:GetSamplingRules",
       "xray:GetSamplingTargets",
       "xray:GetSamplingStatisticSummaries"
+    ]
+    resources = ["*"]
+  }
+
+  # CloudWatch OTLP metrics endpoint (SigV4 service name: monitoring)
+  statement {
+    sid    = "CloudWatchMetricsOTLP"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:PutMetricData"
     ]
     resources = ["*"]
   }
