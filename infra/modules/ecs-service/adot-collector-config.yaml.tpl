@@ -21,6 +21,30 @@ processors:
     send_batch_size: 50
   batch/metrics:
     timeout: 10s
+  resourcedetection/ecs:
+    detectors: [ecs]
+    timeout: 2s
+    override: false
+    ecs:
+      resource_attributes:
+        aws.ecs.cluster.arn:
+          enabled: false
+        aws.ecs.launchtype:
+          enabled: false
+        aws.ecs.task.family:
+          enabled: false
+        aws.ecs.task.revision:
+          enabled: false
+        cloud.account.id:
+          enabled: false
+        cloud.availability_zone:
+          enabled: false
+        cloud.platform:
+          enabled: false
+        cloud.provider:
+          enabled: false
+        cloud.region:
+          enabled: false
 
 exporters:
   awsxray:
@@ -40,5 +64,5 @@ service:
       exporters: [awsxray]
     metrics:
       receivers: [otlp]
-      processors: [batch/metrics]
+      processors: [resourcedetection/ecs, batch/metrics]
       exporters: [otlphttp]
