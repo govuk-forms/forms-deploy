@@ -10,6 +10,7 @@ resource "aws_ssm_parameter" "adot_collector_config" {
   type = "String"
   value = templatefile("${path.module}/adot-collector-config.yaml.tpl", {
     aws_region = data.aws_region.current.region
+    env_name   = var.env_name
   })
 
   description = "OpenTelemetry collector configuration for the ${var.application} ADOT sidecar in ${var.env_name}"

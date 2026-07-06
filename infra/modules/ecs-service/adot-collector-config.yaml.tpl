@@ -45,6 +45,11 @@ processors:
           enabled: false
         cloud.region:
           enabled: false
+  resource/env:
+    attributes:
+      - key: deployment.environment.name
+        value: ${env_name}
+        action: upsert
 
 exporters:
   awsxray:
@@ -64,5 +69,5 @@ service:
       exporters: [awsxray]
     metrics:
       receivers: [otlp]
-      processors: [resourcedetection/ecs, batch/metrics]
+      processors: [resourcedetection/ecs, resource/env, batch/metrics]
       exporters: [otlphttp]
