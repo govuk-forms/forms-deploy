@@ -20,6 +20,7 @@ environmental_settings = {
   rds_maintenance_window                   = "wed:04:00-wed:04:30"
   rds_minimum_capacity_acus                = 0.5
   rds_maxium_capacity_acus                 = 2
+  rds_force_ssl_connections                = true
   ips_to_block                             = []
   rate_limit_bypass_cidrs                  = []
   enable_shield_advanced_healthchecks      = false

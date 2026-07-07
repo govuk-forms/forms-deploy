@@ -100,6 +100,11 @@ resource "aws_rds_cluster" "cluster_aurora_v2" {
   ]
 }
 
+// Not setting cluster ca identifier because it'd cause downtime to the cluster when the CA is rotated (unless we have multiple instances). We could use this at global conf level to make new dbs use bigger key:
+# resource "aws_rds_certificate" "default" {
+#   certificate_identifier = "rds-ca-rsa4096-g1"
+# }
+
 resource "aws_rds_cluster_instance" "member" {
   #checkov:skip=CKV_AWS_118:We don't currently have enhanced monitoring
   #checkov:skip=CKV_AWS_354:We can use the default kms key for encryption

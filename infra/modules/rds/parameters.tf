@@ -51,6 +51,10 @@ resource "aws_secretsmanager_secret_version" "data_api_credentials" {
   })
 }
 
+locals {
+  force_ssl_connections = var.force_ssl_connections ? "verify-full" : "prefer"
+}
+
 resource "aws_ssm_parameter" "database_url" {
   #checkov:skip=CKV_AWS_337:The parameter is already using the default key
   #checkov:skip=CKV2_FORMS_AWS_7:Database URLs should update when passwords or endpoints change
@@ -59,11 +63,12 @@ resource "aws_ssm_parameter" "database_url" {
   name        = "/${each.key}-${var.env_name}/database/url"
   description = "URL for connecting to the ${each.key} database in the ${var.env_name} environment using the ${each.value.username} user"
   type        = "SecureString"
-  value = format("postgres://%s:%s@%s/%s",
+  value = format("postgres://%s:%s@%s/%s?sslmode=%s",
     each.value.username,
     aws_ssm_parameter.database_password[each.key].value,
     aws_rds_cluster.cluster_aurora_v2.endpoint,
-    each.key
+    each.key,
+    local.force_ssl_connections
   )
 }
 
