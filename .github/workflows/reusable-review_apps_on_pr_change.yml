@@ -82,6 +82,7 @@ jobs:
           # Parse outputs
           {
             echo "REVIEW_APP_URL=$(jq -r '.review_app_url.value' outputs.json)"
+            echo "ADMIN_APP_URL=$(jq -r '.admin_app_url.value' outputs.json)"
             echo "ECS_CLUSTER_ID=$(jq -r '.review_app_ecs_cluster_id.value' outputs.json)"
             echo "ECS_SERVICE_NAME=$(jq -r '.review_app_ecs_service_name.value' outputs.json)"
           } >> "$GITHUB_OUTPUT"
@@ -95,13 +96,27 @@ jobs:
             --cluster "${{ steps.outputs.outputs.ECS_CLUSTER_ID }}" \
             --services "${{ steps.outputs.outputs.ECS_SERVICE_NAME }}"
 
+      - name: Generate comment for PR
+        run: |
+          if [ -z "${{ steps.outputs.outputs.ADMIN_APP_URL }}" ] || [ "${{ steps.outputs.outputs.ADMIN_APP_URL }}" = "null" ]; then
+             cat <<EOF > "${{runner.temp}}/pr-comment.md"
+             :tada: A review copy of this PR has been deployed! You can reach it at: ${{steps.outputs.outputs.REVIEW_APP_URL}}
+          EOF
+          else
+          cat <<EOF > "${{runner.temp}}/pr-comment.md"
+            :tada: A review copy of this PR has been deployed! It is made of up two components
+
+            1. [A review copy of forms-runner](${{steps.outputs.outputs.REVIEW_APP_URL}})
+            2. [A production copy of forms-admin](${{steps.outputs.outputs.ADMIN_APP_URL}})
+          EOF
+          fi
+
       - name: Comment on PR
         env:
           COMMENT_MARKER: <!-- review apps on pr change -->
           GH_TOKEN: ${{ github.token }}
         run: |
-          cat <<EOF > "${{runner.temp}}/pr-comment.md"
-          :tada: A review copy of this PR has been deployed! You can reach it at: ${{steps.outputs.outputs.REVIEW_APP_URL}}
+          cat <<EOF >> "${{runner.temp}}/pr-comment.md"
 
           It may take 5 minutes or so for the application to be fully deployed and working. If it still isn't ready
           after 5 minutes, there may be something wrong with the ECS task. You will need to go to the integration AWS account
