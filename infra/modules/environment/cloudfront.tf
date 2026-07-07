@@ -22,6 +22,7 @@ module "cloudfront" {
   subject_alternative_names     = local.subject_alternative_names[var.env_name]
   kinesis_subscription_role_arn = var.kinesis_subscription_role_arn
 
+  serve_assets_from_s3 = var.serve_assets_from_s3
 }
 
 resource "aws_ssm_parameter" "email_zendesk" {

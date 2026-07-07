@@ -32,6 +32,12 @@ variable "enable_cloudfront" {
   default     = true
 }
 
+variable "serve_assets_from_s3" {
+  type        = bool
+  description = "Whether to serve requests for /assets/* from the assets bucket rather than the applications. The deploy pipelines must have synced assets to the bucket before this is enabled."
+  default     = false
+}
+
 variable "enable_alert_actions" {
   type        = bool
   description = "Whether any actions associated with CloudWatch alarms should be enabled"
