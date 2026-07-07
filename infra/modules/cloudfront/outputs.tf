@@ -22,3 +22,7 @@ output "cloudfront_secret" {
   value     = random_password.cloudfront_secret.result
   sensitive = true
 }
+
+output "assets_bucket_name" {
+  value = module.assets_bucket.name
+}

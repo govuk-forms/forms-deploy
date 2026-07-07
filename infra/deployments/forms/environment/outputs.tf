@@ -51,6 +51,10 @@ output "cloudfront_secret" {
   sensitive = true
 }
 
+output "assets_bucket_name" {
+  value = module.environment.assets_bucket_name
+}
+
 output "eventbridge_dead_letter_queue_arn" {
   value = module.environment.eventbridge_dead_letter_queue_arn
 }
