@@ -187,6 +187,17 @@ data "aws_iam_policy_document" "cloudfront" {
     ]
     sid = "ManageCloudfrontDistribution"
   }
+
+  statement {
+    actions = [
+      "cloudfront:*OriginAccessControl*"
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:cloudfront::${var.account_id}:origin-access-control/*"
+    ]
+    sid = "ManageCloudfrontOriginAccessControl"
+  }
 }
 
 data "aws_iam_policy_document" "cloudwatch" {
@@ -927,7 +938,9 @@ data "aws_iam_policy_document" "s3" {
       "arn:aws:s3:::*-alb-access-logs-access-logs/*",
       "arn:aws:s3:::govuk-forms-alb-logs-${var.environment_name}*",
 
-      "arn:aws:s3:::govuk-forms-${var.environment_name}-error-page*"
+      "arn:aws:s3:::govuk-forms-${var.environment_name}-error-page*",
+
+      "arn:aws:s3:::govuk-forms-${var.environment_name}-assets*"
     ]
     sid = "ManageS3"
   }
