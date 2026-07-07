@@ -1,0 +1,30 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+      # Check Image URI is not the default pipeline value
+      - |
+        if [[ "${IMAGE_URI}" = "MUST_BE_SET" ]]; then
+          echo "The IMAGE_URI has not been set by the caller. The value of IMAGE_URI is \"${IMAGE_URI}\""
+          exit 1
+        fi
+
+      - echo "Log in to Amazon ECR repository ${CONTAINER_REGISTRY}"
+      - aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin "${CONTAINER_REGISTRY}"
+  build:
+    commands:
+      # Copy the built assets out of the container image
+      - docker pull "${IMAGE_URI}"
+      - CONTAINER_ID=$(docker create "${IMAGE_URI}")
+      - docker cp "${CONTAINER_ID}:/app/public/assets" ./assets
+      - docker rm "${CONTAINER_ID}"
+
+      # Upload the assets so they are available before the new tasks
+      # serve any pages which reference them. Assets from previous
+      # releases are deliberately left in place so tasks which have not
+      # yet been replaced keep working during the deployment.
+      - |
+        aws s3 sync ./assets "s3://${ASSETS_BUCKET}/assets/" \
+          --exclude ".vite/*" \
+          --cache-control "public, max-age=300" \
+          --no-progress
