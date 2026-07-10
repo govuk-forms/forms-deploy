@@ -16,14 +16,24 @@ environmental_settings = {
   allow_authentication_from_email_domains = [
     ".gov.uk",
   ]
-  enable_alert_actions                = true
-  enable_slo_burn_rate_alert_actions  = false
-  forms_product_page_support_url      = "https://www.staging.forms.service.gov.uk/support"
-  rds_maintenance_window              = "wed:04:00-wed:04:30"
-  rds_minimum_capacity_acus           = 1
-  rds_maxium_capacity_acus            = 2
-  ips_to_block                        = []
-  rate_limit_bypass_cidrs             = []
+  enable_alert_actions               = true
+  enable_slo_burn_rate_alert_actions = false
+  forms_product_page_support_url     = "https://www.staging.forms.service.gov.uk/support"
+  rds_maintenance_window             = "wed:04:00-wed:04:30"
+  rds_minimum_capacity_acus          = 1
+  rds_maxium_capacity_acus           = 2
+  ips_to_block                       = []
+  rate_limit_bypass_cidrs = [
+    "88.98.40.224/27",
+    "172.167.216.147/32",
+    "3.10.36.101/32",
+    "35.178.26.242/32",
+    "18.168.92.160/32",
+    "18.134.34.111/32",
+    "13.41.39.172/32",
+    "20.123.237.233/32",
+    "88.208.100.190/32"
+  ]
   enable_shield_advanced_healthchecks = false
   allow_pagerduty_alerts              = false
   redis_multi_az_enabled              = false
