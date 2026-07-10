@@ -8,7 +8,6 @@ dns_delegation_records  = {}
 codestar_connection_arn = "arn:aws:codeconnections:eu-west-2:972536609845:connection/065d6101-9c43-4336-8fd4-777f3d6fc791"
 deploy_account_id       = "711966560482"
 pentester_email_addresses = [
-  "matus.mihok@digital.cabinet-office.gov.uk",
   "caleb.herbert@digital.cabinet-office.gov.uk",
   "cameron.steel@digital.cabinet-office.gov.uk"
 ]
