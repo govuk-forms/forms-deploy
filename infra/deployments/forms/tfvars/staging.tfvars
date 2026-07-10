@@ -15,6 +15,7 @@ environmental_settings = {
   database_backup_retention_period_days    = 30
   allow_authentication_from_email_domains = [
     ".gov.uk",
+    "@accenture.com",
   ]
   enable_alert_actions               = true
   enable_slo_burn_rate_alert_actions = false
