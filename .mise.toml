@@ -2,7 +2,11 @@
 _.path = "support/forms-cli/bin"
 
 [tools]
-"go:github.com/hashicorp/terraform-config-inspect" = "latest"
+# Pinned to a commit pseudo-version: this module has no tagged releases, and
+# mise's minimum_release_age filter rejects "latest" whenever the newest
+# upstream commit is under 24h old. Find newer versions at
+# https://proxy.golang.org/github.com/hashicorp/terraform-config-inspect/@latest
+"go:github.com/hashicorp/terraform-config-inspect" = "v0.0.0-20260709150029-2fb54c236733"
 hcl2json = "0.6.8"
 tflint = "0.59.1"
 checkov = "3.2.470"
