@@ -171,7 +171,8 @@ forms_runner_settings = {
 }
 scheduled_smoke_tests_settings = {
   enable_scheduled_smoke_tests = true
-  form_url                     = "https://submit.forms.service.gov.uk/form/2570/scheduled-smoke-test"
+  forms_runner_url             = "https://submit.forms.service.gov.uk"
+  form_id                      = 2570
   frequency_minutes            = 10
   enable_alerting              = true
 }
