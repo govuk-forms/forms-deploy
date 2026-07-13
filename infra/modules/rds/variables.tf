@@ -87,3 +87,9 @@ variable "enable_advanced_database_insights" {
   description = "Whether to enable Advanced Database Insights for the RDS instance"
   default     = false
 }
+
+variable "force_ssl_connections" {
+  type        = bool
+  description = "Whether to force SSL connections to the database"
+  default     = true
+}

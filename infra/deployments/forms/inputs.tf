@@ -198,6 +198,7 @@ variable "environmental_settings" {
     rds_maintenance_window                   = string
     rds_minimum_capacity_acus                = number
     rds_maxium_capacity_acus                 = number
+    rds_force_ssl_connections                = bool
     ips_to_block                             = list(string)
     rate_limit_bypass_cidrs                  = list(string)
     enable_shield_advanced_healthchecks      = bool
