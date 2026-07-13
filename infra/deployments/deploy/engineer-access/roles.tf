@@ -17,9 +17,9 @@ module "engineer_access" {
   # Pentesters may not have GDS domains so our pattern using the 'users' module
   # doesn't necessarily work.
   pentesters = [
-    "matus.mihok@accenture.com",
-    "caleb.herbert@accenture.com",
-    "cameron.steel@accenture.com"
+    "matus.mihok2@digital.cabinet-office.gov.uk",
+    "caleb.herbert1@digital.cabinet-office.gov.uk",
+    "cameron.steel@digital.cabinet-office.gov.uk"
   ]
   pentester_cidrs = [
     "88.98.40.224/27",
