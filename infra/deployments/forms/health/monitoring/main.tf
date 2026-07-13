@@ -36,13 +36,14 @@ module "runner_scheduled_smoke_tests" {
     where the tests failed.
     - Attempt to fill in a form in the ${var.environment_name} environment to
     verify if there is an issue. The tests use the form
-    ${var.scheduled_smoke_tests_settings.form_url}. There may be an
+    ${var.scheduled_smoke_tests_settings.forms_runner_url}/form/${var.scheduled_smoke_tests_settings.form_id}. There may be an
     intermittent issue so continue to next step regardless
     - Check the application logs for errors.
     - If this is not a false alarm, begin an incident and follow the incident response at
     https://github.com/govuk-forms/forms-team/wiki/Incident-Response.
     EOF
   codebuild_environment_variables = {
-    SMOKE_TEST_FORM_URL = var.scheduled_smoke_tests_settings.form_url
+    SETTINGS__FORMS_RUNNER__URL    = var.scheduled_smoke_tests_settings.forms_runner_url,
+    SETTINGS__FORM_IDS__SMOKE_TEST = var.scheduled_smoke_tests_settings.form_id,
   }
 }

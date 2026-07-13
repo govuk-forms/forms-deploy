@@ -211,7 +211,8 @@ variable "scheduled_smoke_tests_settings" {
   description = "Configuration for the scheduled smoke tests"
   type = object({
     enable_scheduled_smoke_tests = bool
-    form_url                     = string # This form is created specifically for the runner smoke tests. See https://github.com/govuk-forms/forms-e2e-tests/blob/main/spec/smoke_tests/smoke_test_runner_spec.rb
+    forms_runner_url             = string
+    form_id                      = string # This form is created specifically for the runner smoke tests. See https://github.com/govuk-forms/forms-e2e-tests/blob/main/spec/smoke_tests/smoke_test_runner_spec.rb
     frequency_minutes            = number
     enable_alerting              = bool # Whether to send notification to govuk-forms-alerts channel
   })
