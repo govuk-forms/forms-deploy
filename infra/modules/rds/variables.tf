@@ -93,3 +93,20 @@ variable "force_ssl_connections" {
   description = "Whether to force SSL connections to the database"
   default     = true
 }
+
+variable "monitoring_interval" {
+  type        = number
+  description = "Interval, in seconds, between points when Enhanced Monitoring metrics are collected. A value of 0 means Enhanced Monitoring is disabled. Valid Values: 0, 1, 5, 10, 15, 30, 60. "
+  default     = 0
+
+  validation {
+    condition     = contains([0, 1, 5, 10, 15, 30, 60], var.monitoring_interval)
+    error_message = "Valid values for the monitoring interval in RDS Enhanced Monitoring are 0, 1, 5, 10, 15, 30 and 60"
+  }
+}
+
+variable "monitoring_role_arn" {
+  type        = string
+  description = "ARN for the IAM role that allows RDS to send enhanced monitoring metrics to CloudWatch Logs. Only needed when the monitoring_interval is non zero"
+  default     = ""
+}
