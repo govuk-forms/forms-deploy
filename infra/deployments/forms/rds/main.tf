@@ -4,6 +4,13 @@ variable "apply_immediately" {
   default     = false
 }
 
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
+locals {
+  aws_account_id = data.aws_caller_identity.current.account_id
+  aws_region     = data.aws_region.current.region
+}
 module "rds" {
   # this is the rds cluster for the forms-admin database
   source     = "../../../modules/rds"
@@ -81,8 +88,18 @@ resource "aws_iam_role" "rds_enhanced_monitoring" {
         Principal = {
           Service = "monitoring.rds.amazonaws.com"
         }
-      },
-    ]
+        Condition = {
+          StringLike = {
+            "aws:SourceArn" = [
+              "arn:aws:rds:${local.aws_region}:${local.aws_account_id}:db:primary",
+              "arn:aws:rds:${local.aws_region}:${local.aws_account_id}:db:forms-runner-${var.environment_name}-primary"
+            ]
+          },
+          StringEquals = {
+            "AWS:SourceAccount" = local.aws_account_id
+          }
+        }
+    }]
   })
 }
 
