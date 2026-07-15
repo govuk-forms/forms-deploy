@@ -60,7 +60,7 @@ variable "standard_form_response_body_max_size" {
 variable "admin_extended_post_body_max_size" {
   description = "The maximum request body size allowed for admin endpoints that require larger payloads than standard operations"
   type        = number
-  default     = 100 * 1024 # 100 KB
+  default     = 500 * 1024 # 500 KB
 }
 
 variable "kinesis_subscription_role_arn" {
