@@ -25,6 +25,9 @@ module "rds" {
 
   enable_advanced_database_insights = var.environmental_settings.enable_advanced_database_insights
 
+  # Enable RDS Enhanced Monitoring only when the monitoring interval is set to be greater than 0
+  monitoring_interval = var.environmental_settings.rds_enhanced_monitoring_interval_seconds
+  monitoring_role_arn = var.environmental_settings.rds_enhanced_monitoring_interval_seconds > 0 ? aws_iam_role.rds_enhanced_monitoring[0].arn : ""
   apps_list = {
     forms-admin = { username = "forms-admin-app" }
   }
@@ -52,6 +55,10 @@ module "forms_runner_rds" {
 
   enable_advanced_database_insights = var.environmental_settings.enable_advanced_database_insights
 
+
+  # Enable RDS Enhanced Monitoring only when the monitoring interval is set to be greater than 0
+  monitoring_interval = var.environmental_settings.rds_enhanced_monitoring_interval_seconds
+  monitoring_role_arn = var.environmental_settings.rds_enhanced_monitoring_interval_seconds > 0 ? aws_iam_role.rds_enhanced_monitoring[0].arn : ""
   apps_list = {
     forms-runner       = { username = "forms-runner-app" }
     forms-runner-queue = { username = "forms-runner-app-queue" }
@@ -61,6 +68,8 @@ module "forms_runner_rds" {
 
 # Create an IAM role to allow RDS enhanced monitoring
 resource "aws_iam_role" "rds_enhanced_monitoring" {
+  count = var.environmental_settings.rds_enhanced_monitoring_interval_seconds > 0 ? 1 : 0
+
   name        = "RDSEnhancedMonitoring"
   description = "Used to enable enhanced monitoring in RDS"
   assume_role_policy = jsonencode({
@@ -78,6 +87,8 @@ resource "aws_iam_role" "rds_enhanced_monitoring" {
 }
 
 resource "aws_iam_role_policy_attachment" "rds_enhanced_monitoring" {
-  role       = aws_iam_role.rds_enhanced_monitoring.name
+  count = var.environmental_settings.rds_enhanced_monitoring_interval_seconds > 0 ? 1 : 0
+
+  role       = aws_iam_role.rds_enhanced_monitoring[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
 }
