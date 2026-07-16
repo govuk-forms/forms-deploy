@@ -17,6 +17,26 @@ resource "aws_rds_cluster_parameter_group" "aurora_postgres_v16" {
   name_prefix = "forms-${var.identifier}-pg16"
   family      = "aurora-postgresql16"
   description = "RDS cluster parameter group for Aurora Serverless for PostgreSQL 16"
+
+  parameter {
+    name  = "log_connections"
+    value = 1
+  }
+
+  parameter {
+    name  = "log_disconnections"
+    value = 1
+  }
+
+  parameter {
+    name  = "log_statement"
+    value = "ddl" # Data Definition Language, i.e. things related to data definitions and schemas, like CREATE/DROP TABLE
+  }
+
+  parameter {
+    name  = "log_min_messages"
+    value = "NOTICE" # Valid values are DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, INFO, NOTICE, WARNING, ERROR, LOG, FATAL, and PANIC
+  }
 }
 
 locals {
@@ -60,6 +80,8 @@ resource "aws_rds_cluster" "cluster_aurora_v2" {
   storage_encrypted         = true
   backup_retention_period   = var.backup_retention_period
   deletion_protection       = true
+
+  enabled_cloudwatch_logs_exports = ["postgresql", "iam-db-auth-error"]
 
   database_insights_mode = var.enable_advanced_database_insights ? "advanced" : null
 
