@@ -183,6 +183,27 @@ resource "aws_codepipeline" "deploy_runner_container" {
     }
 
     action {
+      name            = "sync-assets-to-s3"
+      category        = "Build"
+      owner           = "AWS"
+      provider        = "CodeBuild"
+      version         = "1"
+      run_order       = 1
+      input_artifacts = ["buildspec_source"]
+      # we need an input according to AWS, even if we don't... so we'll use this one for now.
+      configuration = {
+        ProjectName = module.sync_assets.name
+        EnvironmentVariables = jsonencode([
+          {
+            name  = "IMAGE_URI"
+            value = "#{variables.container_image_uri}"
+            type  = "PLAINTEXT"
+          }
+        ])
+      }
+    }
+
+    action {
       name             = "generate-image-definitions"
       namespace        = "Build"
       category         = "Build"

@@ -205,6 +205,7 @@ variable "environmental_settings" {
     allow_pagerduty_alerts                   = bool
     redis_multi_az_enabled                   = bool
     enable_advanced_database_insights        = bool
+    serve_assets_from_s3                     = optional(bool, false)
   })
 }
 

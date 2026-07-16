@@ -75,6 +75,10 @@ output "cloudfront_secret" {
   sensitive = true
 }
 
+output "assets_bucket_name" {
+  value = module.cloudfront[0].assets_bucket_name
+}
+
 output "eventbridge_dead_letter_queue_arn" {
   value = aws_sqs_queue.event_bridge_dlq.arn
 }

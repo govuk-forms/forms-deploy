@@ -50,3 +50,9 @@ variable "kinesis_subscription_role_arn" {
   description = "The arn of the role that is allowed to subscribe to the kinesis stream"
   type        = string
 }
+
+variable "serve_assets_from_s3" {
+  description = "Whether to serve requests for /assets/* from the assets bucket rather than the applications. The deploy pipelines must have synced assets to the bucket before this is enabled."
+  type        = bool
+  default     = false
+}

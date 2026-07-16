@@ -18,4 +18,6 @@ module "environment" {
 
   enable_shield_advanced_healthchecks = var.environmental_settings.enable_shield_advanced_healthchecks
   scheduled_smoke_tests_settings      = var.scheduled_smoke_tests_settings
+
+  serve_assets_from_s3 = var.environmental_settings.serve_assets_from_s3
 }
