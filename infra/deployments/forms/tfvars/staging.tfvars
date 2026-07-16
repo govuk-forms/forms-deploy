@@ -35,10 +35,12 @@ environmental_settings = {
     "51.142.199.225/32",
     "20.162.198.121/32"
   ]
-  enable_shield_advanced_healthchecks = false
-  allow_pagerduty_alerts              = false
-  redis_multi_az_enabled              = false
-  enable_advanced_database_insights   = true
+  enable_shield_advanced_healthchecks      = false
+  allow_pagerduty_alerts                   = false
+  redis_multi_az_enabled                   = false
+  enable_advanced_database_insights        = true
+  rds_enhanced_monitoring_interval_seconds = 0 # disabled
+
 }
 root_domain             = "staging.forms.service.gov.uk"
 additional_dns_records  = []

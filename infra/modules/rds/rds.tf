@@ -63,6 +63,10 @@ resource "aws_rds_cluster" "cluster_aurora_v2" {
 
   database_insights_mode = var.enable_advanced_database_insights ? "advanced" : null
 
+  # Enhanced Monitoring (disabled by default)
+  monitoring_interval = var.monitoring_interval
+  monitoring_role_arn = var.monitoring_role_arn
+
   # performance insights with 15 month retention is required for advanced database insights
   # https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_DatabaseInsights.TurningOnAdvanced.html
   performance_insights_enabled          = var.enable_advanced_database_insights
@@ -108,6 +112,7 @@ resource "aws_rds_cluster" "cluster_aurora_v2" {
 resource "aws_rds_cluster_instance" "member" {
   #checkov:skip=CKV_AWS_118:We don't currently have enhanced monitoring
   #checkov:skip=CKV_AWS_354:We can use the default kms key for encryption
+  #checkov:skip=CKV_AWS_353:We enabled performance insights at cluster level
 
   cluster_identifier = aws_rds_cluster.cluster_aurora_v2.id
   engine             = "aurora-postgresql"
