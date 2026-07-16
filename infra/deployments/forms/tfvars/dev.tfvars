@@ -27,7 +27,7 @@ environmental_settings = {
   allow_pagerduty_alerts                   = false
   redis_multi_az_enabled                   = false
   enable_advanced_database_insights        = false
-  rds_enhanced_monitoring_interval_seconds = 0 # disabled
+  rds_enhanced_monitoring_interval_seconds = 60 # disabled
 }
 root_domain = "dev.forms.service.gov.uk"
 additional_dns_records = [
