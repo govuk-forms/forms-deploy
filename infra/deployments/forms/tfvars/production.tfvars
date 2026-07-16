@@ -39,19 +39,17 @@ environmental_settings = {
     "@dhsc.egresscloud.com",
     "@acas.org.uk"
   ]
-  forms_product_page_support_url           = "https://www.forms.service.gov.uk/support"
-  rds_maintenance_window                   = "wed:04:00-wed:04:30"
-  rds_minimum_capacity_acus                = 2
-  rds_maxium_capacity_acus                 = 10
-  rds_force_ssl_connections                = true
-  ips_to_block                             = []
-  rate_limit_bypass_cidrs                  = []
-  enable_shield_advanced_healthchecks      = true
-  allow_pagerduty_alerts                   = true
-  redis_multi_az_enabled                   = true
-  enable_advanced_database_insights        = true
-  rds_enhanced_monitoring_interval_seconds = 15
-
+  forms_product_page_support_url      = "https://www.forms.service.gov.uk/support"
+  rds_maintenance_window              = "wed:04:00-wed:04:30"
+  rds_minimum_capacity_acus           = 2
+  rds_maxium_capacity_acus            = 10
+  rds_force_ssl_connections           = true
+  ips_to_block                        = []
+  rate_limit_bypass_cidrs             = []
+  enable_shield_advanced_healthchecks = true
+  allow_pagerduty_alerts              = true
+  redis_multi_az_enabled              = true
+  enable_advanced_database_insights   = true
 }
 root_domain = "forms.service.gov.uk"
 additional_dns_records = [

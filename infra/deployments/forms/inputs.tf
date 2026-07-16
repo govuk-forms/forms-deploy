@@ -205,13 +205,7 @@ variable "environmental_settings" {
     allow_pagerduty_alerts                   = bool
     redis_multi_az_enabled                   = bool
     enable_advanced_database_insights        = bool
-    rds_enhanced_monitoring_interval_seconds = number # Enables RDS enhanced monitoring if value is 1, 5, 10, 15, 30 or 60. Disabled if 0
-
   })
-  validation {
-    condition     = contains([0, 1, 5, 10, 15, 30, 60], var.environmental_settings.rds_enhanced_monitoring_interval_seconds)
-    error_message = "Valid values for the monitoring interval in RDS Enhanced Monitoring are 0, 1, 5, 10, 15, 30 and 60"
-  }
 }
 
 variable "scheduled_smoke_tests_settings" {
