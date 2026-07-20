@@ -91,8 +91,8 @@ resource "aws_iam_role" "rds_enhanced_monitoring" {
         Condition = {
           StringLike = {
             "aws:SourceArn" = [
-              "arn:aws:rds:${local.aws_region}:${local.aws_account_id}:db:primary",
-              "arn:aws:rds:${local.aws_region}:${local.aws_account_id}:db:forms-runner-${var.environment_name}-primary"
+              "arn:aws:rds:${local.aws_region}:${local.aws_account_id}:cluster:aurora-v2-cluster-${var.environment_name}",
+              "arn:aws:rds:${local.aws_region}:${local.aws_account_id}:cluster:aurora-v2-cluster-forms-runner-${var.environment_name}"
             ]
           },
           StringEquals = {
