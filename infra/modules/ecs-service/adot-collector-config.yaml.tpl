@@ -16,6 +16,15 @@ receivers:
     transport: udp
 
 processors:
+%{ if length(drop_spans) > 0 ~}
+  filter/drop_spans:
+    error_mode: ignore
+    traces:
+      span:
+%{ for expr in drop_spans ~}
+        - '${expr}'
+%{ endfor ~}
+%{ endif ~}
   batch/traces:
     timeout: 1s
     send_batch_size: 50
@@ -65,7 +74,7 @@ service:
   pipelines:
     traces:
       receivers: [otlp, awsxray]
-      processors: [batch/traces]
+      processors: [${length(drop_spans) > 0 ? "filter/drop_spans, " : ""}batch/traces]
       exporters: [awsxray]
     metrics:
       receivers: [otlp]
