@@ -486,7 +486,9 @@ data "aws_iam_policy_document" "iam" {
       "arn:aws:iam::${var.account_id}:policy/${var.environment_name}-forms-runner-ecs-task-policy",
       "arn:aws:iam::${var.account_id}:policy/${var.environment_name}-forms-runner-adot-collector",
       "arn:aws:iam::${var.account_id}:policy/${var.environment_name}-forms-product-page-ecs-task-policy",
-      "arn:aws:iam::${var.account_id}:policy/${var.environment_name}-forms-product-page-adot-collector"
+      "arn:aws:iam::${var.account_id}:policy/${var.environment_name}-forms-product-page-adot-collector",
+      "arn:aws:iam::${var.account_id}:policy/grafana-ecs-task-policy",
+      "arn:aws:iam::${var.account_id}:policy/grafana-ecs-task-execution-additional"
     ]
     sid = "ManageEcsPolicies"
   }
@@ -550,7 +552,9 @@ data "aws_iam_policy_document" "iam" {
       "arn:aws:iam::${var.account_id}:role/${var.environment_name}-forms-admin-ecs-task-execution",
       "arn:aws:iam::${var.account_id}:role/${var.environment_name}-forms-runner-ecs-task-execution",
       "arn:aws:iam::${var.account_id}:role/${var.environment_name}-forms-product-page-ecs-task-execution",
-      "arn:aws:iam::${var.account_id}:role/${var.environment_name}-forms-runner-queue-worker-ecs-task-execution"
+      "arn:aws:iam::${var.account_id}:role/${var.environment_name}-forms-runner-queue-worker-ecs-task-execution",
+      "arn:aws:iam::${var.account_id}:role/grafana-ecs-task",
+      "arn:aws:iam::${var.account_id}:role/grafana-ecs-task-execution"
     ]
     sid = "ManageTaskAndTaskExecutionRoles"
   }
@@ -807,6 +811,7 @@ data "aws_iam_policy_document" "logs" {
       "arn:aws:logs:eu-west-2:${var.account_id}:log-group:/aws/ecs/forms-runner-queue-worker-${var.environment_name}/adot-collector:*",
       "arn:aws:logs:eu-west-2:${var.account_id}:log-group:/aws/ecs/forms-product-page-${var.environment_name}:*",
       "arn:aws:logs:eu-west-2:${var.account_id}:log-group:/aws/ecs/forms-product-page-${var.environment_name}/adot-collector:*",
+      "arn:aws:logs:eu-west-2:${var.account_id}:log-group:/aws/ecs/grafana:*",
       "arn:aws:logs:us-east-1:${var.account_id}:log-group:aws-waf-logs-${var.environment_name}*",
       "arn:aws:logs:eu-west-2:${var.account_id}:log-group:aws-waf-logs-alb-${var.environment_name}*"
     ]
