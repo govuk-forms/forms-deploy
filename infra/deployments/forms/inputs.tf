@@ -233,3 +233,17 @@ variable "end_to_end_test_settings" {
     email_receiver_s3_bucket_name = string
   })
 }
+
+variable "grafana_settings" {
+  description = "Configuration for the self-hosted Grafana service"
+  type = object({
+    enabled                      = optional(bool, false)
+    cpu                          = number
+    memory                       = number
+    github_allowed_organizations = list(string) # GitHub organisations whose members may sign in
+    github_admin_team            = string       # GitHub team (org/team) granted Grafana server admin
+    github_editor_teams          = list(string) # GitHub teams (org/team) granted the Editor role; other org members are denied
+    seconds_until_auto_pause     = optional(number, 3600)
+  })
+  nullable = false
+}
