@@ -1,7 +1,7 @@
 # Manages an AWS ACM certificate and the necessary DNS records for its
 # validation.  The certificate domain name and its subject alternative names
-# must be valid within a single Route53 hosted zone for the var.domain_name
-# passed.
+# must be valid within a single Route53 hosted zone, named by var.zone_name
+# or, when that is not set, var.domain_name.
 
 resource "aws_acm_certificate" "cert" {
   #checkov:skip=CKV2_AWS_71:we can't tell Checkov that domain_name won't include * here
@@ -17,7 +17,7 @@ resource "aws_acm_certificate" "cert" {
 }
 
 data "aws_route53_zone" "cert_domain" {
-  name         = var.domain_name
+  name         = coalesce(var.zone_name, var.domain_name)
   private_zone = false
 }
 
