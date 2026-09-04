@@ -50,7 +50,8 @@ data "aws_iam_policy_document" "allow_logs" {
     actions = ["s3:PutObject"]
     resources = [
       "arn:aws:s3:::${module.logs_bucket.bucket_name}/${var.env_name}/AWSLogs/${local.account_id}/*",
-      "arn:aws:s3:::${module.logs_bucket.bucket_name}/forms-internal/AWSLogs/${local.account_id}/*"
+      "arn:aws:s3:::${module.logs_bucket.bucket_name}/forms-internal/AWSLogs/${local.account_id}/*",
+      "arn:aws:s3:::${module.logs_bucket.bucket_name}/grafana/AWSLogs/${local.account_id}/*"
     ]
   }
 }
