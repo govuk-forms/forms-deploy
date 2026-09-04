@@ -31,13 +31,19 @@ resource "aws_wafv2_ip_set" "ips_to_block" {
   addresses = var.ips_to_block
 }
 
-resource "aws_wafv2_regex_pattern_set" "admin_extended_post_pages" {
+resource "aws_wafv2_regex_pattern_set" "body_size_limit_exempt_paths" {
   provider = aws.us-east-1
 
-  name        = "${var.environment_name}-admin-extended-post-pages"
-  description = "Regex patterns for admin pages that require extended POST body size limits"
+  name        = "${var.environment_name}-body-size-limit-exempt-paths"
+  description = "Paths that are exempt from the 8 KB request body limit in AWSManagedRulesCommonRuleSet; request size limits should be enforced at the application layer for these endpoints."
   scope       = "CLOUDFRONT"
 
+  # Bulk options upload when creating or editing a selection question in the admin app
+  regular_expression {
+    regex_string = "^/forms/\\d+/pages/(?:new|\\d+/edit)/selection/bulk-options$"
+  }
+
+  # Admin pages that post larger payloads than a standard form
   regular_expression {
     regex_string = "^/forms/\\d+/pages/(?:new|\\d+/edit)/guidance-preview$"
   }
@@ -49,320 +55,16 @@ resource "aws_wafv2_regex_pattern_set" "admin_extended_post_pages" {
   regular_expression {
     regex_string = "^/forms/\\d+/routes$"
   }
-}
 
-resource "aws_wafv2_rule_group" "admin_body_size_limits" {
-  provider = aws.us-east-1
-
-  name        = "${var.environment_name}-admin-body-size-limits"
-  description = "Rule group for admin request body size restrictions"
-  scope       = "CLOUDFRONT"
-  capacity    = 50
-
-  rule {
-    # Allow large POSTs when uploading multiple options in bulk (form creation)
-    name     = "allow_bulk_options_uploads"
-    priority = 1
-
-    action {
-      allow {}
-      # Stop processing
-    }
-
-    statement {
-      and_statement {
-        statement {
-          regex_match_statement {
-            field_to_match {
-              uri_path {}
-            }
-            regex_string = "^/forms/\\d+/pages/(?:new|\\d+/edit)/selection/bulk-options$"
-            text_transformation {
-              priority = 1
-              type     = "LOWERCASE"
-            }
-          }
-        }
-
-        statement {
-          size_constraint_statement {
-            field_to_match {
-              body {}
-            }
-            comparison_operator = "LE"
-            size                = var.bulk_options_max_size
-            text_transformation {
-              priority = 1
-              type     = "NONE"
-            }
-          }
-        }
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "BulkOptionsUploads"
-      sampled_requests_enabled   = false
-    }
+  # Brand asset uploads in the admin app: POST /brands creates a brand, POST /brands/:id updates one
+  regular_expression {
+    regex_string = "^/brands(?:/\\d+)?$"
   }
 
-  rule {
-    # Allow larger POST bodies for admin endpoints that require extended payload sizes
-    name     = "allow_admin_extended_post_bodies"
-    priority = 2
-
-    action {
-      allow {}
-      # Stop processing
-    }
-
-    statement {
-      and_statement {
-        statement {
-          regex_pattern_set_reference_statement {
-            arn = aws_wafv2_regex_pattern_set.admin_extended_post_pages.arn
-            field_to_match {
-              uri_path {}
-            }
-            text_transformation {
-              priority = 1
-              type     = "LOWERCASE"
-            }
-          }
-        }
-        statement {
-          size_constraint_statement {
-            field_to_match {
-              body {}
-            }
-            comparison_operator = "LE"
-            size                = var.admin_extended_post_body_max_size
-            text_transformation {
-              priority = 1
-              type     = "NONE"
-            }
-          }
-        }
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "AdminExtendedPostBodies"
-      sampled_requests_enabled   = false
-    }
-  }
-
-  visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "AdminBodySizeLimitsRuleGroup"
-    sampled_requests_enabled   = false
-  }
-}
-
-resource "aws_wafv2_rule_group" "public_form_body_size_limits" {
-  provider = aws.us-east-1
-
-  name        = "${var.environment_name}-public-form-body-size-limits"
-  description = "Rule group for public form request body size restrictions"
-  scope       = "CLOUDFRONT"
-  capacity    = 50
-
-  rule {
-    # Allow file uploads when filling out a form
-    name     = "allow_file_uploads"
-    priority = 1
-
-    action {
-      allow {}
-      # Stop processing
-    }
-
-    statement {
-      and_statement {
-        statement {
-          byte_match_statement {
-            field_to_match {
-              single_header {
-                name = "content-type"
-              }
-            }
-            positional_constraint = "STARTS_WITH"
-            search_string         = "multipart/form-data"
-            text_transformation {
-              priority = 1
-              type     = "LOWERCASE"
-            }
-          }
-        }
-        statement {
-          regex_match_statement {
-            field_to_match {
-              uri_path {}
-            }
-            # /:mode/:form_id/:form_slug(.locale)/:page_slug
-            regex_string = "^/(?:preview-draft|preview-archived|preview-live|form)/\\d+/[\\w-]+(\\.(cy|en))?/[a-zA-Z\\d]+$"
-            text_transformation {
-              priority = 1
-              type     = "LOWERCASE"
-            }
-          }
-        }
-        statement {
-          size_constraint_statement {
-            field_to_match {
-              body {}
-            }
-            comparison_operator = "LE"
-            size                = var.file_upload_max_size
-            text_transformation {
-              priority = 1
-              type     = "NONE"
-            }
-          }
-        }
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "FileUploads"
-      sampled_requests_enabled   = false
-    }
-  }
-
-  rule {
-    # Enforce standard maximum size for form response bodies
-    # ie. POST requests to standard form fields (text inputs, selections, etc.)
-    name     = "allow_standard_form_responses"
-    priority = 2
-
-    action {
-      allow {}
-      # Stop processing
-    }
-
-    statement {
-      and_statement {
-        statement {
-          regex_match_statement {
-            field_to_match {
-              uri_path {}
-            }
-            # /:mode/:form_id/:form_slug(.locale)/:page_slug(/:answer_index)
-            regex_string = "^/(?:preview-draft|preview-archived|preview-live|form)/\\d+/[\\w-]+(\\.(cy|en))?/[a-zA-Z\\d]+(?:/\\d+)?$"
-            text_transformation {
-              priority = 1
-              type     = "LOWERCASE"
-            }
-          }
-        }
-        statement {
-          size_constraint_statement {
-            field_to_match {
-              body {}
-            }
-            comparison_operator = "LE"
-            size                = var.standard_form_response_body_max_size
-            text_transformation {
-              priority = 1
-              type     = "NONE"
-            }
-          }
-        }
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "StandardFormResponses"
-      sampled_requests_enabled   = false
-    }
-  }
-
-  visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "PublicFormBodySizeLimitsRuleGroup"
-    sampled_requests_enabled   = false
-  }
-}
-
-resource "aws_wafv2_rule_group" "admin_file_upload_body_size_limits" {
-  provider = aws.us-east-1
-
-  name        = "${var.environment_name}-admin-file-upload-body-size-limits"
-  description = "Rule group for admin file upload request body size restrictions"
-  scope       = "CLOUDFRONT"
-  capacity    = 50
-
-  rule {
-    # Allow file uploads when uploading brand assets
-    name     = "allow_brand_asset_uploads"
-    priority = 1
-
-    action {
-      allow {}
-      # Stop processing
-    }
-
-    statement {
-      and_statement {
-        statement {
-          byte_match_statement {
-            field_to_match {
-              single_header {
-                name = "content-type"
-              }
-            }
-            positional_constraint = "STARTS_WITH"
-            search_string         = "multipart/form-data"
-            text_transformation {
-              priority = 1
-              type     = "LOWERCASE"
-            }
-          }
-        }
-        statement {
-          regex_match_statement {
-            field_to_match {
-              uri_path {}
-            }
-            # POST /brands creates a brand, POST /brands/:id updates one
-            regex_string = "^/brands(?:/\\d+)?$"
-            text_transformation {
-              priority = 1
-              type     = "LOWERCASE"
-            }
-          }
-        }
-        statement {
-          size_constraint_statement {
-            field_to_match {
-              body {}
-            }
-            comparison_operator = "LE"
-            size                = var.brand_asset_upload_max_size
-            text_transformation {
-              priority = 1
-              type     = "NONE"
-            }
-          }
-        }
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "BrandAssetUploads"
-      sampled_requests_enabled   = false
-    }
-  }
-
-  visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "AdminFileUploadBodySizeLimitsRuleGroup"
-    sampled_requests_enabled   = false
+  # Answers to form questions in the runner, including file uploads
+  # /:mode/:form_id/:form_slug(.locale)/:page_slug(/:answer_index)
+  regular_expression {
+    regex_string = "^/(?:preview-draft|preview-archived|preview-live|form)/\\d+/[\\w-]+(\\.(cy|en))?/[a-zA-Z\\d]+(?:/\\d+)?$"
   }
 }
 
@@ -411,69 +113,6 @@ resource "aws_wafv2_web_acl" "this" {
   }
 
   rule {
-    name     = "AdminBodySizeLimitsRuleGroup"
-    priority = 2
-
-    override_action {
-      none {}
-    }
-
-    statement {
-      rule_group_reference_statement {
-        arn = aws_wafv2_rule_group.admin_body_size_limits.arn
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "AdminBodySizeLimitsRuleGroup"
-      sampled_requests_enabled   = false
-    }
-  }
-
-  rule {
-    name     = "PublicFormBodySizeLimitsRuleGroup"
-    priority = 3
-
-    override_action {
-      none {}
-    }
-
-    statement {
-      rule_group_reference_statement {
-        arn = aws_wafv2_rule_group.public_form_body_size_limits.arn
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "PublicFormBodySizeLimitsRuleGroup"
-      sampled_requests_enabled   = false
-    }
-  }
-
-  rule {
-    name     = "AdminFileUploadBodySizeLimitsRuleGroup"
-    priority = 1
-
-    override_action {
-      none {}
-    }
-
-    statement {
-      rule_group_reference_statement {
-        arn = aws_wafv2_rule_group.admin_file_upload_body_size_limits.arn
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "AdminFileUploadBodySizeLimitsRuleGroup"
-      sampled_requests_enabled   = false
-    }
-  }
-
-  rule {
     name     = "AWSManagedRulesCommonRuleSet"
     priority = 4
 
@@ -485,6 +124,15 @@ resource "aws_wafv2_web_acl" "this" {
       managed_rule_group_statement {
         name        = "AWSManagedRulesCommonRuleSet"
         vendor_name = "AWS"
+
+        # Counted rather than blocked so that the paths in body_size_limit_exempt_paths
+        # can be excluded; the block is applied by BlockOversizeBody below
+        rule_action_override {
+          name = "SizeRestrictions_BODY"
+          action_to_use {
+            count {}
+          }
+        }
       }
     }
 
@@ -540,6 +188,48 @@ resource "aws_wafv2_web_acl" "this" {
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "BlockOversizeBody"
+    priority = 7
+
+    action {
+      block {}
+    }
+
+    statement {
+      and_statement {
+        statement {
+          label_match_statement {
+            scope = "LABEL"
+            key   = "awswaf:managed:aws:core-rule-set:SizeRestrictions_Body"
+          }
+        }
+        statement {
+          not_statement {
+            statement {
+              regex_pattern_set_reference_statement {
+                arn = aws_wafv2_regex_pattern_set.body_size_limit_exempt_paths.arn
+                field_to_match {
+                  uri_path {}
+                }
+                text_transformation {
+                  priority = 1
+                  type     = "LOWERCASE"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "BlockOversizeBody"
       sampled_requests_enabled   = true
     }
   }
