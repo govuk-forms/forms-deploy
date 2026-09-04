@@ -14,6 +14,18 @@ output "private_subnet_ids" {
   ]
 }
 
+output "public_subnet_ids" {
+  value = [
+    aws_subnet.public_a.id,
+    aws_subnet.public_b.id,
+    aws_subnet.public_c.id
+  ]
+}
+
+output "alb_logs_bucket_name" {
+  value = module.logs_bucket.bucket_name
+}
+
 output "alb_arn_suffix" {
   value = aws_lb.alb.arn_suffix
 }
