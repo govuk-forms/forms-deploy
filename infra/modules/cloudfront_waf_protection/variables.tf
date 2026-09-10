@@ -69,6 +69,12 @@ variable "welsh_translation_post_body_max_size" {
   default     = 10 * 1024 * 1024 # 10 MB
 }
 
+variable "welsh_translation_upload_max_size" {
+  description = "The maximum allowed request body size in bytes for file uploads to the Welsh translations upload page"
+  type        = number
+  default     = 100 * 1024 * 1024 # 100 MB
+}
+
 variable "brand_asset_upload_max_size" {
   description = "The maximum request body size in bytes allowed when uploading brand assets in the admin app."
   type        = number
