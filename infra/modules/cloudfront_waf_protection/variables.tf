@@ -58,9 +58,15 @@ variable "standard_form_response_body_max_size" {
 }
 
 variable "admin_extended_post_body_max_size" {
-  description = "The maximum request body size allowed for admin endpoints that require larger payloads than standard operations"
+  description = "The maximum allowed request body size in bytes for admin endpoints that require larger payloads than standard operations"
   type        = number
   default     = 500 * 1024 # 500 KB
+}
+
+variable "welsh_translation_post_body_max_size" {
+  description = "The maximum allowed request body size in bytes for POST requests to the Welsh translation page"
+  type        = number
+  default     = 10 * 1024 * 1024 # 10 MB
 }
 
 variable "brand_asset_upload_max_size" {

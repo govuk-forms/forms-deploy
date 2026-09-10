@@ -43,10 +43,6 @@ resource "aws_wafv2_regex_pattern_set" "admin_extended_post_pages" {
   }
 
   regular_expression {
-    regex_string = "^/forms/\\d+/welsh-translation$"
-  }
-
-  regular_expression {
     regex_string = "^/forms/\\d+/routes$"
   }
 }
@@ -150,6 +146,53 @@ resource "aws_wafv2_rule_group" "admin_body_size_limits" {
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "AdminExtendedPostBodies"
+      sampled_requests_enabled   = false
+    }
+  }
+
+  rule {
+    # Allow larger POST bodies for the welsh translation page
+    name     = "allow_welsh_translation_post_bodies"
+    priority = 3
+
+    action {
+      allow {}
+      # Stop processing
+    }
+
+    statement {
+      and_statement {
+        statement {
+          regex_match_statement {
+            field_to_match {
+              uri_path {}
+            }
+            regex_string = "^/forms/\\d+/welsh-translation$"
+            text_transformation {
+              priority = 1
+              type     = "LOWERCASE"
+            }
+          }
+        }
+        statement {
+          size_constraint_statement {
+            field_to_match {
+              body {}
+            }
+            comparison_operator = "LE"
+            size                = var.welsh_translation_post_body_max_size
+            text_transformation {
+              priority = 1
+              type     = "NONE"
+            }
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "WelshTranslationPostBodies"
       sampled_requests_enabled   = false
     }
   }
