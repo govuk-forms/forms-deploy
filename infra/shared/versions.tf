@@ -11,11 +11,11 @@ terraform {
     }
     awscc = {
       source  = "hashicorp/awscc"
-      version = "1.98.0"
+      version = "1.100.0"
     }
     auth0 = {
       source  = "auth0/auth0"
-      version = "1.55.0"
+      version = "1.56.0"
     }
     random = {
       source  = "hashicorp/random"
