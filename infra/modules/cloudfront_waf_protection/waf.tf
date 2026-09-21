@@ -133,6 +133,15 @@ resource "aws_wafv2_web_acl" "this" {
             count {}
           }
         }
+
+        # Counted rather than blocked so that we can exclude specified paths; the block is
+        # applied by BlockXSSBody below
+        rule_action_override {
+          name = "CrossSiteScripting_BODY"
+          action_to_use {
+            count {}
+          }
+        }
       }
     }
 
@@ -230,6 +239,70 @@ resource "aws_wafv2_web_acl" "this" {
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "BlockOversizeBody"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "BlockXSSBody"
+    priority = 8
+
+    action {
+      block {}
+    }
+
+    statement {
+      and_statement {
+        statement {
+          label_match_statement {
+            scope = "LABEL"
+            key   = "awswaf:managed:aws:core-rule-set:CrossSiteScripting_Body"
+          }
+        }
+        statement {
+          not_statement {
+            statement {
+              and_statement {
+                statement {
+                  regex_match_statement {
+                    # Answers to form questions in the runner, including file uploads
+                    # /:mode/:form_id/:form_slug(.locale)/:page_slug(/:answer_index)
+                    regex_string = "^/(?:preview-draft|preview-archived|preview-live|form)/\\d+/[\\w-]+(\\.(cy|en))?/[a-zA-Z\\d]+(?:/\\d+)?$"
+                    field_to_match {
+                      uri_path {}
+                    }
+                    text_transformation {
+                      priority = 1
+                      type     = "LOWERCASE"
+                    }
+                  }
+                }
+                statement {
+                  byte_match_statement {
+                    # Only exempt file upload requests
+                    field_to_match {
+                      single_header {
+                        name = "content-type"
+                      }
+                    }
+                    positional_constraint = "STARTS_WITH"
+                    search_string         = "multipart/form-data"
+                    text_transformation {
+                      priority = 1
+                      type     = "LOWERCASE"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "BlockXSSBody"
       sampled_requests_enabled   = true
     }
   }
