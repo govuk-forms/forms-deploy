@@ -11,6 +11,10 @@ resource "aws_backup_plan" "daily_cross_account" {
     lifecycle {
       delete_after = 3
     }
+
+    copy_action {
+      destination_vault_arn = "arn:aws:backup:eu-west-2:842676007477:backup-vault:copy" # arn in the destination account
+    }
   }
 }
 

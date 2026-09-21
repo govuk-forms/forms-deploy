@@ -21,3 +21,7 @@ output "github_oidc_provider_arn" {
   description = "The ARN of the GitHub OIDC provider"
   value       = aws_iam_openid_connect_provider.github.arn
 }
+
+output "destination_vault_arn" {
+  value = aws_backup_vault.copy.arn
+}
