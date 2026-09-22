@@ -1,5 +1,9 @@
 data "aws_caller_identity" "current" {}
 
+module "other_accounts" {
+  source = "../../../modules/all-accounts"
+}
+
 resource "aws_backup_plan" "daily_cross_account" {
   name = "daily-cross-account"
 
@@ -19,7 +23,72 @@ resource "aws_backup_plan" "daily_cross_account" {
 }
 
 resource "aws_backup_vault" "main" {
-  name = "main"
+  name        = "main"
+  kms_key_arn = aws_kms_key.backup.arn
+}
+
+resource "aws_kms_key" "backup" {
+  description         = "For encrypting backups (AWS Backup)"
+  enable_key_rotation = true
+
+  policy = data.aws_iam_policy_document.backup_kms.json
+}
+
+data "aws_iam_policy_document" "backup_kms" {
+  statement {
+    sid    = "Enable IAM User Permissions"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+    actions   = ["kms:*"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "Allow use of the key"
+    effect = "Allow"
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root", # source account
+        "arn:aws:iam::${module.other_accounts.integration_account_id}:root" # destination account for copies
+      ]
+    }
+    actions = [
+      "kms:DescribeKey",
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKeyWithoutPlaintext"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "Allow attachment of persistent resources"
+    effect = "Allow"
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root", # source account
+        "arn:aws:iam::${module.other_accounts.integration_account_id}:root" # destination account for copies
+      ]
+    }
+    actions = [
+      "kms:CreateGrant",
+      "kms:ListGrants",
+      "kms:RevokeGrant"
+    ]
+    resources = ["*"]
+    condition {
+      test     = "Bool"
+      variable = "kms:GrantIsForAWSResource"
+      values   = ["true"]
+    }
+  }
 }
 
 resource "aws_backup_vault_policy" "main_backup" {
