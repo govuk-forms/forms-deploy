@@ -892,7 +892,8 @@ data "aws_iam_policy_document" "route53" {
     effect = "Allow"
     resources = [
       "arn:aws:route53:::hostedzone/${var.hosted_zone_id}",
-      "arn:aws:route53:::hostedzone/${var.private_internal_zone_id}"
+      "arn:aws:route53:::hostedzone/${var.private_internal_zone_id}",
+      "arn:aws:route53:::hostedzone/${var.internal_digital_zone_id}"
     ]
     sid = "ManageRoute53RecordSets"
   }
