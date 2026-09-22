@@ -34,6 +34,11 @@ resource "aws_kms_key" "backup" {
   policy = data.aws_iam_policy_document.backup_kms.json
 }
 
+resource "aws_kms_alias" "backup" {
+  name          = "alias/backup-vault-encryption"
+  target_key_id = aws_kms_key.backup.key_id
+}
+
 data "aws_iam_policy_document" "backup_kms" {
   statement {
     sid    = "Enable IAM User Permissions"
