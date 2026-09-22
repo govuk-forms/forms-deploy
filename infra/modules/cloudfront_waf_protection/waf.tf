@@ -201,8 +201,8 @@ resource "aws_wafv2_rule_group" "public_form_body_size_limits" {
             field_to_match {
               uri_path {}
             }
-            # /:mode/:form_id/:form_slug(.locale)/:page_slug
-            regex_string = "^/(?:preview-draft|preview-archived|preview-live|form)/\\d+/[\\w-]+(\\.(cy|en))?/[a-zA-Z\\d]+$"
+            # /:mode/:form_id/:form_slug(.locale)/:page_slug(/upload-file)
+            regex_string = "^/(?:preview-draft|preview-archived|preview-live|form)/\\d+/[\\w-]+(\\.(cy|en))?/[a-zA-Z\\d]+(?:/upload-file)?$"
             text_transformation {
               priority = 1
               type     = "LOWERCASE"
