@@ -89,7 +89,7 @@ This is used to allow the account hosting 'forms.internal.digital.gov.uk' to del
 The value is a map of string => list(string)
 
 {
-  "staging.forms.internal.digital.gov.uk" = ["ns1", "ns2", "n3"]
+  "staging.forms.internal.digital.gov.uk" = ["ns1", "ns2", "ns3"]
   "dev.forms.internal.digital.gov.uk" = ["ns4", "ns5", "ns6", "ns7"]
 }
 EOF
