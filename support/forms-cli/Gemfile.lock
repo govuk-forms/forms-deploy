@@ -16,7 +16,7 @@ GEM
       uri (>= 0.13.1)
     ast (2.4.3)
     aws-eventstream (1.4.0)
-    aws-partitions (1.1270.0)
+    aws-partitions (1.1287.0)
     aws-sdk (3.3.0)
       aws-sdk-resources (~> 3)
     aws-sdk-accessanalyzer (1.73.0)
@@ -276,8 +276,8 @@ GEM
     aws-sdk-codegurusecurity (1.30.0)
       aws-sdk-core (~> 3, >= 3.225.0)
       aws-sigv4 (~> 1.1)
-    aws-sdk-codepipeline (1.118.0)
-      aws-sdk-core (~> 3, >= 3.254.0)
+    aws-sdk-codepipeline (1.120.0)
+      aws-sdk-core (~> 3, >= 3.256.0)
       aws-sigv4 (~> 1.5)
     aws-sdk-codestarconnections (1.61.0)
       aws-sdk-core (~> 3, >= 3.225.0)
@@ -333,7 +333,7 @@ GEM
     aws-sdk-controltower (1.44.0)
       aws-sdk-core (~> 3, >= 3.225.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-core (3.254.0)
+    aws-sdk-core (3.257.0)
       aws-eventstream (~> 1, >= 1.3.0)
       aws-partitions (~> 1, >= 1.992.0)
       aws-sigv4 (~> 1.9)
@@ -341,6 +341,7 @@ GEM
       bigdecimal
       jmespath (~> 1, >= 1.6.1)
       logger
+      rexml (~> 3.4, >= 3.4.2)
     aws-sdk-costandusagereportservice (1.74.0)
       aws-sdk-core (~> 3, >= 3.225.0)
       aws-sigv4 (~> 1.5)
@@ -1535,8 +1536,8 @@ GEM
     aws-sdk-snowdevicemanagement (1.38.0)
       aws-sdk-core (~> 3, >= 3.225.0)
       aws-sigv4 (~> 1.1)
-    aws-sdk-sns (1.118.0)
-      aws-sdk-core (~> 3, >= 3.254.0)
+    aws-sdk-sns (1.121.0)
+      aws-sdk-core (~> 3, >= 3.256.0)
       aws-sigv4 (~> 1.5)
     aws-sdk-socialmessaging (1.9.0)
       aws-sdk-core (~> 3, >= 3.225.0)
@@ -1668,7 +1669,7 @@ GEM
     aws-sigv4 (1.12.1)
       aws-eventstream (~> 1, >= 1.0.2)
     base64 (0.3.0)
-    bigdecimal (4.1.2)
+    bigdecimal (4.1.3)
     colorize (1.1.0)
     concurrent-ruby (1.3.8)
     connection_pool (3.0.2)
@@ -1688,7 +1689,7 @@ GEM
       reline (>= 0.4.2)
     jmespath (1.6.2)
     json (2.21.2)
-    jwt (3.2.0)
+    jwt (3.3.0)
       base64
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
@@ -1696,7 +1697,7 @@ GEM
     minitest (6.0.6)
       drb (~> 2.0)
       prism (~> 1.5)
-    notifications-ruby-client (6.4.0)
+    notifications-ruby-client (6.5.1)
       jwt (>= 1.5, < 4)
     parallel (1.28.0)
     parser (3.3.11.1)
@@ -1798,7 +1799,7 @@ CHECKSUMS
   activesupport (8.1.3.1) sha256=85458765f25ea48b9019c46b6bb3fa5683197bf4280d9f06710a6e8d7a831376
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
   aws-eventstream (1.4.0) sha256=116bf85c436200d1060811e6f5d2d40c88f65448f2125bc77ffce5121e6e183b
-  aws-partitions (1.1270.0) sha256=378416d28f3d60d40e5bb595d6ca01c8659f1c27fa3d03787da75ed5f3c37184
+  aws-partitions (1.1287.0) sha256=76f4c73011654553566c5db5bbef0f24738bb016e923910e8b1b3f9cb7d989ca
   aws-sdk (3.3.0) sha256=f8c1222706957a6427fe293bafacf8f58bbde3f0a24fa2bf897fa3a220a4ccbc
   aws-sdk-accessanalyzer (1.73.0) sha256=45932c09db336e3a7357988994a4bcfee672536fe823ab4a7562073ff8178a5f
   aws-sdk-account (1.43.0) sha256=1c038c4bf12f14596d331049701cd7f95a12df18081b4726d1c9bf9a11c28bcd
@@ -1886,7 +1887,7 @@ CHECKSUMS
   aws-sdk-codeguruprofiler (1.55.0) sha256=700d34837eb11c53681619d9d5df60c33d2d204a363d1a3ade14cd3476008334
   aws-sdk-codegurureviewer (1.66.0) sha256=8afce8331f2b3ea1132f4da26be9a71c0ef8ac39c3be2eb9de8e845e7130f091
   aws-sdk-codegurusecurity (1.30.0) sha256=387a224e3af461d601b14a7a581a26e98dbbef7b5ff7c6c258ccfc985a4b90a3
-  aws-sdk-codepipeline (1.118.0) sha256=197a97d1b532484f38d87b7c3ceccf50afed2db27ed1807a2e9cad7b8962f14e
+  aws-sdk-codepipeline (1.120.0) sha256=41f23a9f9db22a2a5c3764c770320be42c2529015df4da27e00aeba8433725e9
   aws-sdk-codestarconnections (1.61.0) sha256=a21b2a069de2cf12a16a9c55bd0632d0db1c052e9b79c3e83ed5e6e65a37474d
   aws-sdk-codestarnotifications (1.52.0) sha256=bbaec5db84b1d641573aedd07fe447251134cc079e2d8c3f64bab1e2031749d3
   aws-sdk-cognitoidentity (1.74.0) sha256=96922193861718ab6f87e8ebb9b715a0fab5b40f4e19d8867dad2c3474274e93
@@ -1905,7 +1906,7 @@ CHECKSUMS
   aws-sdk-connectwisdomservice (1.48.0) sha256=43f5eb48aeb1f9359bf5434bc20e39957625dae1257fff96ccf9f1d277e35266
   aws-sdk-controlcatalog (1.26.0) sha256=b6681ecc4374f3e4642ef3cc64693119857dccca75821d00277907d2b3277434
   aws-sdk-controltower (1.44.0) sha256=004d8eb94633b320e856a03046e09660f73570028a03464d69c24d3ff0314497
-  aws-sdk-core (3.254.0) sha256=ee3e3220b8468a3c9e59daba18e6ec897bf5c7ce8adcc0670cfa2f1f092112fe
+  aws-sdk-core (3.257.0) sha256=a92ad19c7ff668cec6688ee3200ee562da80647a3bbeed9fda02e8b0ca6492c6
   aws-sdk-costandusagereportservice (1.74.0) sha256=e03c0477c44633d911fa0af6ce6ebc6cc58d8628dea3694d4981924272ffdcce
   aws-sdk-costexplorer (1.128.0) sha256=8d255ca42901e44ee8c2861beda077a8258065e0e954ddf00a46b322f8cc026a
   aws-sdk-costoptimizationhub (1.27.0) sha256=d1acf245bee789f3364a62a6ba9199b2e57897a48a00d7eeb49566d697a10a14
@@ -2168,7 +2169,7 @@ CHECKSUMS
   aws-sdk-sms (1.72.0) sha256=ce047621ec6c8860281599c93f57e99967606a872ac12416b8efbe593592e6f1
   aws-sdk-snowball (1.87.0) sha256=da8a39bed87a9626b0b5ba70b259a3ef64c82208fd7699aff71110710fd07cc5
   aws-sdk-snowdevicemanagement (1.38.0) sha256=fa8cb2f7bc4d62844cc6ce56a83b3349da9e57c175c21a3f550dca15c09bdd1d
-  aws-sdk-sns (1.118.0) sha256=46786eb1a27f8031163572043ed750cd292a1ca408527c5589ba5ecd43a0d2b9
+  aws-sdk-sns (1.121.0) sha256=68124e4deab8335797826d777cd9cbc6ba23c8b293fe71360bafac6123c4688d
   aws-sdk-socialmessaging (1.9.0) sha256=5f77b81bc2386a08735ac7baa3b1320490bc3b619e3cb7d915855f60c9b65d9b
   aws-sdk-sqs (1.96.0) sha256=842bc82a07a46b81e6543c8f49dc8b5b7e93427a13d08199624aa962dc2c0bac
   aws-sdk-ssm (1.197.0) sha256=dcd48f5ba60bce8716f5bdb73a779aa792ace9bbeac270b54ebef35e893d50c1
@@ -2214,7 +2215,7 @@ CHECKSUMS
   aws-sigv2 (1.3.1) sha256=dd7b72e867d611a0da310ebd8bee2071c6c9d4cc70f7e3d2526d1c1fa24c9410
   aws-sigv4 (1.12.1) sha256=6973ff95cb0fd0dc58ba26e90e9510a2219525d07620c8babeb70ef831826c00
   base64 (0.3.0) sha256=27337aeabad6ffae05c265c450490628ef3ebd4b67be58257393227588f5a97b
-  bigdecimal (4.1.2) sha256=53d217666027eab4280346fba98e7d5b66baaae1b9c3c1c0ffe89d48188a3fbd
+  bigdecimal (4.1.3) sha256=61ebe1e5e559bdc3cc6f2c0ee7f427321fc838f59611c294356eb04d6e21cf66
   bundler (4.0.13) sha256=19f08be7f27022cf0b89f27da0b044ae075e8270a9ef44ad248a932614e1ca3b
   colorize (1.1.0) sha256=30b5237f0603f6662ab8d1fc2bd4a96142b806c6415d79e45ef5fdc6a0cfc837
   concurrent-ruby (1.3.8) sha256=b2f1be836e968ccc78ccfce277ea79c72a88633f22306782c16ff23fb415d1e1
@@ -2229,12 +2230,12 @@ CHECKSUMS
   irb (1.16.0) sha256=2abe56c9ac947cdcb2f150572904ba798c1e93c890c256f8429981a7675b0806
   jmespath (1.6.2) sha256=238d774a58723d6c090494c8879b5e9918c19485f7e840f2c1c7532cf84ebcb1
   json (2.21.2) sha256=1f1d3b7cf2b3ba1a69beca0bb6db13d5438b80bff3cd54cdaaa620b9b07c1c6a
-  jwt (3.2.0) sha256=5419b1fe37b1da0982bd07051f573a8b8789ab724c2aa7e785e4784a3ed217d7
+  jwt (3.3.0) sha256=44cc34fbc341c148233cf66641522b4bce0dfb1ce55e8073f05c56f44f4ee546
   language_server-protocol (3.17.0.5) sha256=fd1e39a51a28bf3eec959379985a72e296e9f9acfce46f6a79d31ca8760803cc
   lint_roller (1.1.0) sha256=2c0c845b632a7d172cb849cc90c1bce937a28c5c8ccccb50dfd46a485003cc87
   logger (1.7.0) sha256=196edec7cc44b66cfb40f9755ce11b392f21f7967696af15d274dde7edff0203
   minitest (6.0.6) sha256=153ea36d1d987a62942382b61075745042a2b3123b1cd48f4c3675af9cc7d6f1
-  notifications-ruby-client (6.4.0) sha256=1aff01a7990d6c2b8a261c144e1d65143372da4674f73dd37409ca287dcc2822
+  notifications-ruby-client (6.5.1) sha256=d6289c07f3e1228c90c55f4d599e1a4bbf1e276c47dafc65d2308ff234945d74
   parallel (1.28.0) sha256=33e6de1484baf2524792d178b0913fc8eb94c628d6cfe45599ad4458c638c970
   parser (3.3.11.1) sha256=d17ace7aabe3e72c3cc94043714be27cc6f852f104d81aa284c2281aecc65d54
   pp (0.6.3) sha256=2951d514450b93ccfeb1df7d021cae0da16e0a7f95ee1e2273719669d0ab9df6
