@@ -74,6 +74,29 @@ EOF
   nullable    = false
 }
 
+variable "internal_apex_domain" {
+  type        = string
+  description = "The apex domain under 'internal.digital.gov.uk' that will be hosted in the account. For example 'forms.internal.digital.gov.uk', 'staging.forms.internal.digital.gov.uk'"
+  nullable    = false
+}
+
+variable "internal_dns_delegation_records" {
+  type        = map(list(string))
+  description = <<EOF
+Any DNS delegation records to set within the internal apex domain's zone.
+This is used to allow the account hosting 'forms.internal.digital.gov.uk' to delegate subdomains to other accounts
+
+The value is a map of string => list(string)
+
+{
+  "staging.forms.internal.digital.gov.uk" = ["ns1", "ns2", "n3"]
+  "dev.forms.internal.digital.gov.uk" = ["ns4", "ns5", "ns6", "ns7"]
+}
+EOF
+  default     = {}
+  nullable    = false
+}
+
 variable "codestar_connection_arn" {
   description = "It isn't possible to automate the creation of a CodeStar connection, so we must create it by hand once in each account and hardcode its ARN."
   type        = string

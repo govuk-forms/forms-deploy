@@ -17,6 +17,25 @@ resource "aws_route53_record" "domain_delegations" {
   records  = each.value
 }
 
+resource "aws_route53_zone" "internal_digital" {
+  #checkov:skip=CKV2_AWS_38:DNSSEC is not currently necessary
+  #checkov:skip=CKV2_AWS_39:DNS query logging not necessary
+  name = "${var.internal_apex_domain}."
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "aws_route53_record" "internal_domain_delegations" {
+  for_each = var.internal_dns_delegation_records
+  zone_id  = aws_route53_zone.internal_digital.id
+  name     = each.key
+  type     = "NS"
+  ttl      = 60
+  records  = each.value
+}
+
 # Create a dummy VPC for the internal zone
 # This is used to create the internal zone in the account,
 # before the real VPC is available from the environment deployment
