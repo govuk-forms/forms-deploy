@@ -47,6 +47,11 @@ resource "aws_wafv2_regex_pattern_set" "file_upload_paths" {
   regular_expression {
     regex_string = "^/brands(?:/\\d+)?$"
   }
+
+  # Upload CSV of Welsh translations
+  regular_expression {
+    regex_string = "^/forms/\\d+/welsh-translation-upload$"
+  }
 }
 
 resource "aws_wafv2_regex_pattern_set" "body_size_limit_exempt_paths" {
