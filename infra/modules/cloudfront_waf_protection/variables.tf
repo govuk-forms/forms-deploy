@@ -36,24 +36,6 @@ variable "rate_limit_bypass_cidrs" {
   default     = []
 }
 
-variable "file_upload_max_size" {
-  description = "The maximum file size allowed for uploads in bytes. This should be larger than the maximum file size defined in the form schema, so that people can get the pretty error message from the form rather than a WAF error."
-  type        = number
-  default     = 100 * 1024 * 1024 # 100 MB
-}
-
-variable "standard_form_response_body_max_size" {
-  description = "The default maximum size allowed for each form response body in bytes (ie. all response fields except file uploads). This should be larger than the maximum size defined in the form schema, so that people can get the pretty error message from the form rather than a WAF error."
-  type        = number
-  default     = 100 * 1024 # 100 KB
-}
-
-variable "brand_asset_upload_max_size" {
-  description = "The maximum request body size in bytes allowed when uploading brand assets in the admin app."
-  type        = number
-  default     = 10 * 1024 * 1024 # 10 MB
-}
-
 variable "kinesis_subscription_role_arn" {
   description = "The arn of the role that is allowed to subscribe to the kinesis stream"
   type        = string

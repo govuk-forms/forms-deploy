@@ -31,208 +31,21 @@ resource "aws_wafv2_ip_set" "ips_to_block" {
   addresses = var.ips_to_block
 }
 
-resource "aws_wafv2_rule_group" "public_form_body_size_limits" {
+resource "aws_wafv2_regex_pattern_set" "file_upload_paths" {
   provider = aws.us-east-1
 
-  name        = "${var.environment_name}-public-form-body-size-limits"
-  description = "Rule group for public form request body size restrictions"
+  name        = "${var.environment_name}-file-upload-paths"
+  description = "Paths that handle file uploads. These are allowed through all WAF rules to bypass the 8KB limit and other rules that may block requests based on the file content."
   scope       = "CLOUDFRONT"
-  capacity    = 50
 
-  rule {
-    # Allow file uploads when filling out a form
-    name     = "allow_file_uploads"
-    priority = 1
-
-    action {
-      allow {}
-      # Stop processing
-    }
-
-    statement {
-      and_statement {
-        statement {
-          byte_match_statement {
-            field_to_match {
-              single_header {
-                name = "content-type"
-              }
-            }
-            positional_constraint = "STARTS_WITH"
-            search_string         = "multipart/form-data"
-            text_transformation {
-              priority = 1
-              type     = "LOWERCASE"
-            }
-          }
-        }
-        statement {
-          regex_match_statement {
-            field_to_match {
-              uri_path {}
-            }
-            # /:mode/:form_id/:form_slug(.locale)/:page_slug(/upload-file)
-            regex_string = "^/(?:preview-draft|preview-archived|preview-live|form)/\\d+/[\\w-]+(\\.(cy|en))?/[a-zA-Z\\d]+(?:/upload-file)?$"
-            text_transformation {
-              priority = 1
-              type     = "LOWERCASE"
-            }
-          }
-        }
-        statement {
-          size_constraint_statement {
-            field_to_match {
-              body {}
-            }
-            comparison_operator = "LE"
-            size                = var.file_upload_max_size
-            text_transformation {
-              priority = 1
-              type     = "NONE"
-            }
-          }
-        }
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "FileUploads"
-      sampled_requests_enabled   = false
-    }
+  # File uploads when filling out a form: /:mode/:form_id/:form_slug(.locale)/:page_slug/upload-file
+  regular_expression {
+    regex_string = "^/(?:preview-draft|preview-archived|preview-live|form)/\\d+/[\\w-]+(\\.(cy|en))?/[a-zA-Z\\d]+/upload-file$"
   }
 
-  rule {
-    # Enforce standard maximum size for form response bodies
-    # ie. POST requests to standard form fields (text inputs, selections, etc.)
-    name     = "allow_standard_form_responses"
-    priority = 2
-
-    action {
-      allow {}
-      # Stop processing
-    }
-
-    statement {
-      and_statement {
-        statement {
-          regex_match_statement {
-            field_to_match {
-              uri_path {}
-            }
-            # /:mode/:form_id/:form_slug(.locale)/:page_slug(/:answer_index)
-            regex_string = "^/(?:preview-draft|preview-archived|preview-live|form)/\\d+/[\\w-]+(\\.(cy|en))?/[a-zA-Z\\d]+(?:/\\d+)?$"
-            text_transformation {
-              priority = 1
-              type     = "LOWERCASE"
-            }
-          }
-        }
-        statement {
-          size_constraint_statement {
-            field_to_match {
-              body {}
-            }
-            comparison_operator = "LE"
-            size                = var.standard_form_response_body_max_size
-            text_transformation {
-              priority = 1
-              type     = "NONE"
-            }
-          }
-        }
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "StandardFormResponses"
-      sampled_requests_enabled   = false
-    }
-  }
-
-  visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "PublicFormBodySizeLimitsRuleGroup"
-    sampled_requests_enabled   = false
-  }
-}
-
-resource "aws_wafv2_rule_group" "admin_file_upload_body_size_limits" {
-  provider = aws.us-east-1
-
-  name        = "${var.environment_name}-admin-file-upload-body-size-limits"
-  description = "Rule group for admin file upload request body size restrictions"
-  scope       = "CLOUDFRONT"
-  capacity    = 50
-
-  rule {
-    # Allow file uploads when uploading brand assets
-    name     = "allow_brand_asset_uploads"
-    priority = 1
-
-    action {
-      allow {}
-      # Stop processing
-    }
-
-    statement {
-      and_statement {
-        statement {
-          byte_match_statement {
-            field_to_match {
-              single_header {
-                name = "content-type"
-              }
-            }
-            positional_constraint = "STARTS_WITH"
-            search_string         = "multipart/form-data"
-            text_transformation {
-              priority = 1
-              type     = "LOWERCASE"
-            }
-          }
-        }
-        statement {
-          regex_match_statement {
-            field_to_match {
-              uri_path {}
-            }
-            # POST /brands creates a brand, POST /brands/:id updates one
-            regex_string = "^/brands(?:/\\d+)?$"
-            text_transformation {
-              priority = 1
-              type     = "LOWERCASE"
-            }
-          }
-        }
-        statement {
-          size_constraint_statement {
-            field_to_match {
-              body {}
-            }
-            comparison_operator = "LE"
-            size                = var.brand_asset_upload_max_size
-            text_transformation {
-              priority = 1
-              type     = "NONE"
-            }
-          }
-        }
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "BrandAssetUploads"
-      sampled_requests_enabled   = false
-    }
-  }
-
-  visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "AdminFileUploadBodySizeLimitsRuleGroup"
-    sampled_requests_enabled   = false
+  # Brand asset uploads in the admin app: POST /brands creates a brand, POST /brands/:id updates one
+  regular_expression {
+    regex_string = "^/brands(?:/\\d+)?$"
   }
 }
 
@@ -315,43 +128,33 @@ resource "aws_wafv2_web_acl" "this" {
   }
 
   rule {
-    name     = "PublicFormBodySizeLimitsRuleGroup"
-    priority = 3
+    # The WAF cannot block request bodies larger than 16KB selectively based on size, except using the Content-Length
+    # header which can be spoofed and so is ineffective. We don't apply other rules as rules such as the XSS rule are
+    # likely to return false positives for files.
+    name     = "allow_file_upload_paths"
+    priority = 2
 
-    override_action {
-      none {}
+    action {
+      allow {}
+      # Stop processing - no WAF rules are applied
     }
 
     statement {
-      rule_group_reference_statement {
-        arn = aws_wafv2_rule_group.public_form_body_size_limits.arn
+      regex_pattern_set_reference_statement {
+        arn = aws_wafv2_regex_pattern_set.file_upload_paths.arn
+        field_to_match {
+          uri_path {}
+        }
+        text_transformation {
+          priority = 1
+          type     = "LOWERCASE"
+        }
       }
     }
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "PublicFormBodySizeLimitsRuleGroup"
-      sampled_requests_enabled   = false
-    }
-  }
-
-  rule {
-    name     = "AdminFileUploadBodySizeLimitsRuleGroup"
-    priority = 1
-
-    override_action {
-      none {}
-    }
-
-    statement {
-      rule_group_reference_statement {
-        arn = aws_wafv2_rule_group.admin_file_upload_body_size_limits.arn
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "AdminFileUploadBodySizeLimitsRuleGroup"
+      metric_name                = "FileUploadPaths"
       sampled_requests_enabled   = false
     }
   }
