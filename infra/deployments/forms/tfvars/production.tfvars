@@ -37,7 +37,8 @@ environmental_settings = {
     "@gov.scot",
     "@gov.wales",
     "@dhsc.egresscloud.com",
-    "@acas.org.uk"
+    "@acas.org.uk",
+    "@nsandi.com"
   ]
   forms_product_page_support_url           = "https://www.forms.service.gov.uk/support"
   rds_maintenance_window                   = "wed:04:00-wed:04:30"
