@@ -17,9 +17,16 @@ resource "aws_backup_plan" "daily_cross_account" {
     }
 
     copy_action {
-      destination_vault_arn = "arn:aws:backup:eu-west-2:842676007477:backup-vault:copy" # arn in the destination account
+      # destination_vault_arn = "arn:aws:backup:eu-west-2:842676007477:backup-vault:copy" # arn in the destination account
+      destination_vault_arn = aws_backup_logically_air_gapped_vault.lag_backup.arn
     }
   }
+}
+
+resource "aws_backup_logically_air_gapped_vault" "lag_backup" {
+  name               = "lag-example-vault"
+  max_retention_days = 7
+  min_retention_days = 7
 }
 
 resource "aws_backup_vault" "main" {
