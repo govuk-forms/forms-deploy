@@ -137,7 +137,7 @@ resource "aws_wafv2_web_acl" "this" {
     # header which can be spoofed and so is ineffective. We don't apply other rules as rules such as the XSS rule are
     # likely to return false positives for files.
     name     = "allow_file_upload_paths"
-    priority = 2
+    priority = 1
 
     action {
       allow {}
@@ -166,7 +166,7 @@ resource "aws_wafv2_web_acl" "this" {
 
   rule {
     name     = "AWSManagedRulesCommonRuleSet"
-    priority = 4
+    priority = 2
 
     override_action {
       none {}
