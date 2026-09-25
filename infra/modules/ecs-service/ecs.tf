@@ -124,6 +124,12 @@ locals {
     readonlyRootFilesystem = true,
     cpu                    = var.adot_sidecar_cpu,
     memory                 = var.adot_sidecar_memory,
+    # A hash of the collector config is included as a Docker label so that any change to
+    # the config template produces a different container_definitions JSON, which forces a
+    # new task definition revision and triggers an ECS redeployment automatically.
+    dockerLabels = {
+      "adot-config-hash" = sha256(aws_ssm_parameter.adot_collector_config[0].value)
+    },
     secrets = [
       {
         name      = "AOT_CONFIG_CONTENT"
