@@ -79,7 +79,9 @@ To recreate the `deploy` environment, apply the following roots:
 
 ### DNS For GOV.UK Forms
 
-The `forms.service.gov.uk` domain is delegated to a Route53 Hosted Zone in our production environment. The `production` configuration of the `forms/account` root manages records to delegate the `dev.`, `staging.`, and `research.` subdomains to Route53 Hosted Zones in their respective environments. This is achieved by creating `NS` records within the production Hosted Zone which point to the name server addresses output when applying the `forms/account` root in each environment.
+The `forms.service.gov.uk` domain is delegated to a Route53 Hosted Zone in our production environment. The `production` configuration of the `forms/account` root manages records to delegate the `dev.` and `staging.` subdomains to Route53 Hosted Zones in their respective environments. This is achieved by creating `NS` records within the production Hosted Zone which point to the name server addresses output when applying the `forms/account` root in each environment.
+
+The `forms.internal.digital.gov.uk` domain follows the same pattern. It is delegated from the GDS `internal.digital.gov.uk` zone to a Route53 Hosted Zone in our production environment, and the `production` configuration of the `forms/account` root delegates the `dev.` and `staging.` subdomains to Hosted Zones in those environments via `internal_dns_delegation_records`. The name servers for each environment's zone are available from the `internal_digital_name_servers` output of the `forms/account` root.
 
 
 ### Linting and Static Analysis

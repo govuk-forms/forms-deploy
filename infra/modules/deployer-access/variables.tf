@@ -30,6 +30,12 @@ variable "private_internal_zone_id" {
   nullable    = false
 }
 
+variable "internal_digital_zone_id" {
+  description = "The ID of the internal.digital.gov.uk hosted zone in the account, to which DNS records will be added"
+  type        = string
+  nullable    = false
+}
+
 variable "codestar_connection_arn" {
   description = "It isn't possible to automate the creation of a CodeStar connection, so we must create it by hand once in each account and hardcode its ARN."
   type        = string

@@ -31,7 +31,9 @@ dns_delegation_records = {
     "ns-785.awsdns-34.net",
   ]
 }
-codestar_connection_arn   = "arn:aws:codeconnections:eu-west-2:443944947292:connection/a2c94a66-2c03-45db-bb18-5c37f8b44531"
-deploy_account_id         = "711966560482"
-pentester_email_addresses = []
-pentester_cidr_ranges     = []
+internal_apex_domain            = "forms.internal.digital.gov.uk"
+internal_dns_delegation_records = {}
+codestar_connection_arn         = "arn:aws:codeconnections:eu-west-2:443944947292:connection/a2c94a66-2c03-45db-bb18-5c37f8b44531"
+deploy_account_id               = "711966560482"
+pentester_email_addresses       = []
+pentester_cidr_ranges           = []
