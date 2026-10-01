@@ -1,0 +1,138 @@
+# syntax=docker/sandbox-kit:3
+# The line above must stay first: it tells the builder this is a kit
+# descriptor rather than a Dockerfile.
+schemaVersion: "3"
+kind: mixin
+displayName: GOV.UK Forms development
+description: >-
+  Ruby and Node (via mise, versions from each repo's .ruby-version and .nvmrc)
+  plus Postgres and Valkey (via Docker Compose) for the GOV.UK Forms Rails
+  apps. On each start it installs gems and npm packages and prepares the dev
+  and test databases.
+version: "1.0.0"
+
+capabilities:
+  - type: com.docker.sandbox/network-policy@1
+    config:
+      # Open only while the install hooks run
+      install:
+        allow:
+          # apt-get update fails if any configured source is unreachable, so
+          # every source in the claude workload is listed
+          - archive.ubuntu.com
+          - security.ubuntu.com
+          - ports.ubuntu.com
+          - download.docker.com
+          # mise's installer
+          - mise.run
+          - mise.jdx.dev
+          - github.com
+          - "*.githubusercontent.com"
+      runtime:
+        allow:
+          # mise, Ruby and Node downloads
+          - mise.jdx.dev
+          - mise-versions.jdx.dev
+          - github.com
+          - api.github.com
+          - "*.githubusercontent.com"
+          - nodejs.org
+          - cache.ruby-lang.org
+          # gems and npm packages
+          - rubygems.org
+          - "*.rubygems.org"
+          - registry.npmjs.org
+          # Postgres and Valkey images
+          - registry-1.docker.io
+          - auth.docker.io
+          - production.cloudflare.docker.com
+
+  # The GitHub token from `sbx secret set github`, if the person stored one.
+  # The repos' SSH remotes are rewritten to HTTPS below so git uses it too.
+  - type: com.docker.sandbox/credential@1
+    optional: true
+    description: GitHub access for git push and gh
+    config:
+      service: github
+      phase: runtime
+      apiKey:
+        name: GH_TOKEN
+        proxyManaged: true
+        inject:
+          - {domain: api.github.com, header: Authorization, format: "Bearer %s"}
+          - {domain: github.com, scheme: basic, username: x-access-token}
+
+  - type: com.docker.sandbox/lifecycle@1
+    config:
+      install:
+        - description: Install build dependencies for Ruby and native gems
+          user: "0"
+          env: &network
+            # The sandbox's proxy, and the CA bundle that trusts it. Hooks only
+            # see the variables they list.
+            - HTTP_PROXY
+            - HTTPS_PROXY
+            - NO_PROXY
+            - http_proxy
+            - https_proxy
+            - no_proxy
+            - SSL_CERT_FILE
+            - NODE_EXTRA_CA_CERTS
+            - NODE_USE_ENV_PROXY
+          command: >
+            apt-get update &&
+            apt-get install -y --no-install-recommends
+            build-essential libpq-dev libyaml-dev libssl-dev zlib1g-dev libffi-dev
+            postgresql-client git curl ca-certificates
+
+        - description: Install mise and read .ruby-version and .nvmrc files
+          user: agent
+          env: *network
+          command: >
+            curl -fsSL https://mise.run | sh &&
+            ~/.local/bin/mise settings add idiomatic_version_file_enable_tools ruby &&
+            ~/.local/bin/mise settings add idiomatic_version_file_enable_tools node
+
+        # Ahead of the image's own Node. Claude's Bash tool sources
+        # $CLAUDE_ENV_FILE before every command, so this reaches non-login
+        # shells too.
+        - description: Put mise shims first on PATH for every shell
+          user: agent
+          env: [CLAUDE_ENV_FILE]
+          command: >
+            for rc in ~/.bashrc ~/.profile "${CLAUDE_ENV_FILE:-/etc/sandbox-persistent.sh}"; do
+            grep -q 'mise/shims' "$rc" 2>/dev/null ||
+            echo 'export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"' >> "$rc";
+            done
+
+        # The repos' remotes are SSH, but the sandbox has no SSH key. Over
+        # HTTPS the proxy adds the GitHub token. This only changes the
+        # sandbox's ~/.gitconfig.
+        - description: Use HTTPS for GitHub so pushes use the github secret
+          user: agent
+          command: >
+            git config --global --replace-all url.https://github.com/.insteadOf git@github.com: git@github.com: &&
+            git config --global --add url.https://github.com/.insteadOf ssh://git@github.com/
+
+        # The repos are mounted side by side at their host paths, so their
+        # parent holds exactly the ones sbxenv.yaml mounts. The scripts read
+        # it from here, so they also work when run by hand.
+        - description: Record the folder holding the repos for the forms-dev scripts
+          user: agent
+          env: [WORKSPACE_DIR]
+          command: >
+            mkdir -p ~/.config/forms-dev &&
+            dirname "$WORKSPACE_DIR" > ~/.config/forms-dev/workdir
+
+      startup:
+        - description: Start Postgres and Valkey, mount sandbox-only node_modules
+          env: [DOCKER_HOST]
+          command: [forms-dev-up]
+        - description: Install gems and npm packages, prepare databases
+          background: true
+          env: *network
+          command: [sh, -c, "forms-app-setup > /tmp/forms-app-setup.log 2>&1"]
+
+  - type: com.docker.sandbox/agent-context@1
+    config:
+      contentFile: ./forms-dev-context.md

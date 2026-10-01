@@ -1,0 +1,61 @@
+# Docker Sandboxes environment for GOV.UK Forms development.
+#
+# Mounts the GOV.UK Forms repos into one Claude sandbox, with Ruby, Node and
+# the Postgres/Valkey services from ../compose.yaml. See README.md in this
+# directory for setup.
+#
+#   ./setup.sh     # once per person
+#   sbx env run    # from this directory
+#
+# Run sbx env commands from this directory without a path: only then does sbx
+# merge in your personal ~/.sbxenv.yaml (your git identity).
+#
+# https://docs.docker.com/ai/sandboxes/configuration/environment-files
+schemaVersion: "1"
+name: govuk-forms
+
+# The v3 Claude Code workload. `agent:` is the handle sbx derives from the
+# kit reference under kits:. Bump the tag to move to a newer Claude Code.
+agent: sbx-kit-claude
+kits:
+  - docker.io/docker/sbx-kit-claude:2.1.267
+  # Claude Code through the team's model gateway (ai-gateway/)
+  - ./ai-gateway
+  # Ruby, Node, Postgres and Valkey for the apps (forms-dev/)
+  - ./forms-dev
+
+# The repos, cloned side by side. Each is mounted at its host path, and
+# Claude starts in forms-deploy, which holds this environment.
+workspace: ../..
+additionalWorkspaces:
+  - path: ../../../forms-admin
+  - path: ../../../forms-runner
+  - path: ../../../forms-product-page
+
+env:
+  # Rails binds to localhost in development; listen on all interfaces so the
+  # published ports below can reach the apps.
+  # Don't add app config here (RAILS_ENV, REDIS_URL, SETTINGS__*): these
+  # variables also reach specs and override the apps' test settings.
+  BINDING: 0.0.0.0
+
+# Where the proxy may use each stored secret. setup.sh stores the secrets;
+# this only approves them for these hosts.
+bindings:
+  ai-gateway:
+    apiKey:
+      domains:
+        - licenseportal.aiengineeringlab.co.uk
+  github:
+    apiKey:
+      domains:
+        - api.github.com
+        - github.com
+
+ports:
+  - sandbox: 3000 # forms-admin
+    host: 3000
+  - sandbox: 3001 # forms-runner
+    host: 3001
+  - sandbox: 3002 # forms-product-page
+    host: 3002

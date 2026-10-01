@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Runs on every sandbox start, before the app setup. Starts Postgres and
+# Valkey, and gives each app a sandbox-only node_modules so Linux packages
+# never overwrite the macOS ones in the host checkout.
+set -euo pipefail
+
+WS="$(cat "$HOME/.config/forms-dev/workdir")"
+
+for _ in $(seq 1 60); do
+  docker info >/dev/null 2>&1 && break
+  sleep 1
+done
+docker compose -f "$WS/forms-deploy/local/compose.yaml" up -d postgres redis
+
+# Every app with Ruby and npm dependencies (see forms-app-setup)
+for dir in "$WS"/*/; do
+  dir="${dir%/}"
+  [ -f "$dir/Gemfile" ] && [ -f "$dir/package-lock.json" ] || continue
+  target="$dir/node_modules"
+  store="$HOME/.cache/forms-node-modules/$(basename "$dir")"
+  mkdir -p "$store" "$target"
+  if ! mountpoint -q "$target"; then
+    sudo mount --bind "$store" "$target"
+  fi
+done

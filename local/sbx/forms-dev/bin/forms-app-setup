@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+# Installs Ruby, Node, gems and npm packages and prepares the development and
+# test databases for each app. Idempotent: runs in the background on every
+# sandbox start, and can be re-run by hand. Progress: /tmp/forms-app-setup.log
+set -uo pipefail
+
+export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
+export PGPASSWORD=postgres
+WS="$(cat "$HOME/.config/forms-dev/workdir")"
+STATUS=/tmp/forms-app-setup.status
+
+echo running > "$STATUS"
+failed=""
+
+log() { echo "== [$(date +%T)] $*"; }
+
+db_exists() {
+  psql -h localhost -U postgres -tAc "SELECT 1 FROM pg_database WHERE datname = '$1'" | grep -q 1
+}
+
+# Every app with Ruby and npm dependencies (see forms-dev-up)
+apps() {
+  for dir in "$WS"/*/; do
+    dir="${dir%/}"
+    [ -f "$dir/Gemfile" ] && [ -f "$dir/package-lock.json" ] && basename "$dir"
+  done
+}
+
+setup_app() {
+  local app="$1" dir="$WS/$1"
+  cd "$dir" || return 1
+
+  # Versions from the app's .ruby-version and .nvmrc
+  log "$app: ruby $(cat .ruby-version 2>/dev/null), node $(cat .nvmrc 2>/dev/null)"
+  mise install || return 1
+
+  # Never run npm against the host's node_modules (see forms-dev-up)
+  if ! mountpoint -q node_modules; then
+    log "$app: node_modules is not the sandbox-only mount, skipping npm"
+    return 1
+  fi
+  local lock_sum
+  lock_sum="$(sha256sum package-lock.json | cut -d' ' -f1)"
+  if [ "$(cat node_modules/.forms-lock-sum 2>/dev/null)" != "$lock_sum" ]; then
+    log "$app: npm ci"
+    npm ci --no-audit --no-fund || return 1
+    echo "$lock_sum" > node_modules/.forms-lock-sum
+  fi
+
+  log "$app: bundle install"
+  bundle check >/dev/null || bundle install || return 1
+
+  [ -f config/database.yml ] || return 0
+
+  log "$app: development database"
+  bin/rails db:prepare || return 1
+
+  local test_db="${app//-/_}_test"
+  if ! db_exists "$test_db"; then
+    log "$app: test database"
+    RAILS_ENV=test bin/rails db:create db:schema:load || return 1
+  fi
+}
+
+for _ in $(seq 1 60); do
+  pg_isready -q -h localhost && break
+  sleep 1
+done
+
+first=""
+for app in $(apps); do
+  if setup_app "$app"; then
+    log "$app: ready"
+    first="${first:-$app}"
+  else
+    log "$app: FAILED"
+    failed="$failed $app"
+  fi
+done
+
+# Default versions outside the app directories, from the first app set up
+if [ -n "$first" ]; then
+  (cd "$WS/$first" && mise use -g "ruby@$(cat .ruby-version)" "node@$(cat .nvmrc)" >/dev/null)
+fi
+
+if [ -n "$failed" ]; then
+  echo "failed:$failed" > "$STATUS"
+else
+  echo done > "$STATUS"
+fi

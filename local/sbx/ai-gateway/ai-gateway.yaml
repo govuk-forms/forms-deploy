@@ -1,0 +1,58 @@
+# syntax=docker/sandbox-kit:3
+#
+# Points Claude Code at the team's model gateway, a LiteLLM proxy, and has
+# the sbx proxy supply each person's gateway key. The key stays in the host's
+# secret store under the `ai-gateway` service (setup.sh stores it). The
+# sandbox only sees a placeholder in ANTHROPIC_AUTH_TOKEN, and the proxy
+# replaces the Authorization header on requests to the gateway.
+schemaVersion: "3"
+kind: mixin
+displayName: AI Engineering Lab model gateway
+description: >-
+  Routes Claude Code through the AI Engineering Lab LiteLLM gateway, with
+  the gateway key supplied by the sandbox proxy.
+version: "1.0.0"
+
+# Hooks run after the kits they require, so the hook below runs after the
+# claude kit writes settings.json
+requires: ["claude"]
+
+build: |
+  FROM scratch
+  ENV ANTHROPIC_BASE_URL=https://licenseportal.aiengineeringlab.co.uk \
+      ANTHROPIC_DEFAULT_OPUS_MODEL=eu.anthropic.claude-opus-4-8 \
+      ANTHROPIC_DEFAULT_SONNET_MODEL=claude-sonnet-4-6 \
+      ANTHROPIC_DEFAULT_HAIKU_MODEL=claude-haiku-4-5
+
+capabilities:
+  - type: com.docker.sandbox/network-policy@1
+    config:
+      runtime:
+        allow:
+          - licenseportal.aiengineeringlab.co.uk
+
+  - type: com.docker.sandbox/credential@1
+    description: Model gateway key
+    config:
+      service: ai-gateway
+      phase: runtime
+      apiKey:
+        name: ANTHROPIC_AUTH_TOKEN
+        proxyManaged: true
+        inject:
+          - domain: licenseportal.aiengineeringlab.co.uk
+            header: Authorization
+            format: "Bearer %s"
+
+  # The claude kit adds an apiKeyHelper when the person has an anthropic
+  # secret, and Claude Code warns when that and ANTHROPIC_AUTH_TOKEN are both
+  # set.
+  - type: com.docker.sandbox/lifecycle@1
+    config:
+      install:
+        - description: Remove the claude kit's apiKeyHelper
+          user: agent
+          command: >
+            f=~/.claude/settings.json;
+            [ ! -f "$f" ] ||
+            { jq 'del(.apiKeyHelper)' "$f" > "$f.tmp" && mv "$f.tmp" "$f"; }
