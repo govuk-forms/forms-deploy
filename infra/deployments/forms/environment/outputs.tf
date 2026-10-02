@@ -10,6 +10,14 @@ output "private_subnet_ids" {
   value = module.environment.private_subnet_ids
 }
 
+output "public_subnet_ids" {
+  value = module.environment.public_subnet_ids
+}
+
+output "alb_logs_bucket_name" {
+  value = module.environment.alb_logs_bucket_name
+}
+
 output "alb_arn_suffix" {
   value = module.environment.alb_arn_suffix
 }
