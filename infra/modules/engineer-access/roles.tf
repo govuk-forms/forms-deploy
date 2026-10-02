@@ -33,6 +33,7 @@ module "support_role" {
     var.allow_ecs_task_usage ? [aws_iam_policy.manage_ecs_task[0].arn] : [],
     aws_iam_policy.get_ux_customisation.arn,
     aws_iam_policy.get_usage_data.arn,
+    aws_iam_policy.aws_cli_login.arn,
   ])
   ip_restrictions = local.vpn_ip_restrictions
 }
@@ -48,6 +49,7 @@ module "readonly_role" {
     aws_iam_policy.lock_state_files.arn,
     aws_iam_policy.get_ux_customisation.arn,
     aws_iam_policy.get_usage_data.arn,
+    aws_iam_policy.aws_cli_login.arn,
   ]
   ip_restrictions = local.vpn_ip_restrictions
 }

@@ -357,3 +357,26 @@ resource "aws_iam_policy" "get_usage_data" {
     ]
   })
 }
+
+resource "aws_iam_policy" "aws_cli_login" {
+  name = "allow-aws-cli-login"
+  path = "/"
+
+  description = "Allow getting CLI credentials with aws login on the same device"
+
+  # Based on the AWS managed policy SignInLocalDevelopmentAccess, but only
+  # allows same-device login (not `aws login --remote`)
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "signin:AuthorizeOAuth2Access",
+          "signin:CreateOAuth2Token",
+        ]
+        Effect   = "Allow"
+        Resource = "arn:aws:signin:*:*:oauth2/public-client/localhost"
+      }
+    ]
+  })
+}
