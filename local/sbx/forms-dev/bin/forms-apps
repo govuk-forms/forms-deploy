@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Prints the name of every app with Ruby and npm dependencies, one per line.
+# setup.sh, forms-dev-up and forms-app-setup all read the list from here, so
+# the apps given a sandbox-only node_modules are the ones npm runs in. Listed
+# by name, so other repos in the workspace are never touched.
+set -euo pipefail
+
+printf '%s\n' forms-admin forms-runner forms-product-page
