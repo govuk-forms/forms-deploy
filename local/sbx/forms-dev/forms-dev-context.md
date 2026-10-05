@@ -3,8 +3,15 @@
 You are in a Docker sandbox, in the folder holding the GOV.UK Forms repos
 (forms-admin, forms-runner, forms-product-page, forms-deploy), mounted from
 the host at its host path. Each repo is its own git repository, so run git
-from inside the repo you are changing. Each repo's AGENTS.md has the team's
-conventions; these notes only cover the sandbox.
+from inside the repo you are changing.
+
+## Commits and pull requests
+
+The rules are in `forms-deploy/AGENTS.md` and apply in every repo here, not
+only forms-deploy. Read that file and follow it before you commit, push, or
+open or update a pull request.
+
+## Sandbox
 
 - Ruby and Node come from mise, at the versions in each app's `.ruby-version`
   and `.nvmrc`, and are already on PATH.

@@ -4,11 +4,17 @@
 schemaVersion: "3"
 kind: mixin
 displayName: GOV.UK Forms development
+# sbx copies this description into the CLAUDE.md Claude loads at the start of
+# every session; forms-dev-context.md is only read on demand. The commit and
+# pull request rules live in AGENTS.md at the root of this repo, which isn't
+# loaded here because Claude starts in the folder above. So the last sentence
+# sends Claude to that file instead of repeating the rules.
 description: >-
   Ruby and Node (via mise, versions from each repo's .ruby-version and .nvmrc)
   plus Postgres and Valkey (via Docker Compose) for the GOV.UK Forms Rails
   apps. On each start it installs gems and npm packages and prepares the dev
-  and test databases.
+  and test databases. In every one of these repos, read forms-deploy/AGENTS.md
+  and follow it before you commit, push, or open or update a pull request.
 version: "1.0.0"
 
 capabilities:
