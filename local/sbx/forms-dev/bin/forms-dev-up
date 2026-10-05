@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Runs on every sandbox start, before the app setup. Starts Postgres and
+# Valkey, and gives each app a sandbox-only node_modules so Linux packages
+# never overwrite the macOS ones in the host checkout.
+set -euo pipefail
+
+WS="$(cat "$HOME/.config/forms-dev/workdir")"
+
+# /tmp outlives a restart. Cleared first, so the last session's status never
+# stands in for this one's, even if the app setup doesn't get to run.
+rm -f /tmp/forms-app-setup.status
+
+# Every app with Ruby and npm dependencies. Assigned before the loop, so a
+# forms-apps failure stops the script rather than mounting nothing.
+apps="$(forms-apps)"
+for app in $apps; do
+  target="$WS/$app/node_modules"
+  store="$HOME/.cache/forms-node-modules/$app"
+  mkdir -p "$store" "$target"
+  if ! mountpoint -q "$target"; then
+    sudo mount --bind "$store" "$target"
+  fi
+done
+
+# Last, so a Docker failure never leaves an app without its mount
+for _ in $(seq 1 60); do
+  docker info >/dev/null 2>&1 && break
+  sleep 1
+done
+docker compose -f "$WS/forms-deploy/local/compose.yaml" up -d postgres redis
