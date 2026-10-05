@@ -213,6 +213,12 @@ variable "opentelemetry_head_sampler_ratio" {
   default     = "1"
 }
 
+variable "adot_drop_span_expressions" {
+  type        = list(string)
+  description = "OTTL span expressions for the filter/drop_spans processor. Matching spans are dropped before export to X-Ray. An empty list disables the filter entirely."
+  default     = []
+}
+
 variable "healthcheck" {
   type = object({
     command     = list(string)
