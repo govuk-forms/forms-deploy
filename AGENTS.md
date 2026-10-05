@@ -1,5 +1,8 @@
 # Agent instructions
 
+The Docker sandbox in `local/sbx/` tells Claude to follow these rules in every
+GOV.UK Forms repo, so keep them general and keep this file at this path.
+
 ## Commits
 
 - Split features into well-scoped commits. Each commit should leave the tests
