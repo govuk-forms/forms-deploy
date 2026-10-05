@@ -10,11 +10,12 @@ displayName: GOV.UK Forms development
 # loaded here because Claude starts in the folder above. So the last sentence
 # sends Claude to that file instead of repeating the rules.
 description: >-
-  Ruby and Node (via mise, versions from each repo's .ruby-version and .nvmrc)
-  plus Postgres and Valkey (via Docker Compose) for the GOV.UK Forms Rails
-  apps. On each start it installs gems and npm packages and prepares the dev
-  and test databases. In every one of these repos, read forms-deploy/AGENTS.md
-  and follow it before you commit, push, or open or update a pull request.
+  Ruby and Node (via mise, versions from each repo's .ruby-version and .nvmrc),
+  Postgres and Valkey (via Docker Compose), and Chrome with chromedriver for
+  the GOV.UK Forms Rails apps and their specs. On each start it installs gems
+  and npm packages and prepares the dev and test databases. In every one of
+  these repos, read forms-deploy/AGENTS.md and follow it before you commit,
+  push, or open or update a pull request.
 version: "1.0.0"
 
 capabilities:
@@ -34,6 +35,8 @@ capabilities:
           - mise.jdx.dev
           - github.com
           - "*.githubusercontent.com"
+          # Chrome for Testing downloads
+          - storage.googleapis.com
       runtime:
         allow:
           # mise, Ruby and Node downloads
@@ -89,7 +92,43 @@ capabilities:
             apt-get update &&
             apt-get install -y --no-install-recommends
             build-essential libpq-dev libyaml-dev libssl-dev zlib1g-dev libffi-dev
-            postgresql-client git curl ca-certificates
+            postgresql-client git curl ca-certificates unzip
+
+        # The libraries Chrome for Testing links against. Its zip, unlike
+        # Chrome's apt package, doesn't pull them in.
+        - description: Install the libraries Chrome needs
+          user: "0"
+          env: *network
+          command: >
+            apt-get install -y --no-install-recommends
+            fonts-liberation libasound2t64 libatk-bridge2.0-0t64 libatk1.0-0t64
+            libatspi2.0-0t64 libcairo2 libcups2t64 libdbus-1-3 libexpat1 libgbm1
+            libglib2.0-0t64 libgtk-3-0t64 libnspr4 libnss3 libpango-1.0-0
+            libvulkan1 libx11-6 libxcb1 libxcomposite1 libxdamage1 libxext6
+            libxfixes3 libxkbcommon0 libxrandr2 xdg-utils
+
+        # The feature specs drive headless Chrome through Selenium, and
+        # forms-admin's integration specs through Cuprite. Ubuntu only
+        # packages Chromium as a snap, which can't run here, and Google's apt
+        # repository only offers the latest Chrome. Chrome for Testing keeps
+        # every version, with a chromedriver to match. To upgrade, pick a
+        # version from https://googlechromelabs.github.io/chrome-for-testing/
+        - description: Install Chrome for Testing and chromedriver
+          user: "0"
+          env: *network
+          command: >
+            version=154.0.8037.92 &&
+            case "$(dpkg --print-architecture)" in
+            arm64) platform=linux-arm64 ;;
+            *) platform=linux64 ;;
+            esac &&
+            for name in chrome chromedriver; do
+            curl -fsSL -o "/tmp/$name.zip"
+            "https://storage.googleapis.com/chrome-for-testing-public/$version/$platform/$name-$platform.zip" &&
+            unzip -oq "/tmp/$name.zip" -d /opt &&
+            rm "/tmp/$name.zip" &&
+            ln -sf "/opt/$name-$platform/$name" "/usr/local/bin/$name" || exit 1;
+            done
 
         - description: Install mise and read .ruby-version and .nvmrc files
           user: agent

@@ -23,6 +23,9 @@ open or update a pull request.
   `failed: <apps>`) and `/tmp/forms-app-setup.log` before running specs. No
   status file means the setup hasn't started. Re-run it with
   `forms-app-setup`, which exits straight away if a run is still going.
+- Chrome for Testing and its chromedriver are installed for the feature and
+  integration specs, which run headless as they do in CI. There is no
+  display, so don't set `SETTINGS__SHOW_BROWSER_DURING_TESTS`.
 - Each app's `node_modules` is a sandbox-only Linux copy mounted over the
   host's macOS one. `npm ci` and `npm install` are safe here and don't affect
   the host. Don't unmount it.

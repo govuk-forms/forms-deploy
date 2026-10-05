@@ -4,3 +4,6 @@
 FROM scratch
 COPY --chmod=755 bin/ /usr/local/bin/
 ENV MISE_YES=1
+# Selenium would otherwise look up a chromedriver online, which the sandbox
+# blocks, before falling back to the installed one
+ENV SE_CHROMEDRIVER=/usr/local/bin/chromedriver

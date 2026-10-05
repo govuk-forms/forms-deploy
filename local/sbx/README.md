@@ -12,6 +12,7 @@ The sandbox has:
   keep in it
 - the Ruby and Node versions each app needs
 - Postgres and Valkey
+- Chrome and chromedriver, for the specs that run in a browser
 - each app's gems, npm packages and databases, ready to use
 - Claude Code, connected to the team's model gateway
 
@@ -138,8 +139,8 @@ To pick them up, delete the sandbox with `sbx env rm`, then run `sbx env run`.
 - [`ai-gateway/`](ai-gateway) connects Claude Code to the model gateway.
   Claude only sees a placeholder in `ANTHROPIC_AUTH_TOKEN`. The sbx proxy
   replaces it with your key on requests to the gateway, and nowhere else.
-- [`forms-dev/`](forms-dev) installs build tools and mise, allows the domains
-  the setup needs, and declares the optional `github` secret. Each time the
+- [`forms-dev/`](forms-dev) installs build tools, mise and Chrome, allows the
+  domains the setup needs, and declares the optional `github` secret. Each time the
   sandbox starts, it runs:
   - `forms-dev-up`, which starts Postgres and Valkey and gives each app a
     separate `node_modules` in the sandbox. This keeps Linux builds of
