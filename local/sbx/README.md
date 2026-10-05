@@ -150,6 +150,8 @@ To pick them up, delete the sandbox with `sbx env rm`, then run `sbx env run`.
   [notes about the sandbox](forms-dev/forms-dev-context.md), and tells it to
   follow the commit and pull request rules in this repo's
   [`AGENTS.md`](../../AGENTS.md) in every repo. Change the rules there.
+- forms-dev turns off the Claude Code footer on pull requests in the sandbox
+  user's Claude settings, so it applies in every repo.
 - The sandbox cannot use SSH, so inside the sandbox git rewrites GitHub
   remotes to HTTPS. The proxy adds your GitHub token to those requests.
 

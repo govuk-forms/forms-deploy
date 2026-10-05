@@ -18,6 +18,10 @@ description: >-
   push, or open or update a pull request.
 version: "1.0.0"
 
+# Hooks run after the kits they require, so the attribution hook below runs
+# after the claude kit writes settings.json
+requires: ["claude"]
+
 capabilities:
   - type: com.docker.sandbox/network-policy@1
     config:
@@ -158,6 +162,18 @@ capabilities:
           command: >
             git config --global --replace-all url.https://github.com/.insteadOf git@github.com: git@github.com: &&
             git config --global --add url.https://github.com/.insteadOf ssh://git@github.com/
+
+        # AGENTS.md asks for no mention of AI tooling in pull requests.
+        # forms-deploy's .claude/settings.json only applies when Claude starts
+        # in forms-deploy, and here it starts in the folder above, so the
+        # setting goes in the sandbox user's settings, which apply everywhere.
+        # jq comes with the claude kit's image.
+        - description: Leave the Claude Code footer off pull requests
+          user: agent
+          command: >
+            mkdir -p ~/.claude && f=~/.claude/settings.json &&
+            { [ -s "$f" ] || echo '{}' > "$f"; } &&
+            new=$(jq '.attribution.pr = ""' "$f") && printf '%s\n' "$new" > "$f"
 
         # sbxenv.yaml mounts the folder holding the repos as the workspace.
         # The scripts read it from here, so they also work when run by hand.
