@@ -81,6 +81,11 @@ resource "aws_wafv2_regex_pattern_set" "body_size_limit_exempt_paths" {
     regex_string = "^/forms/\\d+/routes$"
   }
 
+  # Changing question order in the admin app
+  regular_expression {
+    regex_string = "^/forms/\\d+/pages/change-order$"
+  }
+
   # forms-runner path for submitting answers - except file uploads which have a dedicated path
   # /:mode/:form_id/:form_slug(.locale)/:page_slug(/:answer_index)
   regular_expression {
