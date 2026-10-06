@@ -40,6 +40,7 @@ apply-terraform = {
   git_source_branch        = "poc-pipelines-in-environments"
   previous_stage_name      = ""
   disable_end_to_end_tests = false
+  pipeline_execution_mode  = "SUPERSEDED"
 }
 
 paused-pipeline-detection = {
