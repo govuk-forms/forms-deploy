@@ -8,7 +8,8 @@ module "grafana" {
     aws = aws
   }
 
-  root_domain = var.root_domain
+  environment_name = var.environment_name
+  root_domain      = var.root_domain
 
   vpc_id                      = data.terraform_remote_state.forms_environment.outputs.vpc_id
   vpc_cidr_block              = data.terraform_remote_state.forms_environment.outputs.vpc_cidr_block

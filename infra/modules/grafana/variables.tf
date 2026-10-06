@@ -1,3 +1,8 @@
+variable "environment_name" {
+  description = "The name of the environment, used to prefix IAM role and policy names"
+  type        = string
+}
+
 variable "root_domain" {
   description = "The root domain of the environment; Grafana is served at grafana.<root_domain>"
   type        = string

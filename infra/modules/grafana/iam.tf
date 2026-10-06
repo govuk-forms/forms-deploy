@@ -2,7 +2,7 @@
 # Task role: what Grafana itself may do
 ##
 resource "aws_iam_role" "task" {
-  name               = "${local.name}-ecs-task"
+  name               = "${var.environment_name}-${local.name}-ecs-task"
   description        = "Used by Grafana tasks when running"
   assume_role_policy = data.aws_iam_policy_document.ecs_tasks_assume_role.json
 }
@@ -23,7 +23,7 @@ data "aws_iam_policy_document" "ecs_tasks_assume_role" {
 resource "aws_iam_policy" "task" {
   #checkov:skip=CKV_AWS_355:CloudWatch and X-Ray read operations cannot be scoped to specific resources
   #checkov:skip=CKV_AWS_356:CloudWatch and X-Ray read operations cannot be scoped to specific resources
-  name   = "${local.name}-ecs-task-policy"
+  name   = "${var.environment_name}-${local.name}-ecs-task-policy"
   policy = data.aws_iam_policy_document.task.json
 }
 
@@ -116,7 +116,7 @@ data "aws_iam_policy_document" "task" {
 # Execution role: what ECS needs to start the task
 ##
 resource "aws_iam_role" "task_execution" {
-  name               = "${local.name}-ecs-task-execution"
+  name               = "${var.environment_name}-${local.name}-ecs-task-execution"
   description        = "Used by ECS to create Grafana tasks"
   assume_role_policy = data.aws_iam_policy_document.ecs_tasks_assume_role.json
 }
@@ -127,7 +127,7 @@ resource "aws_iam_role_policy_attachment" "task_execution_standard" {
 }
 
 resource "aws_iam_policy" "task_execution_additional" {
-  name   = "${local.name}-ecs-task-execution-additional"
+  name   = "${var.environment_name}-${local.name}-ecs-task-execution-additional"
   policy = data.aws_iam_policy_document.task_execution_additional.json
 }
 

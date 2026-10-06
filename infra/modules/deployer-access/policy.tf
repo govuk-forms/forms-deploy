@@ -487,8 +487,8 @@ data "aws_iam_policy_document" "iam" {
       "arn:aws:iam::${var.account_id}:policy/${var.environment_name}-forms-runner-adot-collector",
       "arn:aws:iam::${var.account_id}:policy/${var.environment_name}-forms-product-page-ecs-task-policy",
       "arn:aws:iam::${var.account_id}:policy/${var.environment_name}-forms-product-page-adot-collector",
-      "arn:aws:iam::${var.account_id}:policy/grafana-ecs-task-policy",
-      "arn:aws:iam::${var.account_id}:policy/grafana-ecs-task-execution-additional"
+      "arn:aws:iam::${var.account_id}:policy/${var.environment_name}-grafana-ecs-task-policy",
+      "arn:aws:iam::${var.account_id}:policy/${var.environment_name}-grafana-ecs-task-execution-additional"
     ]
     sid = "ManageEcsPolicies"
   }
@@ -553,8 +553,8 @@ data "aws_iam_policy_document" "iam" {
       "arn:aws:iam::${var.account_id}:role/${var.environment_name}-forms-runner-ecs-task-execution",
       "arn:aws:iam::${var.account_id}:role/${var.environment_name}-forms-product-page-ecs-task-execution",
       "arn:aws:iam::${var.account_id}:role/${var.environment_name}-forms-runner-queue-worker-ecs-task-execution",
-      "arn:aws:iam::${var.account_id}:role/grafana-ecs-task",
-      "arn:aws:iam::${var.account_id}:role/grafana-ecs-task-execution"
+      "arn:aws:iam::${var.account_id}:role/${var.environment_name}-grafana-ecs-task",
+      "arn:aws:iam::${var.account_id}:role/${var.environment_name}-grafana-ecs-task-execution"
     ]
     sid = "ManageTaskAndTaskExecutionRoles"
   }
