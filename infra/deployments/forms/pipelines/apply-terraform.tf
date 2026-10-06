@@ -61,7 +61,7 @@ resource "aws_codepipeline" "apply_terroform" {
   name           = "apply-forms-terraform-${var.environment_name}"
   role_arn       = data.aws_iam_role.deployer_role.arn
   pipeline_type  = "V2"
-  execution_mode = "QUEUED"
+  execution_mode = var.apply-terraform.pipeline_execution_mode
 
   artifact_store {
     type     = "S3"

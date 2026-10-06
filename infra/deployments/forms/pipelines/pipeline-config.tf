@@ -119,7 +119,16 @@ variable "apply-terraform" {
     # It isn't possible to perform the end-to-end tests in environments
     # without Auth0 configured. Therefore we need to be able disable that step there.
     disable_end_to_end_tests = bool
+
+    # The AWS CodePipeline execution mode to use for this pipeline.
+    # See https://docs.aws.amazon.com/codepipeline/latest/userguide/concepts-how-it-works.html
+    pipeline_execution_mode = string
   })
+
+  validation {
+    condition     = contains(["QUEUED", "SUPERSEDED"], var.apply-terraform.pipeline_execution_mode)
+    error_message = "Allowed pipeline modes are QUEUED and SUPERSEDED"
+  }
 
   validation {
     condition     = contains(["GIT", "EVENT", "MANUAL"], var.apply-terraform.pipeline_trigger)

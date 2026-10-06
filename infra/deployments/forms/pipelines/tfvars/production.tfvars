@@ -31,6 +31,7 @@ apply-terraform = {
   git_source_branch        = null
   previous_stage_name      = "staging"
   disable_end_to_end_tests = false
+  pipeline_execution_mode  = "QUEUED"
 }
 
 paused-pipeline-detection = {

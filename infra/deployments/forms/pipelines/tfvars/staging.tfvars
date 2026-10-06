@@ -4,7 +4,7 @@ deploy-forms-product-page-container = {
   retagging_sed_expression = "s/merged-\\(.*\\)/stg-\\1/" # "This was OK in staging"
   apply_latest_tag         = false
   disable_end_to_end_tests = false
-  pipeline_execution_mode  = "QUEUED"
+  pipeline_execution_mode  = "SUPERSEDED"
 }
 
 deploy-forms-runner-container = {
@@ -13,7 +13,7 @@ deploy-forms-runner-container = {
   retagging_sed_expression = "s/merged-\\(.*\\)/stg-\\1/" # "This was OK in staging"
   apply_latest_tag         = false
   disable_end_to_end_tests = false
-  pipeline_execution_mode  = "QUEUED"
+  pipeline_execution_mode  = "SUPERSEDED"
 }
 
 
@@ -23,7 +23,7 @@ deploy-forms-admin-container = {
   retagging_sed_expression = "s/merged-\\(.*\\)/stg-\\1/" # "This was OK in staging"
   apply_latest_tag         = false
   disable_end_to_end_tests = false
-  pipeline_execution_mode  = "QUEUED"
+  pipeline_execution_mode  = "SUPERSEDED"
 }
 
 apply-terraform = {
@@ -31,6 +31,7 @@ apply-terraform = {
   git_source_branch        = "main"
   previous_stage_name      = null
   disable_end_to_end_tests = false
+  pipeline_execution_mode  = "SUPERSEDED"
 }
 
 paused-pipeline-detection = {
