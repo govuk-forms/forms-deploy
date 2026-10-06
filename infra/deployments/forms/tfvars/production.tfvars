@@ -186,7 +186,7 @@ end_to_end_test_settings = {
   email_receiver_s3_bucket_name = "govuk-forms-production-test-emails"
 }
 grafana_settings = {
-  enabled                      = false
+  enabled                      = true
   cpu                          = 512
   memory                       = 1024
   github_allowed_organizations = ["govuk-forms"]
