@@ -57,6 +57,6 @@ updates:
       default-days: 7
     open-pull-requests-limit: 10
     groups:
-      terraform-all-dependencies:
+      pre-commit-all-dependencies:
         patterns:
           - "*"
