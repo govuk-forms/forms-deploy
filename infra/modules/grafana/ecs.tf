@@ -144,6 +144,10 @@ resource "aws_ecs_service" "grafana" {
     assign_public_ip = false
   }
 
+  # The target group must be attached to the load balancer before the service
+  # can be created, which only happens once the listener exists.
+  depends_on = [aws_lb_listener.https]
+
   lifecycle {
     prevent_destroy = true # ECS services cannot be destructively replaced without downtime. This helps to avoid accidentally doing so.
   }
