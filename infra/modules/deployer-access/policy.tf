@@ -8,6 +8,7 @@ data "aws_iam_policy_document" "forms_infra" {
     data.aws_iam_policy_document.acm.json,
     data.aws_iam_policy_document.application-autoscaling.json,
     data.aws_iam_policy_document.application-signals.json,
+    data.aws_iam_policy_document.athena.json,
     data.aws_iam_policy_document.cloudformation.json,
     data.aws_iam_policy_document.cloudfront.json,
     data.aws_iam_policy_document.cloudwatch.json,
@@ -142,6 +143,23 @@ data "aws_iam_policy_document" "application-signals" {
       "arn:aws:application-signals:eu-west-2:${var.account_id}:slo/*"
     ]
     sid = "ManageApplicationSignalsSLOs"
+  }
+}
+
+data "aws_iam_policy_document" "athena" {
+  statement {
+    actions = [
+      "athena:CreateWorkGroup",
+      "athena:UpdateWorkGroup",
+      "athena:DeleteWorkGroup",
+      "athena:TagResource",
+      "athena:UntagResource"
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:athena:eu-west-2:${var.account_id}:workgroup/grafana"
+    ]
+    sid = "ManageAthenaWorkGroups"
   }
 }
 
@@ -962,7 +980,9 @@ data "aws_iam_policy_document" "s3" {
 
       "arn:aws:s3:::govuk-forms-${var.environment_name}-error-page*",
 
-      "arn:aws:s3:::govuk-forms-${var.environment_name}-assets*"
+      "arn:aws:s3:::govuk-forms-${var.environment_name}-assets*",
+
+      "arn:aws:s3:::govuk-forms-${var.environment_name}-grafana-athena-results*"
     ]
     sid = "ManageS3"
   }
