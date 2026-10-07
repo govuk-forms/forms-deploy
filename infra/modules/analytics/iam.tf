@@ -102,3 +102,44 @@ data "aws_iam_policy_document" "firehose_delivery" {
     resources = ["${aws_cloudwatch_log_group.firehose.arn}:log-stream:*"]
   }
 }
+
+# Role assumed by CloudWatch Logs to put log events onto the Firehose stream
+resource "aws_iam_role" "log_subscription" {
+  name               = "govuk-forms-submission-events-subscription-${var.env_name}"
+  assume_role_policy = data.aws_iam_policy_document.log_subscription_assume_role.json
+}
+
+data "aws_iam_policy_document" "log_subscription_assume_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["logs.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "aws:SourceArn"
+      values   = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:*"]
+    }
+  }
+}
+
+resource "aws_iam_role_policy" "log_subscription" {
+  name   = "put-records-to-firehose"
+  role   = aws_iam_role.log_subscription.id
+  policy = data.aws_iam_policy_document.log_subscription.json
+}
+
+data "aws_iam_policy_document" "log_subscription" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "firehose:PutRecord",
+      "firehose:PutRecordBatch"
+    ]
+    resources = [aws_kinesis_firehose_delivery_stream.submission_events.arn]
+  }
+}
