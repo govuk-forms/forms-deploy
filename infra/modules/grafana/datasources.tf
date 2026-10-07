@@ -47,15 +47,15 @@ locals {
     },
     {
       # Queries run in the workgroup in athena.tf, which sets where results
-      # are written. The database is only the one selected by default in the
-      # query editor.
+      # are written. The catalog and database are only the ones selected by
+      # default in the query editor.
       name     = "Athena"
       uid      = "athena"
       type     = "grafana-athena-datasource"
       access   = "proxy"
       editable = false
       jsonData = merge(local.aws_datasource_json_data, {
-        catalog   = "AwsDataCatalog"
+        catalog   = "s3tablescatalog/${local.forms_analytics_table_bucket_name}"
         database  = var.athena_default_database
         workgroup = aws_athena_workgroup.grafana.name
       })

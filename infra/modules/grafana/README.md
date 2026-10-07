@@ -43,6 +43,15 @@ table in the Glue data catalog, but Athena reads the underlying objects as the
 task role, so the buckets holding the data must be listed in
 `athena_data_bucket_arns` before their tables can be queried.
 
+The data source selects the S3 Tables catalog holding submission events,
+`s3tablescatalog/govuk-forms-<environment>-analytics`, and its `forms`
+database by default. Athena is vended credentials for that catalog through
+Lake Formation. The catalog grants `IAM_ALLOWED_PRINCIPALS`, so no Lake
+Formation grants are expected. If queries fail with "Insufficient Lake
+Formation permission(s)", grant the task role `SELECT` and `DESCRIBE` on the
+catalog `<account id>:s3tablescatalog/<table bucket>` with
+`aws_lakeformation_permissions`.
+
 ## Notes
 
 - The database is allowed to pause after `seconds_until_auto_pause` seconds

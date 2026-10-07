@@ -79,9 +79,9 @@ variable "rds_maintenance_window" {
 }
 
 variable "athena_default_database" {
-  description = "The Glue database selected by default in the Athena query editor"
+  description = "The database in the forms analytics catalog selected by default in the Athena query editor"
   type        = string
-  default     = "default"
+  default     = "forms"
 }
 
 variable "athena_data_bucket_arns" {

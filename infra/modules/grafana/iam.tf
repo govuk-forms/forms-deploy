@@ -1,3 +1,17 @@
+locals {
+  # Created by infra/modules/analytics
+  forms_analytics_table_bucket_name = "govuk-forms-${var.environment_name}-analytics"
+  forms_analytics_table_bucket_arn  = "arn:aws:s3tables:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:bucket/${local.forms_analytics_table_bucket_name}"
+
+  # The S3 Tables bucket is a federated catalog nested under s3tablescatalog,
+  # see infra/modules/analytics/iam.tf
+  forms_analytics_glue_catalog_arns = [
+    "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog",
+    "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog/s3tablescatalog",
+    "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog/s3tablescatalog/${local.forms_analytics_table_bucket_name}"
+  ]
+}
+
 ##
 # Task role: what Grafana itself may do
 ##
@@ -183,6 +197,44 @@ data "aws_iam_policy_document" "task" {
         [for arn in var.athena_data_bucket_arns : "${arn}/*"]
       )
     }
+  }
+
+  # Databases and tables in the federated catalog are covered by
+  # ReadAthenaAndGlueMetadata above
+  statement {
+    sid    = "ReadFormsAnalyticsGlueCatalog"
+    effect = "Allow"
+    actions = [
+      "glue:GetCatalog",
+      "glue:GetCatalogs"
+    ]
+    resources = local.forms_analytics_glue_catalog_arns
+  }
+
+  statement {
+    sid    = "ReadFormsAnalyticsTableData"
+    effect = "Allow"
+    actions = [
+      "s3tables:GetTableBucket",
+      "s3tables:ListNamespaces",
+      "s3tables:GetNamespace",
+      "s3tables:ListTables",
+      "s3tables:GetTable",
+      "s3tables:GetTableData",
+      "s3tables:GetTableMetadataLocation"
+    ]
+    resources = [
+      local.forms_analytics_table_bucket_arn,
+      "${local.forms_analytics_table_bucket_arn}/table/*"
+    ]
+  }
+
+  # Athena vends credentials for federated catalogs through Lake Formation
+  statement {
+    sid       = "VendCredentialsForFederatedCatalog"
+    effect    = "Allow"
+    actions   = ["lakeformation:GetDataAccess"]
+    resources = ["*"]
   }
 }
 
