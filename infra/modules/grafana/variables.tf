@@ -77,3 +77,9 @@ variable "seconds_until_auto_pause" {
 variable "rds_maintenance_window" {
   type = string
 }
+
+variable "athena_bytes_scanned_cutoff_per_query" {
+  description = "The most data a single Athena query from Grafana may scan before it is cancelled, in bytes"
+  type        = number
+  default     = 10737418240 # 10 GiB
+}
