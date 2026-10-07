@@ -26,13 +26,6 @@ locals {
       development = "admin"
       integration = "admin"
     },
-    "catalina.garcia" = {
-      deploy      = "admin" # Admin to apply changes to pipelines until we have pipelines for our pipelines
-      staging     = "admin" # Required whilst setting up environments
-      production  = "admin" # Required whilst setting up environments
-      development = "admin"
-      integration = "admin"
-    },
     "david.biddle" = {
       deploy      = "admin"
       staging     = "admin"
@@ -68,13 +61,6 @@ locals {
       development = "admin"
       integration = "readonly"
     },
-    "sarah.young1" = {
-      deploy      = "admin"
-      staging     = "admin"
-      production  = "admin"
-      development = "admin"
-      integration = "admin"
-    },
     "sean.rankine" = {
       deploy      = "admin" # Sean is our Lead Dev and has also worked as a Sr SRE.
       staging     = "admin"
@@ -83,13 +69,6 @@ locals {
       integration = "admin"
     },
     "stephen.daly" = {
-      deploy      = "admin"
-      staging     = "admin"
-      production  = "admin"
-      development = "admin"
-      integration = "readonly"
-    },
-    "tom.iles" = {
       deploy      = "admin"
       staging     = "admin"
       production  = "admin"
