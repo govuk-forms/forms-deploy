@@ -44,6 +44,21 @@ locals {
         sigV4Region   = data.aws_region.current.region
         sigv4Service  = "monitoring"
       }
+    },
+    {
+      # Queries run in the workgroup in athena.tf, which sets where results
+      # are written. The database is only the one selected by default in the
+      # query editor.
+      name     = "Athena"
+      uid      = "athena"
+      type     = "grafana-athena-datasource"
+      access   = "proxy"
+      editable = false
+      jsonData = merge(local.aws_datasource_json_data, {
+        catalog   = "AwsDataCatalog"
+        database  = var.athena_default_database
+        workgroup = aws_athena_workgroup.grafana.name
+      })
     }
   ]
 

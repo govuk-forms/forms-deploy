@@ -38,7 +38,7 @@ locals {
     { name = "GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES", value = "false" },
     { name = "GF_NEWS_NEWS_FEED_ENABLED", value = "false" },
     { name = "GF_AWS_ALLOWED_AUTH_PROVIDERS", value = "default" },
-    { name = "GF_PLUGINS_PREINSTALL_SYNC", value = "grafana-amazonprometheus-datasource@3.2.0,grafana-x-ray-datasource@2.17.1" },
+    { name = "GF_PLUGINS_PREINSTALL_SYNC", value = "grafana-amazonprometheus-datasource@3.2.0,grafana-x-ray-datasource@2.17.1,grafana-athena-datasource@3.3.6" },
     { name = "GRAFANA_DATASOURCES_YAML", value = local.datasources_yaml },
   ]
 

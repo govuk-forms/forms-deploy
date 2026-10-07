@@ -21,8 +21,8 @@ data "aws_iam_policy_document" "ecs_tasks_assume_role" {
 }
 
 resource "aws_iam_policy" "task" {
-  #checkov:skip=CKV_AWS_355:CloudWatch and X-Ray read operations cannot be scoped to specific resources
-  #checkov:skip=CKV_AWS_356:CloudWatch and X-Ray read operations cannot be scoped to specific resources
+  #checkov:skip=CKV_AWS_355:CloudWatch, X-Ray and Athena metadata read operations cannot be scoped to specific resources
+  #checkov:skip=CKV_AWS_356:CloudWatch, X-Ray and Athena metadata read operations cannot be scoped to specific resources
   name   = "${var.environment_name}-${local.name}-ecs-task-policy"
   policy = data.aws_iam_policy_document.task.json
 }
@@ -109,6 +109,80 @@ data "aws_iam_policy_document" "task" {
       "application-signals:GetServiceLevelObjective"
     ]
     resources = ["*"]
+  }
+
+  # https://grafana.com/docs/plugins/grafana-athena-datasource/latest/setup/configure/
+  statement {
+    sid    = "ReadAthenaAndGlueMetadata"
+    effect = "Allow"
+    actions = [
+      "athena:GetDatabase",
+      "athena:GetDataCatalog",
+      "athena:GetTableMetadata",
+      "athena:ListDatabases",
+      "athena:ListDataCatalogs",
+      "athena:ListTableMetadata",
+      "athena:ListWorkGroups",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:GetTable",
+      "glue:GetTables",
+      "glue:GetPartition",
+      "glue:GetPartitions",
+      "glue:BatchGetPartition"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "RunAthenaQueries"
+    effect = "Allow"
+    actions = [
+      "athena:GetWorkGroup",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StartQueryExecution",
+      "athena:StopQueryExecution"
+    ]
+    resources = [aws_athena_workgroup.grafana.arn]
+  }
+
+  # Athena reads and writes query results with the credentials of the caller
+  statement {
+    sid    = "ReadAndWriteAthenaQueryResults"
+    effect = "Allow"
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:AbortMultipartUpload",
+      "s3:ListMultipartUploadParts"
+    ]
+    resources = [
+      module.athena_results_bucket.arn,
+      "${module.athena_results_bucket.arn}/*"
+    ]
+  }
+
+  # Athena also reads the queried data with the credentials of the caller
+  dynamic "statement" {
+    for_each = length(var.athena_data_bucket_arns) > 0 ? [1] : []
+
+    content {
+      sid    = "ReadAthenaData"
+      effect = "Allow"
+      actions = [
+        "s3:GetBucketLocation",
+        "s3:ListBucket",
+        "s3:GetObject"
+      ]
+      resources = concat(
+        var.athena_data_bucket_arns,
+        [for arn in var.athena_data_bucket_arns : "${arn}/*"]
+      )
+    }
   }
 }
 

@@ -77,3 +77,21 @@ variable "seconds_until_auto_pause" {
 variable "rds_maintenance_window" {
   type = string
 }
+
+variable "athena_default_database" {
+  description = "The Glue database selected by default in the Athena query editor"
+  type        = string
+  default     = "default"
+}
+
+variable "athena_data_bucket_arns" {
+  description = "ARNs of the S3 buckets holding the data Grafana may query with Athena"
+  type        = list(string)
+  default     = []
+}
+
+variable "athena_bytes_scanned_cutoff_per_query" {
+  description = "The most data a single Athena query from Grafana may scan before it is cancelled, in bytes"
+  type        = number
+  default     = 10737418240 # 10 GiB
+}
