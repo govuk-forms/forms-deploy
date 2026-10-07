@@ -3,9 +3,9 @@
 Runs Grafana OSS as a single Fargate task behind its own public ALB at
 `grafana.<root_domain>`, backed by its own Aurora Serverless v2 PostgreSQL
 cluster. The load balancer is public and is not behind CloudFront or a WAF;
-GitHub sign in is the only access control. Data sources for CloudWatch and
-X-Ray (Application Signals) are provisioned at start up and authenticate with
-the task role. Grafana alerting is disabled.
+GitHub sign in is the only access control. Data sources for CloudWatch,
+X-Ray (Application Signals) and Athena are provisioned at start up and
+authenticate with the task role. Grafana alerting is disabled.
 
 ## Signing in
 
@@ -32,6 +32,16 @@ form is reachable at `/login?disableAutoLogin=true`.
    `/grafana/github/client-id` and `/grafana/github/client-secret`.
 4. Force a new deployment of the `grafana` ECS service so the task picks the
    values up.
+
+## Querying with Athena
+
+The Athena data source runs queries in the `grafana` workgroup, which writes
+results to the `govuk-forms-<environment>-grafana-athena-results` bucket and
+cancels any query that scans more than
+`athena_bytes_scanned_cutoff_per_query` bytes. It can see every database and
+table in the Glue data catalog, but Athena reads the underlying objects as the
+task role, so the buckets holding the data must be listed in
+`athena_data_bucket_arns` before their tables can be queried.
 
 ## Notes
 

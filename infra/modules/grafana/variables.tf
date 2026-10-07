@@ -78,6 +78,12 @@ variable "rds_maintenance_window" {
   type = string
 }
 
+variable "athena_default_database" {
+  description = "The Glue database selected by default in the Athena query editor"
+  type        = string
+  default     = "default"
+}
+
 variable "athena_data_bucket_arns" {
   description = "ARNs of the S3 buckets holding the data Grafana may query with Athena"
   type        = list(string)
