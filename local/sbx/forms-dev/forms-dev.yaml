@@ -1,0 +1,198 @@
+# syntax=docker/sandbox-kit:3
+# The line above must stay first: it tells the builder this is a kit
+# descriptor rather than a Dockerfile.
+schemaVersion: "3"
+kind: mixin
+displayName: GOV.UK Forms development
+# sbx copies this description into the CLAUDE.md Claude loads at the start of
+# every session; forms-dev-context.md is only read on demand. The commit and
+# pull request rules live in AGENTS.md at the root of this repo, which isn't
+# loaded here because Claude starts in the folder above. So the last sentence
+# sends Claude to that file instead of repeating the rules.
+description: >-
+  Ruby and Node (via mise, versions from each repo's .ruby-version and .nvmrc),
+  Postgres and Valkey (via Docker Compose), and Chrome with chromedriver for
+  the GOV.UK Forms Rails apps and their specs. On each start it installs gems
+  and npm packages and prepares the dev and test databases. In every one of
+  these repos, read forms-deploy/AGENTS.md and follow it before you commit,
+  push, or open or update a pull request.
+version: "1.0.0"
+
+# Hooks run after the kits they require, so the attribution hook below runs
+# after the claude kit writes settings.json
+requires: ["claude"]
+
+capabilities:
+  - type: com.docker.sandbox/network-policy@1
+    config:
+      # Open only while the install hooks run
+      install:
+        allow:
+          # apt-get update fails if any configured source is unreachable, so
+          # every source in the claude workload is listed
+          - archive.ubuntu.com
+          - security.ubuntu.com
+          - ports.ubuntu.com
+          - download.docker.com
+          # mise's installer
+          - mise.run
+          - mise.jdx.dev
+          - github.com
+          - "*.githubusercontent.com"
+          # Chrome for Testing downloads
+          - storage.googleapis.com
+      runtime:
+        allow:
+          # mise, Ruby and Node downloads
+          - mise.jdx.dev
+          - mise-versions.jdx.dev
+          - github.com
+          - api.github.com
+          - "*.githubusercontent.com"
+          - nodejs.org
+          - cache.ruby-lang.org
+          # gems and npm packages
+          - rubygems.org
+          - "*.rubygems.org"
+          - registry.npmjs.org
+          # Postgres and Valkey images
+          - registry-1.docker.io
+          - auth.docker.io
+          - production.cloudflare.docker.com
+
+  # The GitHub token from `sbx secret set github`, if the person stored one.
+  # The repos' SSH remotes are rewritten to HTTPS below so git uses it too.
+  - type: com.docker.sandbox/credential@1
+    optional: true
+    description: GitHub access for git push and gh
+    config:
+      service: github
+      phase: runtime
+      apiKey:
+        name: GH_TOKEN
+        proxyManaged: true
+        inject:
+          - {domain: api.github.com, header: Authorization, format: "Bearer %s"}
+          - {domain: github.com, scheme: basic, username: x-access-token}
+
+  - type: com.docker.sandbox/lifecycle@1
+    config:
+      install:
+        - description: Install build dependencies for Ruby and native gems
+          user: "0"
+          env: &network
+            # The sandbox's proxy, and the CA bundle that trusts it. Hooks only
+            # see the variables they list.
+            - HTTP_PROXY
+            - HTTPS_PROXY
+            - NO_PROXY
+            - http_proxy
+            - https_proxy
+            - no_proxy
+            - SSL_CERT_FILE
+            - NODE_EXTRA_CA_CERTS
+            - NODE_USE_ENV_PROXY
+          command: >
+            apt-get update &&
+            apt-get install -y --no-install-recommends
+            build-essential libpq-dev libyaml-dev libssl-dev zlib1g-dev libffi-dev
+            postgresql-client git curl ca-certificates unzip
+
+        # The libraries Chrome for Testing links against. Its zip, unlike
+        # Chrome's apt package, doesn't pull them in.
+        - description: Install the libraries Chrome needs
+          user: "0"
+          env: *network
+          command: >
+            apt-get install -y --no-install-recommends
+            fonts-liberation libasound2t64 libatk-bridge2.0-0t64 libatk1.0-0t64
+            libatspi2.0-0t64 libcairo2 libcups2t64 libdbus-1-3 libexpat1 libgbm1
+            libglib2.0-0t64 libgtk-3-0t64 libnspr4 libnss3 libpango-1.0-0
+            libvulkan1 libx11-6 libxcb1 libxcomposite1 libxdamage1 libxext6
+            libxfixes3 libxkbcommon0 libxrandr2 xdg-utils
+
+        # The feature specs drive headless Chrome through Selenium, and
+        # forms-admin's integration specs through Cuprite. Ubuntu only
+        # packages Chromium as a snap, which can't run here, and Google's apt
+        # repository only offers the latest Chrome. Chrome for Testing keeps
+        # every version, with a chromedriver to match. To upgrade, pick a
+        # version from https://googlechromelabs.github.io/chrome-for-testing/
+        - description: Install Chrome for Testing and chromedriver
+          user: "0"
+          env: *network
+          command: >
+            version=154.0.8037.92 &&
+            case "$(dpkg --print-architecture)" in
+            arm64) platform=linux-arm64 ;;
+            *) platform=linux64 ;;
+            esac &&
+            for name in chrome chromedriver; do
+            curl -fsSL -o "/tmp/$name.zip"
+            "https://storage.googleapis.com/chrome-for-testing-public/$version/$platform/$name-$platform.zip" &&
+            unzip -oq "/tmp/$name.zip" -d /opt &&
+            rm "/tmp/$name.zip" &&
+            ln -sf "/opt/$name-$platform/$name" "/usr/local/bin/$name" || exit 1;
+            done
+
+        - description: Install mise and read .ruby-version and .nvmrc files
+          user: agent
+          env: *network
+          command: >
+            curl -fsSL https://mise.run | sh &&
+            ~/.local/bin/mise settings add idiomatic_version_file_enable_tools ruby &&
+            ~/.local/bin/mise settings add idiomatic_version_file_enable_tools node
+
+        # Ahead of the image's own Node. Claude's Bash tool sources
+        # $CLAUDE_ENV_FILE before every command, so this reaches non-login
+        # shells too.
+        - description: Put mise shims first on PATH for every shell
+          user: agent
+          env: [CLAUDE_ENV_FILE]
+          command: >
+            for rc in ~/.bashrc ~/.profile "${CLAUDE_ENV_FILE:-/etc/sandbox-persistent.sh}"; do
+            grep -q 'mise/shims' "$rc" 2>/dev/null ||
+            echo 'export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"' >> "$rc";
+            done
+
+        # The repos' remotes are SSH, but the sandbox has no SSH key. Over
+        # HTTPS the proxy adds the GitHub token. This only changes the
+        # sandbox's ~/.gitconfig.
+        - description: Use HTTPS for GitHub so pushes use the github secret
+          user: agent
+          command: >
+            git config --global --replace-all url.https://github.com/.insteadOf git@github.com: git@github.com: &&
+            git config --global --add url.https://github.com/.insteadOf ssh://git@github.com/
+
+        # AGENTS.md asks for no mention of AI tooling in pull requests.
+        # forms-deploy's .claude/settings.json only applies when Claude starts
+        # in forms-deploy, and here it starts in the folder above, so the
+        # setting goes in the sandbox user's settings, which apply everywhere.
+        # jq comes with the claude kit's image.
+        - description: Leave the Claude Code footer off pull requests
+          user: agent
+          command: >
+            mkdir -p ~/.claude && f=~/.claude/settings.json &&
+            { [ -s "$f" ] || echo '{}' > "$f"; } &&
+            new=$(jq '.attribution.pr = ""' "$f") && printf '%s\n' "$new" > "$f"
+
+        # sbxenv.yaml mounts the folder holding the repos as the workspace.
+        # The scripts read it from here, so they also work when run by hand.
+        - description: Record the folder holding the repos for the forms-dev scripts
+          user: agent
+          env: [WORKSPACE_DIR]
+          command: >
+            mkdir -p ~/.config/forms-dev &&
+            printf '%s\n' "$WORKSPACE_DIR" > ~/.config/forms-dev/workdir
+
+      startup:
+        - description: Start Postgres and Valkey, mount sandbox-only node_modules
+          env: [DOCKER_HOST]
+          command: [forms-dev-up]
+        - description: Install gems and npm packages, prepare databases
+          background: true
+          env: *network
+          command: [sh, -c, "forms-app-setup > /tmp/forms-app-setup.log 2>&1"]
+
+  - type: com.docker.sandbox/agent-context@1
+    config:
+      contentFile: ./forms-dev-context.md

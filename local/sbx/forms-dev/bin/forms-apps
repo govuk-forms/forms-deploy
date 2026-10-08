@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Prints the name of every app with Ruby and npm dependencies, one per line.
+# forms-dev-up and forms-app-setup both read the list from here, so the apps
+# given a sandbox-only node_modules are the ones npm runs in.
+#
+#   forms-apps [folder holding the repos]
+set -euo pipefail
+
+WS="${1:-$(cat "$HOME/.config/forms-dev/workdir")}"
+
+for dir in "$WS"/*/; do
+  dir="${dir%/}"
+  [ -f "$dir/Gemfile" ] && [ -f "$dir/package-lock.json" ] || continue
+  basename "$dir"
+done
