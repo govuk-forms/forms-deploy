@@ -24,6 +24,7 @@ data "aws_iam_policy_document" "forms_infra_1" {
     data.aws_iam_policy_document.elasticache.json,
     data.aws_iam_policy_document.events.json,
     data.aws_iam_policy_document.guardduty.json,
+    data.aws_iam_policy_document.s3tables.json,
   ]
 }
 
@@ -1008,6 +1009,20 @@ data "aws_iam_policy_document" "s3" {
       "arn:aws:s3:::gds-forms-${var.environment_type}-tfstate"
     ]
     sid = "ManageTerraformStateBuckets"
+  }
+}
+
+data "aws_iam_policy_document" "s3tables" {
+  statement {
+    actions = [
+      "s3tables:*"
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:s3tables:eu-west-2:${var.account_id}:bucket/govuk-forms-${var.environment_name}-analytics",
+      "arn:aws:s3tables:eu-west-2:${var.account_id}:bucket/govuk-forms-${var.environment_name}-analytics/table/*"
+    ]
+    sid = "ManageAnalyticsTableBucket"
   }
 }
 
