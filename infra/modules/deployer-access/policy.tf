@@ -469,8 +469,9 @@ data "aws_iam_policy_document" "events" {
   }
 }
 
-# The log group and error bucket for the stream are here rather than in logs
-# and s3 because forms_infra_2 is close to the managed policy size limit.
+# The log group, error bucket and Lambda invoke config for the stream are here
+# rather than in logs, s3 and lambda because forms_infra_2 is close to the
+# managed policy size limit.
 data "aws_iam_policy_document" "firehose" {
   statement {
     actions = [
@@ -504,6 +505,17 @@ data "aws_iam_policy_document" "firehose" {
       "arn:aws:s3:::govuk-forms-${var.environment_name}-analytics-errors*"
     ]
     sid = "ManageAnalyticsErrorBucket"
+  }
+
+  statement {
+    actions = [
+      "lambda:*FunctionEventInvokeConfig"
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:lambda:eu-west-2:${var.account_id}:function:submission-events-transform-${var.environment_name}"
+    ]
+    sid = "ManageSubmissionEventsLambdaInvokeConfig"
   }
 }
 
