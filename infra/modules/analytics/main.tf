@@ -3,6 +3,8 @@ locals {
   namespace_name    = "forms"
   table_name        = "submission_events"
   stream_name       = "submission-events-${var.env_name}"
+
+  transform_function_name = "submission-events-transform-${var.env_name}"
 }
 
 data "aws_caller_identity" "current" {}
