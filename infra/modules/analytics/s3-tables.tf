@@ -37,6 +37,10 @@ resource "aws_s3tables_table" "submission_events" {
           name = "preview"
           type = "boolean"
         }
+        field {
+          name = "submission_reference"
+          type = "string"
+        }
       }
     }
   }
