@@ -9,6 +9,9 @@ set -euo pipefail
 
 GATEWAY_HOST=licenseportal.aiengineeringlab.co.uk
 SKILLS_REPO=https://gitlab.com/gitlab-org/ai/skills
+# The oldest sbx that can read the Claude kit pinned in sbxenv.yaml. Raise it
+# when a kit bump needs a newer sbx.
+MIN_SBX_VERSION=0.48.0
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 WS="$(cd "$SCRIPT_DIR/../../.." && pwd)"
@@ -32,7 +35,14 @@ if ! command -v sbx >/dev/null; then
   echo "   sbx isn't installed. See https://docs.docker.com/ai/sandboxes/install/" >&2
   exit 1
 fi
-ok "sbx $(sbx version 2>/dev/null | awk '{print $3}')"
+sbx_version="$(sbx version 2>/dev/null | awk '{print $3}')"
+sbx_version="${sbx_version#v}"
+if [ "$(printf '%s\n' "$MIN_SBX_VERSION" "$sbx_version" | sort -V | head -n1)" != "$MIN_SBX_VERSION" ]; then
+  echo "   sbx $sbx_version is too old: this sandbox needs $MIN_SBX_VERSION or newer." >&2
+  echo "   Upgrade it, for example with: brew upgrade --cask sbx" >&2
+  exit 1
+fi
+ok "sbx $sbx_version"
 missing=""
 for app in $("$SCRIPT_DIR/forms-dev/bin/forms-apps"); do
   [ -d "$WS/$app" ] || missing="$missing $app"

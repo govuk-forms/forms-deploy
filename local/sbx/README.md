@@ -26,7 +26,9 @@ GitHub token.
 
 You need:
 
-- [Docker Sandboxes][install] installed, and to be signed in with `sbx login`
+- [Docker Sandboxes][install] 0.48.0 or newer installed, and to be signed in
+  with `sbx login`. Check with `sbx version`, and upgrade with
+  `brew upgrade --cask sbx` if you installed it with Homebrew
 - the GOV.UK Forms repos cloned side by side, as described in
   [`../README.md`](../README.md)
 - your model gateway key, which starts with `sk-`

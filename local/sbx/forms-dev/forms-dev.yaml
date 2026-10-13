@@ -29,11 +29,9 @@ capabilities:
       install:
         allow:
           # apt-get update fails if any configured source is unreachable, so
-          # every source in the claude workload is listed
-          - archive.ubuntu.com
-          - security.ubuntu.com
-          - ports.ubuntu.com
-          - download.docker.com
+          # every source in the claude workload is listed. The workload
+          # allows its own dhi.io source.
+          - deb.debian.org
           # mise's installer
           - mise.run
           - mise.jdx.dev
@@ -112,9 +110,9 @@ capabilities:
             libxfixes3 libxkbcommon0 libxrandr2 xdg-utils
 
         # The feature specs drive headless Chrome through Selenium, and
-        # forms-admin's integration specs through Cuprite. Ubuntu only
-        # packages Chromium as a snap, which can't run here, and Google's apt
-        # repository only offers the latest Chrome. Chrome for Testing keeps
+        # forms-admin's integration specs through Cuprite. Debian's
+        # chromium package and Google's apt repository only offer the latest
+        # version, and Google's has no arm64 build. Chrome for Testing keeps
         # every version, with a chromedriver to match. To upgrade, pick a
         # version from https://googlechromelabs.github.io/chrome-for-testing/
         - description: Install Chrome for Testing and chromedriver

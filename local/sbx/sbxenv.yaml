@@ -18,7 +18,7 @@ name: govuk-forms
 # kit reference under kits:. Bump the tag to move to a newer Claude Code.
 agent: sbx-kit-claude
 kits:
-  - docker.io/docker/sbx-kit-claude:2.1.267
+  - docker.io/docker/sbx-kit-claude:2.1.296
   # Claude Code through the team's model gateway (ai-gateway/)
   - ./ai-gateway
   # Ruby, Node, Postgres and Valkey for the apps (forms-dev/)
