@@ -35,7 +35,10 @@ resource "aws_kinesis_firehose_delivery_stream" "submission_events" {
   # Firehose validates at creation time that the destination table exists and
   # is reachable through the federated catalog. The catalog is created in the
   # forms/account root, see infra/deployments/forms/account/glue-catalog.tf
-  depends_on = [aws_s3tables_table.submission_events]
+  depends_on = [
+    aws_s3tables_table.submission_events,
+    aws_iam_role_policy.firehose_delivery,
+  ]
 }
 
 resource "aws_cloudwatch_log_group" "firehose" {
