@@ -19,10 +19,7 @@ requires: ["claude"]
 
 build: |
   FROM scratch
-  ENV ANTHROPIC_BASE_URL=https://licenseportal.aiengineeringlab.co.uk \
-      ANTHROPIC_DEFAULT_OPUS_MODEL=eu.anthropic.claude-opus-5-5 \
-      ANTHROPIC_DEFAULT_SONNET_MODEL=claude-sonnet-5-5 \
-      ANTHROPIC_DEFAULT_HAIKU_MODEL=claude-haiku-4-5
+  ENV ANTHROPIC_BASE_URL=https://licenseportal.aiengineeringlab.co.uk
 
 capabilities:
   - type: com.docker.sandbox/network-policy@1
