@@ -23,6 +23,7 @@ data "aws_iam_policy_document" "forms_infra_1" {
     data.aws_iam_policy_document.ecs.json,
     data.aws_iam_policy_document.elasticache.json,
     data.aws_iam_policy_document.events.json,
+    data.aws_iam_policy_document.firehose.json,
     data.aws_iam_policy_document.guardduty.json,
     data.aws_iam_policy_document.s3tables.json,
   ]
@@ -468,6 +469,44 @@ data "aws_iam_policy_document" "events" {
   }
 }
 
+# The log group and error bucket for the stream are here rather than in logs
+# and s3 because forms_infra_2 is close to the managed policy size limit.
+data "aws_iam_policy_document" "firehose" {
+  statement {
+    actions = [
+      "firehose:*"
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:firehose:eu-west-2:${var.account_id}:deliverystream/submission-events-${var.environment_name}"
+    ]
+    sid = "ManageSubmissionEventsStream"
+  }
+
+  statement {
+    actions = [
+      "logs:*LogStream",
+      "logs:*LogGroup"
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:logs:eu-west-2:${var.account_id}:log-group:/aws/kinesisfirehose/submission-events-${var.environment_name}:*"
+    ]
+    sid = "ManageSubmissionEventsStreamLogs"
+  }
+
+  statement {
+    actions = [
+      "s3:*"
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:s3:::govuk-forms-${var.environment_name}-analytics-errors*"
+    ]
+    sid = "ManageAnalyticsErrorBucket"
+  }
+}
+
 data "aws_iam_policy_document" "guardduty" {
   statement {
     actions = [
@@ -618,6 +657,26 @@ data "aws_iam_policy_document" "iam" {
       "arn:aws:iam::${var.account_id}:role/govuk-s3-end-to-end-test-${var.environment_name}"
     ]
     sid = "ManageRunnerSpecificRoles"
+  }
+
+  statement {
+    actions = [
+      "iam:AttachRolePolicy",
+      "iam:CreateRole",
+      "iam:DeleteRole",
+      "iam:DeleteRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:PassRole",
+      "iam:PutRolePolicy",
+      "iam:TagRole",
+      "iam:UpdateAssumeRolePolicy",
+      "iam:UpdateRole"
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:iam::${var.account_id}:role/govuk-forms-submission-events-*-${var.environment_name}"
+    ]
+    sid = "ManageSubmissionEventsRoles"
   }
 
   statement {
