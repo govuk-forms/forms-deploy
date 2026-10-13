@@ -43,6 +43,16 @@ table in the Glue data catalog, but Athena reads the underlying objects as the
 task role, so the buckets holding the data must be listed in
 `athena_data_bucket_arns` before their tables can be queried.
 
+Tables in an S3 table bucket are read as the task role too, so the table
+bucket must be listed in `athena_table_bucket_arns`. Each table bucket is its
+own catalog, `s3tablescatalog/<table bucket name>`, with a database for each
+namespace. The query editor starts in the default catalog, so query these
+tables by their full name:
+
+```sql
+SELECT * FROM "s3tablescatalog/<table bucket name>"."<namespace>"."<table>"
+```
+
 ## Notes
 
 - The database is allowed to pause after `seconds_until_auto_pause` seconds

@@ -27,4 +27,7 @@ module "grafana" {
   github_editor_teams          = var.grafana_settings.github_editor_teams
   seconds_until_auto_pause     = var.grafana_settings.seconds_until_auto_pause
   rds_maintenance_window       = var.environmental_settings.rds_maintenance_window
+
+  # Lets Grafana query the submission events table
+  athena_table_bucket_arns = [module.analytics.table_bucket_arn]
 }
