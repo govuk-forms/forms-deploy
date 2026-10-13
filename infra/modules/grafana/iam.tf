@@ -123,6 +123,8 @@ data "aws_iam_policy_document" "task" {
       "athena:ListDataCatalogs",
       "athena:ListTableMetadata",
       "athena:ListWorkGroups",
+      "glue:GetCatalog",
+      "glue:GetCatalogs",
       "glue:GetDatabase",
       "glue:GetDatabases",
       "glue:GetTable",
@@ -181,6 +183,32 @@ data "aws_iam_policy_document" "task" {
       resources = concat(
         var.athena_data_bucket_arns,
         [for arn in var.athena_data_bucket_arns : "${arn}/*"]
+      )
+    }
+  }
+
+  # S3 table buckets are federated into the Glue data catalog with IAM access
+  # control, so Athena reads their tables with the credentials of the caller
+  # too, see
+  # https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-tables-integrating-aws.html
+  dynamic "statement" {
+    for_each = length(var.athena_table_bucket_arns) > 0 ? [1] : []
+
+    content {
+      sid    = "ReadAthenaTableBucketData"
+      effect = "Allow"
+      actions = [
+        "s3tables:GetTableBucket",
+        "s3tables:GetNamespace",
+        "s3tables:ListNamespaces",
+        "s3tables:GetTable",
+        "s3tables:ListTables",
+        "s3tables:GetTableMetadataLocation",
+        "s3tables:GetTableData"
+      ]
+      resources = concat(
+        var.athena_table_bucket_arns,
+        [for arn in var.athena_table_bucket_arns : "${arn}/table/*"]
       )
     }
   }
