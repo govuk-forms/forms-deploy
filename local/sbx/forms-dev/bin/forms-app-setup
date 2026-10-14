@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+# Installs Ruby, Node, gems and npm packages and prepares the development and
+# test databases for each app. Idempotent: runs in the background on every
+# sandbox start, and can be re-run by hand. Progress: /tmp/forms-app-setup.log
+set -uo pipefail
+
+export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
+export PGPASSWORD=postgres
+WS="$(cat "$HOME/.config/forms-dev/workdir")"
+STATUS=/tmp/forms-app-setup.status
+
+# One run at a time: a second would install over the first, and the last to
+# finish would overwrite the status
+exec 9> /tmp/forms-app-setup.lock
+if ! flock -n 9; then
+  echo "forms-app-setup is already running, see $STATUS" >&2
+  exit 1
+fi
+
+# Opened after the lock, so a run that exits early leaves the log of the run
+# in progress alone. Written here rather than by the startup hook, so a run
+# by hand doesn't leave the last startup's log in place.
+exec > >(tee /tmp/forms-app-setup.log) 2>&1
+
+echo running > "$STATUS"
+failed=""
+
+log() { echo "== [$(date +%T)] $*"; }
+
+db_exists() {
+  psql -h localhost -U postgres -tAc "SELECT 1 FROM pg_database WHERE datname = '$1'" | grep -q 1
+}
+
+setup_app() {
+  local app="$1" dir="$WS/$1"
+  cd "$dir" || return 1
+
+  # Versions from the app's .ruby-version and .nvmrc
+  log "$app: ruby $(cat .ruby-version 2>/dev/null), node $(cat .nvmrc 2>/dev/null)"
+  mise install || return 1
+
+  # Never run npm against the host's node_modules (see forms-dev-up)
+  if ! mountpoint -q node_modules; then
+    log "$app: node_modules is not the sandbox-only mount, skipping npm"
+    return 1
+  fi
+  # Native packages are built for one Node version, so a new .nvmrc
+  # reinstalls them even when package-lock.json hasn't changed
+  local install_sum
+  install_sum="$({ node --version && cat package-lock.json; } | sha256sum | cut -d' ' -f1)"
+  if [ "$(cat node_modules/.forms-install-sum 2>/dev/null)" != "$install_sum" ]; then
+    log "$app: npm ci"
+    npm ci --no-audit --no-fund || return 1
+    echo "$install_sum" > node_modules/.forms-install-sum
+  fi
+
+  log "$app: bundle install"
+  bundle check >/dev/null || bundle install || return 1
+
+  [ -f config/database.yml ] || return 0
+
+  log "$app: development database"
+  bin/rails db:prepare || return 1
+
+  local test_db="${app//-/_}_test"
+  if ! db_exists "$test_db"; then
+    log "$app: test database"
+    RAILS_ENV=test bin/rails db:create db:schema:load || return 1
+  fi
+}
+
+for _ in $(seq 1 60); do
+  pg_isready -q -h localhost && break
+  sleep 1
+done
+
+first=""
+# The same list forms-dev-up mounted node_modules for
+for app in $(forms-apps); do
+  if setup_app "$app"; then
+    log "$app: ready"
+    first="${first:-$app}"
+  else
+    log "$app: FAILED"
+    failed="$failed $app"
+  fi
+done
+
+# Default versions outside the app directories, from the first app set up
+if [ -n "$first" ] &&
+  ! (cd "$WS/$first" && mise use -g "ruby@$(cat .ruby-version)" "node@$(cat .nvmrc)" >/dev/null); then
+  log "default ruby and node: FAILED"
+  failed="$failed default-versions"
+fi
+
+if [ -n "$failed" ]; then
+  echo "failed:$failed" > "$STATUS"
+else
+  echo done > "$STATUS"
+fi

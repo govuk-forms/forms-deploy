@@ -11,6 +11,9 @@ The components which make up the service are:
 - https://github.com/govuk-forms/forms-admin
 - https://github.com/govuk-forms/forms-product-page
 
+To work on the apps with Claude Code in an isolated Docker Sandbox instead,
+see [sbx/README.md](sbx/README.md).
+
 ## How it works
 Each of the components above has a Dockerfile in its repo which is used to build
 a docker image. The file `compose.yaml` defines the configuration for using
