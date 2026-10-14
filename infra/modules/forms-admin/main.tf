@@ -136,6 +136,10 @@ module "ecs_service" {
       value = "production"
     },
     {
+      name  = "SETTINGS__FORMS_PRODUCT_PAGE__URL",
+      value = var.product_page_base_url
+    },
+    {
       name  = "SETTINGS__FORMS_RUNNER__URL",
       value = var.runner_base_url
     },

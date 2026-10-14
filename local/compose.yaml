@@ -31,6 +31,7 @@ services:
       - RAILS_DEVELOPMENT_HOSTS=admin:3000
       - SECRET_KEY_BASE=dummyvalue
       - SETTINGS__FORMS_RUNNER__URL=http://localhost:3001
+      - SETTINGS__FORMS_PRODUCT_PAGE__URL=http://localhost:3002
     extra_hosts:
       - host.docker.internal:host-gateway
     ports:
