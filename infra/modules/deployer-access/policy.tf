@@ -52,14 +52,44 @@ data "aws_iam_policy_document" "forms_infra_3" {
   ]
 }
 
-resource "aws_iam_role_policy_attachment" "iam" {
-  policy_arn = aws_iam_policy.iam.arn
+resource "aws_iam_policy" "iam_ecs" {
+  policy = data.aws_iam_policy_document.iam_ecs.json
+}
+
+resource "aws_iam_role_policy_attachment" "iam_ecs" {
+  policy_arn = aws_iam_policy.iam_ecs.arn
   role       = aws_iam_role.deployer.id
 }
 
-resource "aws_iam_policy" "iam" {
-  policy = data.aws_iam_policy_document.iam.json
+# Keep the existing policy rather than replacing it
+moved {
+  from = aws_iam_policy.iam
+  to   = aws_iam_policy.iam_ecs
 }
+
+moved {
+  from = aws_iam_role_policy_attachment.iam
+  to   = aws_iam_role_policy_attachment.iam_ecs
+}
+
+resource "aws_iam_policy" "iam_pipelines" {
+  policy = data.aws_iam_policy_document.iam_pipelines.json
+}
+
+resource "aws_iam_role_policy_attachment" "iam_pipelines" {
+  policy_arn = aws_iam_policy.iam_pipelines.arn
+  role       = aws_iam_role.deployer.id
+}
+
+resource "aws_iam_policy" "iam_service_access" {
+  policy = data.aws_iam_policy_document.iam_service_access.json
+}
+
+resource "aws_iam_role_policy_attachment" "iam_service_access" {
+  policy_arn = aws_iam_policy.iam_service_access.arn
+  role       = aws_iam_role.deployer.id
+}
+
 resource "aws_iam_policy" "forms_infra" {
   policy = data.aws_iam_policy_document.forms_infra.json
 }
@@ -523,7 +553,9 @@ data "aws_iam_policy_document" "guardduty" {
     sid = "ManageMalwareProtectionPlan"
   }
 }
-data "aws_iam_policy_document" "iam" {
+
+# Roles and policies for the ECS tasks that run the apps
+data "aws_iam_policy_document" "iam_ecs" {
 
   statement {
     actions = [
@@ -553,45 +585,6 @@ data "aws_iam_policy_document" "iam" {
 
   statement {
     actions = [
-      "iam:*Role",
-      "iam:*RolePolicy"
-    ]
-    effect = "Allow"
-    resources = [
-      "arn:aws:iam::${var.account_id}:role/${var.environment_name}-lambda-pipeline-invoker",
-      "arn:aws:iam::${var.account_id}:role/${var.environment_name}-lambda-paused-pipeline-invoker"
-    ]
-    sid = "ManageRelatedIAMRoles"
-  }
-
-  statement {
-    actions = [
-      "iam:AttachRolePolicy",
-      "iam:CreateRole",
-      "iam:DeletePolicyVersion",
-      "iam:DeleteRolePolicy",
-      "iam:DetachRolePolicy",
-      "iam:DeleteRole",
-      "iam:PassRole",
-      "iam:PutRolePolicy",
-      "iam:TagRole"
-    ]
-    effect = "Allow"
-    resources = [
-      "arn:aws:iam::${var.account_id}:policy/codebuild-*",
-      "arn:aws:iam::${var.account_id}:role/codebuild-*",
-      "arn:aws:iam::${var.account_id}:role/${var.environment_name}-event-bridge-*",
-      "arn:aws:iam::${var.account_id}:role/event-bridge-actor",
-      "arn:aws:iam::${var.account_id}:role/ecs-events-role",
-      "arn:aws:iam::${var.account_id}:role/deployer-${var.environment_name}",
-      "arn:aws:iam::${var.account_id}:role/malware-protection-for-s3",
-      "arn:aws:iam::${var.account_id}:role/RDSEnhancedMonitoring"
-    ]
-    sid = "ManageRoles"
-  }
-
-  statement {
-    actions = [
       "iam:AttachRolePolicy",
       "iam:CreateRole",
       "iam:DeleteRolePolicy",
@@ -615,6 +608,150 @@ data "aws_iam_policy_document" "iam" {
       "arn:aws:iam::${var.account_id}:role/${var.environment_name}-grafana-ecs-task-execution"
     ]
     sid = "ManageTaskAndTaskExecutionRoles"
+  }
+
+  statement {
+    actions = [
+      "iam:CreateServiceLinkedRole"
+    ]
+    condition {
+      test     = "StringLike"
+      values   = ["ecs.application-autoscaling.amazonaws.com"]
+      variable = "iam:AWSServiceName"
+    }
+    effect = "Allow"
+    resources = [
+      "arn:aws:iam::*:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService"
+    ]
+    sid = "ManageServiceLinkedRoleForAutoscaling"
+  }
+
+  statement {
+    actions = [
+      "iam:PassRole"
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:iam::*:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService"
+    ]
+    sid = "AllowPassingServiceLinkedRole"
+  }
+}
+
+# Roles and policies for CodeBuild, EventBridge and Lambda, which run the
+# pipelines and scheduled tasks
+data "aws_iam_policy_document" "iam_pipelines" {
+
+  statement {
+    actions = [
+      "iam:*Role",
+      "iam:*RolePolicy"
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:iam::${var.account_id}:role/${var.environment_name}-lambda-pipeline-invoker",
+      "arn:aws:iam::${var.account_id}:role/${var.environment_name}-lambda-paused-pipeline-invoker"
+    ]
+    sid = "ManagePipelineInvokerRoles"
+  }
+
+  statement {
+    actions = [
+      "iam:AttachRolePolicy",
+      "iam:CreateRole",
+      "iam:DeletePolicyVersion",
+      "iam:DeleteRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:DeleteRole",
+      "iam:PassRole",
+      "iam:PutRolePolicy",
+      "iam:TagRole"
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:iam::${var.account_id}:policy/codebuild-*",
+      "arn:aws:iam::${var.account_id}:role/codebuild-*",
+      "arn:aws:iam::${var.account_id}:role/${var.environment_name}-event-bridge-*",
+      "arn:aws:iam::${var.account_id}:role/event-bridge-actor",
+      "arn:aws:iam::${var.account_id}:role/ecs-events-role",
+      "arn:aws:iam::${var.account_id}:role/deployer-${var.environment_name}"
+    ]
+    sid = "ManagePipelineRoles"
+  }
+
+  statement {
+    actions = [
+      "iam:CreatePolicy",
+      "iam:CreatePolicyVersion",
+      "iam:DeletePolicy",
+      "iam:DeletePolicyVersion",
+      "iam:TagPolicy",
+      "iam:UntagPolicy"
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:iam::${var.account_id}:policy/codebuild-*",
+      "arn:aws:iam::${var.account_id}:policy/${var.environment_name}-event-bridge-*"
+    ]
+    sid = "ManagePipelinePolicies"
+  }
+
+  statement {
+    actions = [
+      "iam:PassRole"
+    ]
+    condition {
+      test     = "StringLike"
+      values   = ["events.amazonaws.com"]
+      variable = "iam:PassedToService"
+    }
+    effect = "Allow"
+    resources = [
+      "arn:aws:iam::*:role/*"
+    ]
+    sid = "AllowPassRoleForEventBridge"
+  }
+}
+
+# Roles, users and policies that other AWS services and Auth0 use to act on
+# our resources
+data "aws_iam_policy_document" "iam_service_access" {
+
+  statement {
+    actions = [
+      "iam:AttachRolePolicy",
+      "iam:CreateRole",
+      "iam:DeletePolicyVersion",
+      "iam:DeleteRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:DeleteRole",
+      "iam:PassRole",
+      "iam:PutRolePolicy",
+      "iam:TagRole"
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:iam::${var.account_id}:role/malware-protection-for-s3",
+      "arn:aws:iam::${var.account_id}:role/RDSEnhancedMonitoring"
+    ]
+    sid = "ManageServiceRoles"
+  }
+
+  statement {
+    actions = [
+      "iam:CreatePolicy",
+      "iam:CreatePolicyVersion",
+      "iam:DeletePolicy",
+      "iam:DeletePolicyVersion",
+      "iam:TagPolicy",
+      "iam:UntagPolicy"
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:iam::${var.account_id}:policy/allow-malware-scanning-for-s3",
+      "arn:aws:iam::${var.account_id}:policy/ses_sender"
+    ]
+    sid = "ManageServicePolicies"
   }
 
   statement {
@@ -706,25 +843,6 @@ data "aws_iam_policy_document" "iam" {
 
   statement {
     actions = [
-      "iam:CreatePolicy",
-      "iam:CreatePolicyVersion",
-      "iam:DeletePolicy",
-      "iam:DeletePolicyVersion",
-      "iam:TagPolicy",
-      "iam:UntagPolicy"
-    ]
-    effect = "Allow"
-    resources = [
-      "arn:aws:iam::${var.account_id}:policy/allow-malware-scanning-for-s3",
-      "arn:aws:iam::${var.account_id}:policy/ses_sender",
-      "arn:aws:iam::${var.account_id}:policy/codebuild-*",
-      "arn:aws:iam::${var.account_id}:policy/${var.environment_name}-event-bridge-*"
-    ]
-    sid = "ManageMalwareProtectionPoliciesforS3"
-  }
-
-  statement {
-    actions = [
       "iam:CreateServiceLinkedRole"
     ]
     condition {
@@ -754,50 +872,6 @@ data "aws_iam_policy_document" "iam" {
     ]
     sid = "CreateServiceLinkedRoleForWAF"
   }
-
-  statement {
-    actions = [
-      "iam:CreateServiceLinkedRole"
-    ]
-    condition {
-      test     = "StringLike"
-      values   = ["ecs.application-autoscaling.amazonaws.com"]
-      variable = "iam:AWSServiceName"
-    }
-    effect = "Allow"
-    resources = [
-      "arn:aws:iam::*:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService"
-    ]
-    sid = "ManageServiceLinkedRoleForAutoscaling"
-  }
-
-  statement {
-    actions = [
-      "iam:PassRole"
-    ]
-    condition {
-      test     = "StringLike"
-      values   = ["events.amazonaws.com"]
-      variable = "iam:PassedToService"
-    }
-    effect = "Allow"
-    resources = [
-      "arn:aws:iam::*:role/*"
-    ]
-    sid = "AllowPassRoleForEventBridge"
-  }
-
-  statement {
-    actions = [
-      "iam:PassRole"
-    ]
-    effect = "Allow"
-    resources = [
-      "arn:aws:iam::*:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService"
-    ]
-    sid = "AllowPassingServiceLinkedRole"
-  }
-
 }
 
 data "aws_iam_policy_document" "kms" {
