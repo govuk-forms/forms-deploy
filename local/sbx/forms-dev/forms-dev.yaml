@@ -173,6 +173,16 @@ capabilities:
             { [ -s "$f" ] || echo '{}' > "$f"; } &&
             new=$(jq '.attribution.pr = ""' "$f") && printf '%s\n' "$new" > "$f"
 
+        # Fullscreen rendering draws Claude Code in the terminal's alternate
+        # screen, which stops the flicker the default renderer shows in long
+        # sessions.
+        - description: Run Claude Code in fullscreen render mode
+          user: agent
+          command: >
+            mkdir -p ~/.claude && f=~/.claude/settings.json &&
+            { [ -s "$f" ] || echo '{}' > "$f"; } &&
+            new=$(jq '.tui = "fullscreen"' "$f") && printf '%s\n' "$new" > "$f"
+
         # sbxenv.yaml mounts the folder holding the repos as the workspace.
         # The scripts read it from here, so they also work when run by hand.
         - description: Record the folder holding the repos for the forms-dev scripts
