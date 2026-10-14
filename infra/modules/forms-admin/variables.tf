@@ -28,9 +28,14 @@ variable "memory" {
 }
 
 
-variable "runner_base" {
+variable "runner_base_url" {
   type        = string
   description = "The url for redirecting to forms-runner"
+}
+
+variable "product_page_base_url" {
+  type        = string
+  description = "The url for redirecting to forms-product-page"
 }
 
 variable "auth_provider" {
