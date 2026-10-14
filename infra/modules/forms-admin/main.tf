@@ -137,7 +137,7 @@ module "ecs_service" {
     },
     {
       name  = "SETTINGS__FORMS_RUNNER__URL",
-      value = var.runner_base
+      value = var.runner_base_url
     },
     {
       name  = "SETTINGS__AUTH_PROVIDER",

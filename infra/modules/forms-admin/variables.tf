@@ -28,7 +28,7 @@ variable "memory" {
 }
 
 
-variable "runner_base" {
+variable "runner_base_url" {
   type        = string
   description = "The url for redirecting to forms-runner"
 }
