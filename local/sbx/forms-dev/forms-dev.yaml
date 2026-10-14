@@ -57,6 +57,22 @@ capabilities:
           - registry-1.docker.io
           - auth.docker.io
           - production.cloudflare.docker.com
+          # Docs, for Claude's web fetches. Terraform provider docs are on
+          # the Terraform Registry. ** matches any number of subdomains, so
+          # it covers sites like frontend.design-system.service.gov.uk.
+          - docs.aws.amazon.com
+          - developer.hashicorp.com
+          - registry.terraform.io
+          - "**.gov.uk"
+          - "*.rubyonrails.org"
+          - docs.ruby-lang.org
+          - ruby-doc.org
+          - rspec.info
+          - govuk-components.x-govuk.org
+          - govuk-form-builder.x-govuk.org
+          - docs.docker.com
+          - developer.mozilla.org
+          - www.w3.org
 
   # The GitHub token from `sbx secret set github`, if the person stored one.
   # The repos' SSH remotes are rewritten to HTTPS below so git uses it too.
