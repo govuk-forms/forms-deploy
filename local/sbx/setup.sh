@@ -2,9 +2,10 @@
 # One-time setup for the GOV.UK Forms sandbox. Safe to re-run: each step is
 # skipped if it's already done. See README.md in this directory.
 #
-#   ./setup.sh [--github | --no-github]
+#   ./setup.sh [--github | --no-github] [--statusline | --no-statusline]
 #
 # --github / --no-github answer the "GitHub token" question without prompting.
+# --statusline / --no-statusline do the same for the "Status line" question.
 set -euo pipefail
 
 GATEWAY_HOST=licenseportal.aiengineeringlab.co.uk
@@ -17,11 +18,14 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 WS="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
 github=ask
+statusline=ask
 for arg in "$@"; do
   case "$arg" in
     --github) github=yes ;;
     --no-github) github=no ;;
-    -h | --help) sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    --statusline) statusline=yes ;;
+    --no-statusline) statusline=no ;;
+    -h | --help) sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "Unknown option: $arg" >&2; exit 1 ;;
   esac
 done
@@ -158,6 +162,39 @@ else
     echo "     GIT_${var}_NAME: $yaml_name"
     echo "     GIT_${var}_EMAIL: $yaml_email"
   done
+fi
+
+step "Status line (optional)"
+claude_dir="$WS/.claude"
+local_settings="$claude_dir/settings.local.json"
+# Claude starts in $WS on your machine and in the sandbox, which mounts it at
+# the same path, so this one setting works in both
+# shellcheck disable=SC2016 # Claude expands CLAUDE_PROJECT_DIR, not this script
+statusline_command='bash "${CLAUDE_PROJECT_DIR:-.}/.claude/statusline.sh"'
+current="$(jq -r '.statusLine.command // ""' "$local_settings" 2>/dev/null || true)"
+if [ "$current" = "$statusline_command" ] &&
+  cmp -s "$SCRIPT_DIR/statusline.sh" "$claude_dir/statusline.sh"; then
+  ok "already set up"
+else
+  if [ "$statusline" = ask ]; then
+    note "Shows the model, folder, git branch and state, context use and cost"
+    note "under Claude's prompt, in the sandbox and when you run Claude in $WS."
+    read -r -p "   Add the status line? [y/N] " answer
+    case "$answer" in [yY]*) statusline=yes ;; *) statusline=no ;; esac
+  fi
+  if [ "$statusline" = no ]; then
+    note "skipped. To add it later: ./setup.sh --statusline"
+  elif ! command -v jq >/dev/null; then
+    note "skipped: the status line needs jq. Install it, then re-run this."
+  else
+    mkdir -p "$claude_dir"
+    cp "$SCRIPT_DIR/statusline.sh" "$claude_dir/statusline.sh"
+    [ -s "$local_settings" ] || echo '{}' > "$local_settings"
+    new="$(jq --arg c "$statusline_command" \
+      '.statusLine = {type: "command", command: $c}' "$local_settings")"
+    printf '%s\n' "$new" > "$local_settings"
+    ok "wrote $claude_dir/statusline.sh and set it in settings.local.json"
+  fi
 fi
 
 step "Done. Start the sandbox with:"

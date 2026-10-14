@@ -64,6 +64,7 @@ You only need to do this once.
 
 2. Choose whether to add a GitHub token.
 3. Paste your model gateway key when asked.
+4. Choose whether to add the status line.
 
 The script:
 
@@ -71,12 +72,18 @@ The script:
 - installs the [commit messages skill][skill]
 - adds your git name and email to `~/.sbxenv.yaml`, so your commits in the
   sandbox are in your name
+- if you choose to, copies [`statusline.sh`](statusline.sh) into `.claude/` in
+  the folder holding the repos and sets it in `.claude/settings.local.json`
+  there. Claude then shows the model, folder, git state, context use and cost
+  under the prompt, in the sandbox and when you run Claude in that folder on
+  your machine
 
 The sbx proxy adds your secrets to requests as they leave the sandbox, so the
 sandbox never sees them.
 
 You can safely run the script again. It skips anything already done. To
-answer the GitHub question up front, use `--github` or `--no-github`.
+answer the questions up front, use `--github` or `--no-github`, and
+`--statusline` or `--no-statusline`.
 
 [skill]: https://gitlab.com/gitlab-org/ai/skills/-/blob/main/skills/commit-messages/SKILL.md
 
