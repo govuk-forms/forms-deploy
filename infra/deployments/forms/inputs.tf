@@ -240,9 +240,10 @@ variable "grafana_settings" {
     enabled                      = optional(bool, false)
     cpu                          = number
     memory                       = number
-    github_allowed_organizations = list(string) # GitHub organisations whose members may sign in
-    github_admin_team            = string       # GitHub team (org/team) granted Grafana server admin
-    github_editor_teams          = list(string) # GitHub teams (org/team) granted the Editor role; other org members are denied
+    github_allowed_organizations = list(string)               # GitHub organisations whose members may sign in
+    github_admin_team            = string                     # GitHub team (org/team) granted Grafana server admin
+    github_editor_teams          = list(string)               # GitHub teams (org/team) granted the Editor role
+    github_viewer_teams          = optional(list(string), []) # GitHub teams (org/team) granted the Viewer role; members of no listed team are denied
     seconds_until_auto_pause     = optional(number, 3600)
   })
   nullable = false
