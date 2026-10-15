@@ -61,12 +61,6 @@ variable "enable_maintenance_mode" {
   description = "Controls whether the maintenance page is shown"
 }
 
-variable "forms_product_page_support_url" {
-  type        = string
-  description = "Sets the support URL for the product page"
-  default     = ""
-}
-
 variable "min_capacity" {
   description = "Sets the minimum number of instances"
   type        = number

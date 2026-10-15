@@ -19,7 +19,6 @@ module "forms_admin" {
   runner_base_url                   = "https://submit.${var.root_domain}"
   govuk_app_domain                  = var.forms_admin_settings.govuk_app_domain
   enable_maintenance_mode           = var.forms_admin_settings.enable_maintenance_mode
-  forms_product_page_support_url    = var.environmental_settings.forms_product_page_support_url
   auth_provider                     = var.forms_admin_settings.auth_provider
   previous_auth_provider            = var.forms_admin_settings.previous_auth_provider
   cloudwatch_metrics_enabled        = var.forms_admin_settings.cloudwatch_metrics_enabled
