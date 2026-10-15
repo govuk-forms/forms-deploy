@@ -15,7 +15,7 @@ module "forms_admin" {
   memory                            = var.forms_admin_settings.memory
   min_capacity                      = var.forms_admin_settings.min_capacity
   max_capacity                      = var.forms_admin_settings.max_capacity
-  product_page_base_url             = "https://${var.root_domain}"
+  product_page_base_url             = "https://www.${var.root_domain}"
   runner_base_url                   = "https://submit.${var.root_domain}"
   govuk_app_domain                  = var.forms_admin_settings.govuk_app_domain
   enable_maintenance_mode           = var.forms_admin_settings.enable_maintenance_mode

@@ -289,7 +289,7 @@ module "deploy_product_pages_end_to_end_tests" {
   container_registry            = var.container_registry
   forms_admin_url               = "https://admin.${var.root_domain}"
   forms_runner_url              = "https://submit.${var.root_domain}"
-  product_pages_url             = "https://${var.root_domain}"
+  product_pages_url             = "https://www.${var.root_domain}"
   artifact_store_arn            = module.artifact_bucket.arn
   service_role_arn              = aws_iam_role.e2e_service_role.arn
   deploy_account_id             = var.deploy_account_id
