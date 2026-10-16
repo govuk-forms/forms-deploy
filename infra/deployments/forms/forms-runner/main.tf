@@ -45,7 +45,7 @@ module "forms_runner" {
   max_capacity                                       = var.forms_runner_settings.max_capacity
   api_base_url                                       = "http://admin.internal.${var.root_domain}"
   admin_base_url                                     = "https://admin.${var.root_domain}"
-  product_page_base_url                              = "https://${var.root_domain}"
+  product_page_base_url                              = "https://www.${var.root_domain}"
   runner_base_url                                    = "https://submit.${var.root_domain}"
   enable_maintenance_mode                            = var.forms_runner_settings.enable_maintenance_mode
   cloudwatch_metrics_enabled                         = var.forms_runner_settings.cloudwatch_metrics_enabled
