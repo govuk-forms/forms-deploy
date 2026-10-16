@@ -135,4 +135,5 @@ grafana_settings = {
   github_allowed_organizations = ["govuk-forms"]
   github_admin_team            = "govuk-forms/govuk-forms-infrastructure"
   github_editor_teams          = ["govuk-forms/govuk-forms-devs"]
+  github_viewer_teams          = ["govuk-forms/govuk-forms-all"]
 }

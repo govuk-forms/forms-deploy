@@ -68,6 +68,12 @@ variable "github_editor_teams" {
   type        = list(string)
 }
 
+variable "github_viewer_teams" {
+  description = "GitHub teams (org/team) whose members are Grafana viewers"
+  type        = list(string)
+  default     = []
+}
+
 variable "seconds_until_auto_pause" {
   description = "How long the database must be idle before it pauses"
   type        = number

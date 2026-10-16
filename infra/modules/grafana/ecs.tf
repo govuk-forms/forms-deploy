@@ -5,7 +5,8 @@ locals {
   # Grafana teams are exposed to the role mapping as "@<org>/<team>"
   github_role_attribute_path = join(" || ", concat(
     ["contains(groups[*], '@${var.github_admin_team}') && 'GrafanaAdmin'"],
-    [for team in var.github_editor_teams : "contains(groups[*], '@${team}') && 'Editor'"]
+    [for team in var.github_editor_teams : "contains(groups[*], '@${team}') && 'Editor'"],
+    [for team in var.github_viewer_teams : "contains(groups[*], '@${team}') && 'Viewer'"]
   ))
 
   environment_variables = [

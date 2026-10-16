@@ -13,7 +13,8 @@ Users sign in with GitHub and are sent straight to GitHub when they visit
 Grafana. Access is limited to members of the organisations in
 `github_allowed_organizations`, and a role is assigned from team membership:
 `github_admin_team` members are Grafana server admins, `github_editor_teams`
-members are editors, and anybody else is refused.
+members are editors, `github_viewer_teams` members are viewers, and anybody
+else is refused.
 
 The built-in `admin` user remains for use when GitHub sign in is unavailable.
 Its password is in the SSM parameter `/grafana/admin-password` and the login

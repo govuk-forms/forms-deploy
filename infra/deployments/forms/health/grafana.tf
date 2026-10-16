@@ -25,6 +25,7 @@ module "grafana" {
   github_allowed_organizations = var.grafana_settings.github_allowed_organizations
   github_admin_team            = var.grafana_settings.github_admin_team
   github_editor_teams          = var.grafana_settings.github_editor_teams
+  github_viewer_teams          = var.grafana_settings.github_viewer_teams
   seconds_until_auto_pause     = var.grafana_settings.seconds_until_auto_pause
   rds_maintenance_window       = var.environmental_settings.rds_maintenance_window
 
