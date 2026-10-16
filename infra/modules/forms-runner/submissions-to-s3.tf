@@ -38,10 +38,17 @@ resource "aws_iam_role_policy" "allow_s3_actions" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid      = "AllowAllS3Actions"
-        Action   = "s3:*"
+        # Departments choose which bucket receives their submissions, so we cannot list the buckets here
+        Sid      = "AllowWritingSubmissionsToFormBuckets"
+        Action   = "s3:PutObject"
         Effect   = "Allow"
-        Resource = ["arn:aws:s3:::*"]
+        Resource = ["arn:aws:s3:::*/*"]
+      },
+      {
+        Sid      = "AllowReadingUploadedFilesToCopy"
+        Action   = "s3:GetObject"
+        Effect   = "Allow"
+        Resource = ["arn:aws:s3:::${local.file_upload_bucket_name}/*"]
       }
     ]
   })
