@@ -217,6 +217,7 @@ spec:
 	(cd infra; bundle install; bundle exec rspec;)
 	(cd support/pipeline-visualiser; bundle install; bundle exec rspec;)
 	(cd infra/deployments/forms/pipelines/pipeline-invoker; bundle install; bundle exec rspec;)
+	(cd infra/modules/analytics/lambda; bundle install; bundle exec rspec;)
 
 .PHONY: tflint
 tflint: tflint_init tflint_modules tflint_deploy tflint_forms tflint_integration

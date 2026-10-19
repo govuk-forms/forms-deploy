@@ -1,7 +1,13 @@
+# Only the handler is packaged: the Gemfile and specs alongside it are for
+# running the tests, and the Lambda Ruby runtime provides the AWS SDK
 data "archive_file" "transform" {
   type        = "zip"
-  source_dir  = "${path.module}/lambda"
   output_path = "${path.module}/zip-files/transform-lambda.zip"
+
+  source {
+    content  = file("${path.module}/lambda/transform.rb")
+    filename = "transform.rb"
+  }
 }
 
 resource "aws_lambda_function" "transform" {
