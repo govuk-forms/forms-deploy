@@ -168,10 +168,6 @@ module "ecs_service" {
       value = var.env_name
     },
     {
-      name  = "SETTINGS__FORMS_PRODUCT_PAGE__SUPPORT_URL",
-      value = var.forms_product_page_support_url
-    },
-    {
       name  = "SETTINGS__CLOUDWATCH_METRICS_ENABLED",
       value = var.cloudwatch_metrics_enabled
     },
