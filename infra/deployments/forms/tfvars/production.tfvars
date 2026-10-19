@@ -151,7 +151,7 @@ forms_product_page_settings = {
   cpu          = 256
   memory       = 512
   min_capacity = 3
-  max_capacity = 9
+  max_capacity = 3
 }
 forms_runner_settings = {
   cpu                                                             = 1024
