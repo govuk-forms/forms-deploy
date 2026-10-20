@@ -44,11 +44,6 @@ variable "vpn" {
   description = "If true then user must be on the VPN to assume the role"
 }
 
-variable "codestar_connection_arn" {
-  type        = string
-  description = "The arn of the github connection to use"
-}
-
 variable "allow_rds_data_api_access" {
   type        = bool
   description = "Whether appropriate engineer roles should have access to the AWS RDS Data API"
