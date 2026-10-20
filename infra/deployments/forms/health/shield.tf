@@ -7,13 +7,6 @@ resource "aws_shield_protection" "cloudfront" {
   resource_arn = local.cloudfront_arn
 }
 
-resource "aws_shield_application_layer_automatic_response" "cloudfront" {
-  resource_arn = local.cloudfront_arn
-  action       = "BLOCK"
-
-  depends_on = [aws_shield_protection.cloudfront]
-}
-
 resource "aws_iam_role" "shield_response_team" {
 
   name = "shield-response-team"
