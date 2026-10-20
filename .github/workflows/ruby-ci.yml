@@ -17,6 +17,7 @@ jobs:
   setup:
     name: "Setup"
     runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
     outputs:
       ruby-version: ${{ steps.set-ruby-version.outputs.ruby-version }}
       spec-matrix: ${{ steps.build-matrix.outputs.spec-matrix }}
@@ -43,6 +44,7 @@ jobs:
   ruby-lint:
     name: "Ruby Lint"
     runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
     needs: setup
     steps:
       - name: Checkout code
@@ -58,6 +60,7 @@ jobs:
   ruby-spec:
     name: "Rspec"
     runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
     needs: setup
     strategy:
       fail-fast: false
