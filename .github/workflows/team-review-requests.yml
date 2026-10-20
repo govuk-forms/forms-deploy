@@ -10,6 +10,7 @@ jobs:
   request-team-reviews:
     name: Request team PR reviews
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       pull-requests: write
     env:
