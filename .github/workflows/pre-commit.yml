@@ -12,6 +12,7 @@ jobs:
     # We run it on merge to main to ensure that pre-commit's cache is up to date
     if: github.event_name != 'merge_group'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     name: run checks
     permissions:
       contents: read
@@ -187,6 +188,7 @@ jobs:
     # Required, for 'required PR status checks' on GitHub.
     name: Run pre-commit
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [pre-commit]
     if: ${{ always() && !failure() && !cancelled() }}
     steps:

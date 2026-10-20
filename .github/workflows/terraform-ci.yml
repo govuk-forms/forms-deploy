@@ -11,6 +11,7 @@ jobs:
   setup:
     name: "Setup and build matrix"
     runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
     outputs:
       validation-matrix: ${{ steps.build-matrix.outputs.validation-matrix }}
       has-terraform-changes: ${{ steps.check-changes.outputs.has-changes }}
@@ -131,6 +132,7 @@ jobs:
     needs: setup
     if: needs.setup.outputs.has-terraform-changes == 'true'
     runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -148,6 +150,7 @@ jobs:
   terraform-validate:
     name: "Terraform validate"
     runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
     needs: setup
     if: needs.setup.outputs.has-terraform-changes == 'true' && needs.setup.outputs.validation-matrix != '[]'
     strategy:
@@ -179,6 +182,7 @@ jobs:
     needs: setup
     if: needs.setup.outputs.has-terraform-changes == 'true'
     runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -212,6 +216,7 @@ jobs:
     needs: setup
     if: needs.setup.outputs.has-terraform-changes == 'true'
     runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -230,6 +235,7 @@ jobs:
     # Required, for 'required PR status checks' on GitHub.
     name: "Run terraform tests"
     runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
     needs: [terraform-fmt, terraform-validate, tflint, checkov]
     if: ${{ always() && !failure() && !cancelled() }}
     steps:
