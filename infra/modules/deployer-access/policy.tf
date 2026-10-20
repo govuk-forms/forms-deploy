@@ -12,7 +12,7 @@ data "aws_iam_policy_document" "forms_infra" {
     data.aws_iam_policy_document.cloudformation.json,
     data.aws_iam_policy_document.cloudfront.json,
     data.aws_iam_policy_document.cloudwatch.json,
-    data.aws_iam_policy_document.code.json, # codebuild, codecommit, codepipeline, codestar-connections
+    data.aws_iam_policy_document.code.json, # codebuild, codepipeline, codestar-connections
   ]
 }
 
@@ -299,6 +299,23 @@ data "aws_iam_policy_document" "cloudwatch" {
 
 }
 
+locals {
+  # Connections created before 1 July 2024 have `codestar-connections` in their
+  # ARN, newer ones have `codeconnections`. A policy's resource prefix has to
+  # match the resource's, so allow both forms of the same connection.
+  # https://docs.aws.amazon.com/dtconsole/latest/userguide/security-iam.html
+  codestar_connection_arns = [
+    replace(var.codestar_connection_arn, ":codestar-connections:", ":codeconnections:"),
+    replace(var.codestar_connection_arn, ":codeconnections:", ":codestar-connections:"),
+  ]
+
+  # The pipelines the deployer role runs only fetch these repositories.
+  deployer_source_repositories = [
+    "govuk-forms/forms-deploy",
+    "govuk-forms/forms-e2e-tests",
+  ]
+}
+
 data "aws_iam_policy_document" "code" {
   statement {
     actions = [
@@ -310,16 +327,6 @@ data "aws_iam_policy_document" "code" {
       "arn:aws:codebuild:eu-west-2:${var.account_id}:project/*"
     ]
     sid = "ManageCodebuild"
-  }
-
-  statement {
-    actions = [
-      "codecommit:GitPull"
-    ]
-    effect = "Allow"
-    resources = [
-      "${var.codestar_connection_arn}"
-    ]
   }
 
   statement {
@@ -337,15 +344,53 @@ data "aws_iam_policy_document" "code" {
     sid = "ManagePipelines"
   }
 
+  # Each action prefix has its own condition keys, so each gets its own statement
   statement {
-    actions = [
-      "codestar-connections:UseConnection",
-      "codestar-connections:PassConnection"
-    ]
-    effect = "Allow"
-    resources = [
-      "${var.codestar_connection_arn}"
-    ]
+    actions   = ["codeconnections:UseConnection"]
+    effect    = "Allow"
+    resources = local.codestar_connection_arns
+    condition {
+      test     = "StringEquals"
+      variable = "codeconnections:FullRepositoryId"
+      values   = local.deployer_source_repositories
+    }
+    sid = "UseConnectionToFetchRepos"
+  }
+
+  statement {
+    actions   = ["codestar-connections:UseConnection"]
+    effect    = "Allow"
+    resources = local.codestar_connection_arns
+    condition {
+      test     = "StringEquals"
+      variable = "codestar-connections:FullRepositoryId"
+      values   = local.deployer_source_repositories
+    }
+    sid = "UseConnectionToFetchReposLegacy"
+  }
+
+  statement {
+    actions   = ["codeconnections:PassConnection"]
+    effect    = "Allow"
+    resources = local.codestar_connection_arns
+    condition {
+      test     = "StringEquals"
+      variable = "codeconnections:PassedToService"
+      values   = ["codepipeline.amazonaws.com"]
+    }
+    sid = "PassConnectionToCodePipeline"
+  }
+
+  statement {
+    actions   = ["codestar-connections:PassConnection"]
+    effect    = "Allow"
+    resources = local.codestar_connection_arns
+    condition {
+      test     = "StringEquals"
+      variable = "codestar-connections:PassedToService"
+      values   = ["codepipeline.amazonaws.com"]
+    }
+    sid = "PassConnectionToCodePipelineLegacy"
   }
 }
 
