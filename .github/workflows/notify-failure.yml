@@ -16,6 +16,7 @@ on:
       - "pre-commit"
       - "Pipeline Visualiser checks"
       - "Test Forms Cli"
+      - "Lint Workflows"
     types: [completed]
   workflow_dispatch: # to send a test message
 
