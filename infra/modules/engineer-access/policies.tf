@@ -23,7 +23,6 @@ resource "aws_iam_policy" "access_aws_support_centre" {
 resource "aws_iam_policy" "manage_deployments" {
   #checkov:skip=CKV_AWS_111: allow write access without constraint when needed
   #checkov:skip=CKV_AWS_290: allow write access without constraint when needed
-  #checkov:skip=CKV_AWS_289: allow permissions management (PassRole) without constraint when needed
   #checkov:skip=CKV_AWS_355: allow resource * when needed
 
   name        = "manage-deployments"
@@ -33,16 +32,6 @@ resource "aws_iam_policy" "manage_deployments" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      {
-        Sid = "PassRole"
-        Action = [
-          "iam:GetRole",
-          "iam:PassRole",
-          "codestar-connections:PassConnection"
-        ]
-        Effect   = "Allow"
-        Resource = "*"
-      },
       {
         Sid = "DisableEnableMainBranchDeploymentToAnyEnvironment"
         Action = [
@@ -63,24 +52,6 @@ resource "aws_iam_policy" "manage_deployments" {
         ]
         Effect   = "Allow"
         Resource = "*"
-      },
-      {
-        Sid = "CodePipelineModifyDevBranches"
-        Action = [
-          "codepipeline:UpdatePipeline",
-        ]
-        Effect = "Allow"
-        Resource = [
-          "arn:aws:codepipeline:eu-west-2:${local.account_id}:*"
-        ]
-      },
-      {
-        Sid = "CodeStarConnection"
-        Action = [
-          "codestar-connections:UseConnection",
-        ]
-        Effect   = "Allow"
-        Resource = var.codestar_connection_arn
       },
     ]
   })
