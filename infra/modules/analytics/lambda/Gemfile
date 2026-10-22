@@ -1,0 +1,11 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+# The Lambda Ruby runtime provides the AWS SDK, so these gems are only used to
+# run the specs and are not packaged with the function
+group :development, :test do
+  gem "aws-sdk-firehose", "~> 1.114"
+  gem "rspec", "~> 3.13"
+  gem "rubocop-govuk", "~> 5.2"
+end
