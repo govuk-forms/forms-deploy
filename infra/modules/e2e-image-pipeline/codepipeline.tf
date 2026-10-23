@@ -71,7 +71,7 @@ module "docker_build" {
 
   # Selenium is not compatible with aarch64.
   code_build_project_compute_arch = "LINUX_CONTAINER"
-  code_build_project_image        = "aws/codebuild/amazonlinux2-x86_64-standard:5.0"
+  code_build_project_image        = "aws/codebuild/amazonlinux-x86_64-standard:6.0"
 
   extra_env_vars = [
     {
