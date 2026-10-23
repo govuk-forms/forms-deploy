@@ -1,8 +1,11 @@
-ARG ALPINE_VERSION=3.22
+ARG ALPINE_VERSION=3.24
 ARG RUBY_VERSION=3.4.9
 ARG DOCKER_IMAGE_DIGEST=sha256:d48f27097c1e2f3bf01d62d55bc063a292cf18d9a39ee6f0cb27cf37fc39f53c
 
 FROM ruby:${RUBY_VERSION}-alpine${ALPINE_VERSION}@${DOCKER_IMAGE_DIGEST}
+
+RUN apk update
+RUN apk upgrade --available
 
 # Install system-level dependnecies early on so they can be cached effectively for subsequent builds
 # build-base: needed to install be able to install BigDecimal extension requried by 'activesupport-duration-human_string' gem
