@@ -204,7 +204,7 @@ variable "adot_sidecar_memory" {
 variable "adot_image" {
   type        = string
   description = "ADOT collector container image URI"
-  default     = "public.ecr.aws/aws-observability/aws-otel-collector:v0.48.0" # Latest as-of 2026-05-21
+  default     = "public.ecr.aws/aws-observability/aws-otel-collector:v0.50.0" # Latest as-of 2026-08-31
 }
 
 variable "opentelemetry_head_sampler_ratio" {
