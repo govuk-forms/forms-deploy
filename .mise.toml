@@ -9,7 +9,7 @@ _.path = "support/forms-cli/bin"
 "go:github.com/hashicorp/terraform-config-inspect" = "v0.0.0-20260709150029-2fb54c236733"
 hcl2json = "0.6.8"
 tflint = "0.59.1"
-checkov = "3.2.470"
+checkov = "3.3.29"
 tfupdate = "latest"
 
 [settings]
