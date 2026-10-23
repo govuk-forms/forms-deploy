@@ -24,7 +24,7 @@ resource "aws_ecs_task_definition" "traefik" {
       ]
 
       environment = [],
-      image       = "public.ecr.aws/docker/library/traefik:3.3.2"
+      image       = "public.ecr.aws/docker/library/traefik:3.7.15"
       essential   = true,
       portMappings = [
         {
