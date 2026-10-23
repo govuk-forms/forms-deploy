@@ -24,8 +24,8 @@ locals {
       install = {
         commands = [
           "HCL2JSON_VERSION=\"v0.6.9\"",
-          "HCL2JSON_SHA256=\"b609e37094948c0b77cd8c6c0baaf8af2bd168c685c6e3334d671cc9692c34a5\"",
-          "curl https://github.com/tmccombs/hcl2json/releases/download/$${HCL2JSON_VERSION}/hcl2json_linux_amd64 -L -o hcl2json",
+          "HCL2JSON_SHA256=\"cb2ccf59a830829fe122e8dfb85d6ef2500aceda5af45a7c1052a4d2c46541f9\"",
+          "curl https://github.com/tmccombs/hcl2json/releases/download/$${HCL2JSON_VERSION}/hcl2json_linux_arm64 -L -o hcl2json",
           "echo \"$${HCL2JSON_SHA256}  hcl2json\" | sha256sum -c -",
           "mv hcl2json /usr/local/bin/hcl2json",
           "chmod +x /usr/local/bin/hcl2json",
@@ -66,8 +66,8 @@ resource "aws_codebuild_project" "drift_check" {
 
   environment {
     compute_type = "BUILD_GENERAL1_SMALL"
-    image        = "aws/codebuild/standard:7.0"
-    type         = "LINUX_CONTAINER"
+    image        = "aws/codebuild/amazonlinux-aarch64-standard:4.0"
+    type         = "ARM_CONTAINER"
 
     environment_variable {
       name  = "DEPLOYMENT_NAME"
