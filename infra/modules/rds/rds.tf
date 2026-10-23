@@ -17,6 +17,23 @@ resource "aws_rds_cluster_parameter_group" "aurora_postgres_v16" {
   name_prefix = "forms-${var.identifier}-pg16"
   family      = "aurora-postgresql16"
   description = "RDS cluster parameter group for Aurora Serverless for PostgreSQL 16"
+
+  # Log schema changes (DDL) only. This avoids logging queries that may contain user data.
+  # This is a dynamic parameter, so no restart is needed.
+  parameter {
+    name         = "log_statement"
+    value        = "ddl"
+    apply_method = "immediate"
+  }
+}
+
+resource "aws_cloudwatch_log_group" "postgresql" {
+  #checkov:skip=CKV_AWS_338:We're happy with 30 days retention for now
+  #checkov:skip=CKV_AWS_158:The log group is already using the default key, which is sufficient
+
+  # RDS writes to a log group with this exact name when log exports are enabled
+  name              = "/aws/rds/cluster/aurora-v2-cluster-${var.identifier}/postgresql"
+  retention_in_days = 30
 }
 
 locals {
@@ -29,7 +46,6 @@ resource "aws_rds_cluster" "cluster_aurora_v2" {
   #checkov:skip=CKV2_AWS_27:Query logging is not required at this time
   #checkov:skip=CKV_AWS_128:IAM auth to be considered: https://trello.com/c/nY2TcBXb/418-consider-rds-iam-auth
   #checkov:skip=CKV_AWS_162:Duplicate of CKV_AWS_128
-  #checkov:skip=CKV_AWS_324:Log capture is not required at this time
   #checkov:skip=CKV_AWS_327:Database is already encrypted with the default key, and we feel this is sufficient
 
   cluster_identifier = "aurora-v2-cluster-${var.identifier}"
@@ -48,6 +64,8 @@ resource "aws_rds_cluster" "cluster_aurora_v2" {
   db_subnet_group_name   = aws_db_subnet_group.rds.id
 
   enable_http_endpoint = true
+
+  enabled_cloudwatch_logs_exports = ["postgresql"]
 
   db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.aurora_postgres_v16.id
 
@@ -100,7 +118,8 @@ resource "aws_rds_cluster" "cluster_aurora_v2" {
   }
 
   depends_on = [
-    aws_rds_cluster_parameter_group.aurora_postgres_v16
+    aws_rds_cluster_parameter_group.aurora_postgres_v16,
+    aws_cloudwatch_log_group.postgresql
   ]
 }
 
