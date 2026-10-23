@@ -1,0 +1,67 @@
+name: "Notify failure (reusable)"
+
+# Posts a message to Slack when a workflow run fails on main or in the merge
+# queue. Callers should invoke this from a `workflow_run` workflow; see
+# notify-failure.yml for an example.
+
+on:
+  workflow_call:
+    inputs:
+      workflow_name:
+        type: string
+        required: true
+      run_url:
+        type: string
+        required: true
+      branch:
+        type: string
+        required: true
+      event:
+        type: string
+        required: true
+      sha:
+        type: string
+        required: true
+      actor:
+        type: string
+        required: true
+    secrets:
+      SLACK_WEBHOOK_URL:
+        required: true
+
+jobs:
+  notify:
+    name: "Notify Slack of failure"
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Post to Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          REPOSITORY: ${{ github.repository }}
+          WORKFLOW_NAME: ${{ inputs.workflow_name }}
+          RUN_URL: ${{ inputs.run_url }}
+          BRANCH: ${{ inputs.branch }}
+          EVENT: ${{ inputs.event }}
+          SHA: ${{ inputs.sha }}
+          ACTOR: ${{ inputs.actor }}
+        run: |
+          where="$BRANCH"
+          if [ "$EVENT" = "merge_group" ]; then
+            where="the merge queue"
+          fi
+
+          payload="$(jq -n \
+            --arg text ":x: *${WORKFLOW_NAME}* failed on ${where} in ${REPOSITORY}" \
+            --arg detail "Commit ${SHA:0:7} by ${ACTOR} - <${RUN_URL}|view the run>" \
+            '{text: $text, blocks: [
+              {type: "section", text: {type: "mrkdwn", text: $text}},
+              {type: "context", elements: [{type: "mrkdwn", text: $detail}]}
+            ]}')"
+
+          curl --fail --silent --show-error \
+            --max-time 20 --retry 3 \
+            -X POST -H 'Content-type: application/json' \
+            --data "$payload" \
+            "$SLACK_WEBHOOK_URL"

@@ -10,6 +10,7 @@ on:
 jobs:
   build_container:
     runs-on: ubuntu-24.04-arm # The container will ultimately be built for arm64 and run on arm64, so we should test it on arm64.
+    timeout-minutes: 20
     name: "Build container"
     defaults:
       run:
@@ -23,6 +24,7 @@ jobs:
 
   run_tests:
     runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
     name: "Build and test"
     defaults:
       run:

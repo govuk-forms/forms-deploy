@@ -1,0 +1,13 @@
+name: "Lint Workflows"
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/*.yml'
+      - '.github/workflows/*.yaml'
+  merge_group:
+
+jobs:
+  lint-workflows:
+    uses: ./.github/workflows/reusable-lint-workflows.yml
