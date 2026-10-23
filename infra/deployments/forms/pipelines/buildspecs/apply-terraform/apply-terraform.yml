@@ -2,7 +2,7 @@ version: 0.2
 artifacts:
   enable-symlinks: yes
 cache:
-  key: terraform-providers-$(codebuild-hash-files infra/deployments/${ROOT_NAME}/.terraform.lock.hcl)
+  key: terraform-providers-linux-arm64-$(codebuild-hash-files infra/deployments/${ROOT_NAME}/.terraform.lock.hcl)
   paths:
     - "${TF_PLUGIN_CACHE_DIR}/**/*"
 phases:
@@ -13,7 +13,7 @@ phases:
       - set -e
       - uname -a
       - mkdir -p "${TF_PLUGIN_CACHE_DIR}"
-      - curl "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" -o "terraform-${TERRAFORM_VERSION}.zip"
+      - curl "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_arm64.zip" -o "terraform-${TERRAFORM_VERSION}.zip"
       - unzip "terraform-${TERRAFORM_VERSION}.zip"
       - mv terraform /usr/local/bin/terraform
     finally:
