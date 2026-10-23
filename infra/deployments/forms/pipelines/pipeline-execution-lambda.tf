@@ -28,6 +28,7 @@ resource "aws_lambda_function" "pipeline_invoker" {
   role          = aws_iam_role.lambda_pipeline_invoker.arn
 
   runtime                        = "ruby3.4"
+  architectures                  = ["arm64"]
   handler                        = "pipeline_invoker.process"
   reserved_concurrent_executions = 50
   timeout                        = 10

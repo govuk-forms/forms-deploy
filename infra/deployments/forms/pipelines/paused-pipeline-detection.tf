@@ -19,6 +19,7 @@ resource "aws_lambda_function" "paused_pipeline_detection" {
   role          = aws_iam_role.lambda_paused_pipeline_invoker.arn
 
   runtime                        = "ruby3.4"
+  architectures                  = ["arm64"]
   handler                        = "index.main"
   reserved_concurrent_executions = 50
   timeout                        = 10
