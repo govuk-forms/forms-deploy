@@ -50,7 +50,7 @@ variable "memory" {
 variable "image" {
   description = "The Grafana container image"
   type        = string
-  default     = "docker.io/grafana/grafana:13.2.1"
+  default     = "docker.io/grafana/grafana:13.2.4"
 }
 
 variable "github_allowed_organizations" {
