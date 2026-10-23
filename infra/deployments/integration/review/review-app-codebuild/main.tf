@@ -174,7 +174,7 @@ resource "aws_codebuild_project" "this" {
   # using the aws-codebuild-run-build action's env-vars-for-codebuild parameter.
   environment {
     compute_type = "BUILD_GENERAL1_SMALL"
-    image        = "aws/codebuild/amazonlinux2-aarch64-standard:3.0"
+    image        = "aws/codebuild/amazonlinux-aarch64-standard:4.0"
     type         = "ARM_CONTAINER"
 
     environment_variable {
