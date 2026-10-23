@@ -4,6 +4,9 @@ ARG DOCKER_IMAGE_DIGEST=sha256:d48f27097c1e2f3bf01d62d55bc063a292cf18d9a39ee6f0c
 
 FROM ruby:${RUBY_VERSION}-alpine${ALPINE_VERSION}@${DOCKER_IMAGE_DIGEST}
 
+RUN apk update
+RUN apk upgrade --available
+
 # Install system-level dependnecies early on so they can be cached effectively for subsequent builds
 # build-base: needed to install be able to install BigDecimal extension requried by 'activesupport-duration-human_string' gem
 # libxml2-dev: needed to be able to install libxml-ruby gem required by 'activesupport-duration-human_string' gem
