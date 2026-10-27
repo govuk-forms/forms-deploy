@@ -19,7 +19,7 @@ if ! docker info > /dev/null 2>&1 ; then
 fi
 
 # Update these values as necessary and then run the script
-NEW_RUBY_VERSION="3.4.9"
+NEW_RUBY_VERSION="3.4.12"
 NEW_ALPINE_VERSION="3.24"
 
 # Constants that should not need to be updated
