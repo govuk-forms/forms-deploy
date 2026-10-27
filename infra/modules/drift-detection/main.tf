@@ -23,8 +23,8 @@ locals {
     phases = {
       install = {
         commands = [
-          "HCL2JSON_VERSION=\"v0.6.8\"",
-          "HCL2JSON_SHA256=\"449c0832e4a5111e27683827b057aa7993ec4cf0308d9c37386692804ee6ea7a\"",
+          "HCL2JSON_VERSION=\"v0.6.9\"",
+          "HCL2JSON_SHA256=\"b609e37094948c0b77cd8c6c0baaf8af2bd168c685c6e3334d671cc9692c34a5\"",
           "curl https://github.com/tmccombs/hcl2json/releases/download/$${HCL2JSON_VERSION}/hcl2json_linux_amd64 -L -o hcl2json",
           "echo \"$${HCL2JSON_SHA256}  hcl2json\" | sha256sum -c -",
           "mv hcl2json /usr/local/bin/hcl2json",
