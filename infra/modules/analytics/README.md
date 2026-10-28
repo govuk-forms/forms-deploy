@@ -24,8 +24,8 @@ than rows.
 
 ### `form_snapshots`
 
-One row per form per daily run: the form's `state`, organisation, name and a
-JSON object of feature flags in `properties`.
+One row per form per daily run: the form's `state`, organisation and a JSON
+object of feature flags in `properties`.
 
 `snapshot_at` is the same on every row in a run. Queries should pick the
 latest run in each period and count distinct `form_id`s, so reruns, duplicates

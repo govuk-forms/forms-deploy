@@ -76,10 +76,6 @@ resource "aws_s3tables_table" "form_snapshots" {
           required = true
         }
         field {
-          name = "form_name"
-          type = "string"
-        }
-        field {
           name = "organisation_id"
           type = "string"
         }
