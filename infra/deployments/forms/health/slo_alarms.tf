@@ -7,10 +7,9 @@ locals {
   slo_interval_days    = local.common_goal_config.interval.rolling_interval.duration
   slo_interval_minutes = local.slo_interval_days * 24 * 60
 
-  # TO DO: Remove condition that ignores product-page relate SLOs on 9/9/2026. We need the SLO to collect sufficient data to alert us, otherwise we get false positives
   all_slo_names = concat(
-    [for k, v in local.availability_slos : v.name if !strcontains(v.name, "product-page")],
-    [for k, v in local.latency_slos : v.name if !strcontains(v.name, "product-page")],
+    [for k, v in local.availability_slos : v.name],
+    [for k, v in local.latency_slos : v.name],
     [for k, v in local.submission_delivery_slos : v.name]
   )
 
