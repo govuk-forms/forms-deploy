@@ -7,6 +7,8 @@ locals {
   table_name        = "submission_events"
   stream_name       = "submission-events-${var.env_name}"
 
+  form_snapshots_table_name = "form_snapshots"
+
   transform_function_name = "submission-events-transform-${var.env_name}"
 }
 
