@@ -78,7 +78,7 @@ resource "aws_kinesis_firehose_delivery_stream" "form_snapshots" {
     s3_configuration {
       role_arn            = aws_iam_role.firehose_delivery.arn
       bucket_arn          = module.error_bucket.arn
-      error_output_prefix = "form-snapshots/"
+      error_output_prefix = "form-snapshots/!{firehose:error-output-type}/!{timestamp:yyyy/MM/dd}/"
     }
 
     cloudwatch_logging_options {
