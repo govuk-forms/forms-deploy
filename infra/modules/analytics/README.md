@@ -25,11 +25,19 @@ than rows.
 ### `form_snapshots`
 
 One row per form per daily run: the form's `state`, organisation and a JSON
-object of feature flags in `properties`.
+object of feature flags in `properties`. A forms-admin scheduled task
+(`rake analytics:snapshot_forms`, at 22:00 UTC) puts the rows straight to the
+`form-snapshots-<environment>` stream. Its delivery errors go to the
+`form-snapshots/` prefix in the error bucket.
 
 `snapshot_at` is the same on every row in a run. Queries should pick the
 latest run in each period and count distinct `form_id`s, so reruns, duplicates
 and missed days don't change the counts.
+
+Rows before the first scheduled run are backfilled with
+`rake analytics:backfill_form_snapshots` and are approximate: `state` is only
+`draft`, `live` or `archived`, and `properties` is `NULL` where it isn't
+known. Record the date of the first scheduled run here once it has happened.
 
 ## Changing a table
 
@@ -41,4 +49,6 @@ data first.
 ## Applying
 
 Apply `forms/account` first if the deployer permissions in
-`infra/modules/deployer-access` have changed.
+`infra/modules/deployer-access` have changed. Firehose checks that the
+destination table exists when a stream is created, so the table and stream are
+created in the same apply of `forms/health`.
