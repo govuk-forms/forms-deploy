@@ -554,9 +554,10 @@ data "aws_iam_policy_document" "firehose" {
     ]
     effect = "Allow"
     resources = [
-      "arn:aws:firehose:eu-west-2:${var.account_id}:deliverystream/submission-events-${var.environment_name}"
+      "arn:aws:firehose:eu-west-2:${var.account_id}:deliverystream/submission-events-${var.environment_name}",
+      "arn:aws:firehose:eu-west-2:${var.account_id}:deliverystream/form-snapshots-${var.environment_name}"
     ]
-    sid = "ManageSubmissionEventsStream"
+    sid = "ManageAnalyticsStreams"
   }
 
   statement {
@@ -566,9 +567,10 @@ data "aws_iam_policy_document" "firehose" {
     ]
     effect = "Allow"
     resources = [
-      "arn:aws:logs:eu-west-2:${var.account_id}:log-group:/aws/kinesisfirehose/submission-events-${var.environment_name}:*"
+      "arn:aws:logs:eu-west-2:${var.account_id}:log-group:/aws/kinesisfirehose/submission-events-${var.environment_name}:*",
+      "arn:aws:logs:eu-west-2:${var.account_id}:log-group:/aws/kinesisfirehose/form-snapshots-${var.environment_name}:*"
     ]
-    sid = "ManageSubmissionEventsStreamLogs"
+    sid = "ManageAnalyticsStreamLogs"
   }
 
   statement {
