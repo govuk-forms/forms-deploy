@@ -86,9 +86,12 @@ data "aws_iam_policy_document" "firehose_delivery" {
   }
 
   statement {
-    sid       = "WriteDeliveryErrorLogs"
-    effect    = "Allow"
-    actions   = ["logs:PutLogEvents"]
-    resources = ["${aws_cloudwatch_log_group.firehose.arn}:log-stream:*"]
+    sid     = "WriteDeliveryErrorLogs"
+    effect  = "Allow"
+    actions = ["logs:PutLogEvents"]
+    resources = [
+      "${aws_cloudwatch_log_group.firehose.arn}:log-stream:*",
+      "${aws_cloudwatch_log_group.form_snapshots_firehose.arn}:log-stream:*"
+    ]
   }
 }

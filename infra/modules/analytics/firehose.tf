@@ -52,3 +52,56 @@ resource "aws_cloudwatch_log_stream" "firehose_delivery" {
   name           = "DestinationDelivery"
   log_group_name = aws_cloudwatch_log_group.firehose.name
 }
+
+# forms-admin puts rows to this stream directly with PutRecordBatch, so there
+# is no subscription filter or transform Lambda.
+resource "aws_kinesis_firehose_delivery_stream" "form_snapshots" {
+  name        = local.form_snapshots_stream_name
+  destination = "iceberg"
+
+  #checkov:skip=CKV_AWS_241:An AWS-owned key is sufficient, no need for CM KMS.
+  server_side_encryption {
+    enabled  = true
+    key_type = "AWS_OWNED_CMK"
+  }
+
+  iceberg_configuration {
+    role_arn           = aws_iam_role.firehose_delivery.arn
+    catalog_arn        = "arn:aws:glue:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:catalog/s3tablescatalog/${local.table_bucket_name}"
+    buffering_interval = var.firehose_buffering_interval_seconds
+
+    destination_table_configuration {
+      database_name = local.namespace_name
+      table_name    = local.form_snapshots_table_name
+    }
+
+    s3_configuration {
+      role_arn            = aws_iam_role.firehose_delivery.arn
+      bucket_arn          = module.error_bucket.arn
+      error_output_prefix = "form-snapshots/"
+    }
+
+    cloudwatch_logging_options {
+      enabled         = true
+      log_group_name  = aws_cloudwatch_log_group.form_snapshots_firehose.name
+      log_stream_name = aws_cloudwatch_log_stream.form_snapshots_firehose_delivery.name
+    }
+  }
+
+  depends_on = [
+    aws_s3tables_table.form_snapshots,
+    aws_iam_role_policy.firehose_delivery,
+  ]
+}
+
+resource "aws_cloudwatch_log_group" "form_snapshots_firehose" {
+  #checkov:skip=CKV_AWS_338:We're happy with 30 days retention for now
+  #checkov:skip=CKV_AWS_158:Default AWS SSE is sufficient, no need for CM KMS.
+  name              = "/aws/kinesisfirehose/${local.form_snapshots_stream_name}"
+  retention_in_days = 30
+}
+
+resource "aws_cloudwatch_log_stream" "form_snapshots_firehose_delivery" {
+  name           = "DestinationDelivery"
+  log_group_name = aws_cloudwatch_log_group.form_snapshots_firehose.name
+}

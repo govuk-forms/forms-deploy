@@ -2,6 +2,10 @@ output "firehose_stream_arn" {
   value = aws_kinesis_firehose_delivery_stream.submission_events.arn
 }
 
+output "form_snapshots_firehose_stream_arn" {
+  value = aws_kinesis_firehose_delivery_stream.form_snapshots.arn
+}
+
 output "table_bucket_name" {
   value = aws_s3tables_table_bucket.forms_analytics.name
 }
