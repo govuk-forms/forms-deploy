@@ -55,6 +55,10 @@ resource "aws_sesv2_configuration_set" "form_submissions" {
     reputation_metrics_enabled = true
   }
 
+  delivery_options {
+    tls_policy = "REQUIRE"
+  }
+
   suppression_options {
     suppressed_reasons = [] # We don't want to use the suppression list for form submission emails
   }
