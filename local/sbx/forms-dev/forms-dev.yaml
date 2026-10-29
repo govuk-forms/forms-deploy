@@ -71,6 +71,7 @@ capabilities:
           - govuk-components.x-govuk.org
           - govuk-form-builder.x-govuk.org
           - docs.docker.com
+          - docs.github.com
           - developer.mozilla.org
           - www.w3.org
 
