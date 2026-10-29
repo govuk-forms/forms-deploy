@@ -24,3 +24,7 @@ jobs:
       - name: Lint shell scripts in CodeBuild build specs
         run: |
           ./support/shellcheck_codebuild.sh
+
+      - name: Test the CI digest script
+        run: |
+          ./support/ci-digest/ci-digest.test.sh
