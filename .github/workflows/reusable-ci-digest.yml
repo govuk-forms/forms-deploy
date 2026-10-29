@@ -1,0 +1,103 @@
+name: "CI digest (reusable)"
+
+# Builds a summary of how often the calling repository's workflows failed in the
+# last week, and how long they took, compared with the 12 weeks before. See
+# support/ci-digest/README.md.
+#
+# This is a dry run for now: the digest is written to the job summary and nothing
+# is posted to Slack. To go live, change the default of `dry_run` below to false.
+# Even once it is live, only scheduled and manually started runs post. Runs from
+# any other trigger, such as a pull request, only write the summary.
+#
+# The caller needs to grant `actions: read` and `contents: read`.
+
+on:
+  workflow_call:
+    inputs:
+      dry_run:
+        description: "Only write the digest to the job summary, and do not post it to Slack"
+        type: boolean
+        default: true
+    secrets:
+      SLACK_WEBHOOK_URL:
+        description: "Incoming webhook for the channel to post to. Only needed once dry_run is false."
+        required: false
+
+jobs:
+  digest:
+    name: "Digest"
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      # The script comes from main for the other repos. In forms-deploy itself it
+      # comes from the commit being run, so a pull request tests its own version.
+      - name: Checkout the digest script from this repo
+        if: ${{ github.repository == 'govuk-forms/forms-deploy' }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: forms-deploy
+          sparse-checkout: support/ci-digest
+          persist-credentials: false
+
+      - name: Checkout the digest script from forms-deploy
+        if: ${{ github.repository != 'govuk-forms/forms-deploy' }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: govuk-forms/forms-deploy
+          ref: main
+          path: forms-deploy
+          sparse-checkout: support/ci-digest
+          persist-credentials: false
+
+      # The one place that decides whether this run posts, so the summary heading and
+      # the Slack step cannot disagree. Only scheduled and manually started runs can.
+      - name: Decide whether to post
+        id: mode
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [ "$DRY_RUN" != "true" ] && { [ "$EVENT_NAME" = "schedule" ] || [ "$EVENT_NAME" = "workflow_dispatch" ]; }; then
+            echo "post=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "post=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build the digest
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          POST: ${{ steps.mode.outputs.post }}
+        run: |
+          forms-deploy/support/ci-digest/ci-digest.sh > digest.txt
+          title="CI digest"
+          if [ "$POST" != "true" ]; then
+            title="CI digest (dry run, not posted to Slack)"
+          fi
+          {
+            echo "### $title"
+            echo '```'
+            cat digest.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Post to Slack
+        if: ${{ steps.mode.outputs.post == 'true' }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "::error::No Slack webhook was provided. Check the org secret is available to this repository."
+            exit 1
+          fi
+
+          payload="$(jq -n --rawfile text digest.txt '{text: $text}')"
+
+          curl --fail --silent --show-error \
+            --max-time 20 --retry 3 \
+            -X POST -H 'Content-type: application/json' \
+            --data "$payload" \
+            "$SLACK_WEBHOOK_URL"
