@@ -37,9 +37,11 @@ each repo by then.
   covers runs whose logs have not expired, and only for RSpec output. Both look
   into at most 40 failed runs, taking main and the merge queue first and then the
   newest, and say so when they have to leave some out.
-- Only a run's final attempt is seen. A run that failed and then passed when
-  its failed jobs were re-run counts as a success, so a failure hidden that way
-  is not in the digest yet.
+- GitHub lists a run once, as its last attempt, so a run that failed and then
+  passed when its failed jobs were re-run would count as a success and its failure
+  would vanish. The script reads the earlier attempts of re-run runs too and
+  counts every attempt as a run of its own, so flaky runs show up as failures.
+  Reasons and spec names come from the attempt that failed.
 - GitHub lists at most 1000 runs for a query, so a week with more than that is
   read in smaller pieces. If GitHub cannot be read part way through, or a piece
   is still over the limit when it is an hour long, the script exits with an error

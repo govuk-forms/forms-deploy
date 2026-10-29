@@ -56,7 +56,7 @@ fetch_window() {
     return 0
   fi
   gh api --paginate "repos/${GH_REPO}/actions/runs?created=${start}..${end}&per_page=100" \
-    --jq '.workflow_runs[] | {id, workflow: .name, event, branch: .head_branch, conclusion, created: .created_at, started: .run_started_at, ended: .updated_at, url: .html_url}' \
+    --jq '.workflow_runs[] | {id, run_attempt, workflow: .name, event, branch: .head_branch, conclusion, created: .created_at, started: .run_started_at, ended: .updated_at, url: .html_url}' \
     >>"$out" || return 1
 }
 
@@ -69,6 +69,24 @@ fetch_runs() {
     fetch_window $((now - (k + 1) * 604800)) $((now - k * 604800)) "$tmp/week-$k.jsonl" || return 1
   done
   jq -s 'unique_by(.id)' "$tmp"/week-*.jsonl
+}
+
+# GitHub lists a run once, as its last attempt. A run that failed and then passed
+# when its failed jobs were re-run would therefore count as a success and its
+# failure would vanish, which hides exactly the flaky runs we want to see. So read
+# the earlier attempts of every run that was re-run, and count each attempt as a
+# run of its own. $1 is the JSON array of runs; prints it with the attempts added.
+add_earlier_attempts() {
+  local runs_json=$1 id latest a
+  : >"$tmp/attempts.jsonl"
+  while IFS=$'\t' read -r id latest; do
+    for ((a = 1; a < latest; a++)); do
+      gh api "repos/${GH_REPO}/actions/runs/${id}/attempts/${a}" \
+        --jq '{id, run_attempt, workflow: .name, event, branch: .head_branch, conclusion, created: .created_at, started: .run_started_at, ended: .updated_at, url: .html_url}' \
+        >>"$tmp/attempts.jsonl" || return 1
+    done
+  done < <(jq -r '.[] | select(.run_attempt > 1) | [.id, .run_attempt] | @tsv' <<<"$runs_json")
+  jq -s '.[0] + .[1:] | unique_by([.id, .run_attempt])' <(printf '%s' "$runs_json") "$tmp/attempts.jsonl"
 }
 
 esc() { sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'; }
@@ -85,18 +103,18 @@ top() {
 # still available, which specs failed. Runs are taken in the order they arrive:
 # main and the merge queue first, then the newest.
 collect_reasons() {
-  local failed_json=$1 id workflow conclusion job step
+  local failed_json=$1 id workflow conclusion attempt job step
   : >"$tmp/reasons.txt"
   : >"$tmp/specs.txt"
-  jq -r --argjson max "$max_explained" '.[:$max][] | [.id, .workflow, .conclusion] | @tsv' <<<"$failed_json" |
-    while IFS=$'\t' read -r id workflow conclusion; do
+  jq -r --argjson max "$max_explained" '.[:$max][] | [.id, .workflow, .conclusion, .run_attempt] | @tsv' <<<"$failed_json" |
+    while IFS=$'\t' read -r id workflow conclusion attempt; do
       # shellcheck disable=SC2016 # $c is a jq variable, not a shell one
-      if gh api --paginate "repos/${GH_REPO}/actions/runs/${id}/jobs?per_page=100" \
+      if gh api --paginate "repos/${GH_REPO}/actions/runs/${id}/attempts/${attempt}/jobs?per_page=100" \
         --jq '.jobs[] | select(.conclusion == "failure" or .conclusion == "timed_out" or .conclusion == "startup_failure") | .conclusion as $c | [.name, ([.steps[]? | select(.conclusion == "failure") | .name] | first // "no failed step (\($c))")] | @tsv' \
         >"$tmp/jobs.tsv" 2>/dev/null; then
         if [ -s "$tmp/jobs.tsv" ]; then
-          # Once per run: a matrix can fail the same way in many identically named
-          # jobs, and we count runs.
+          # Once per attempt: a matrix can fail the same way in many identically
+          # named jobs, and we count runs.
           while IFS=$'\t' read -r job step; do
             printf '%s › %s › %s\n' "$workflow" "$job" "$step" >>"$tmp/reasons.txt"
           done < <(LC_ALL=C sort -u "$tmp/jobs.tsv")
@@ -108,8 +126,8 @@ collect_reasons() {
         printf '%s › could not read jobs (%s)\n' "$workflow" "$conclusion" >>"$tmp/reasons.txt"
       fi
       if [ "$include_specs" = 1 ]; then
-        # Once per run, so a spec that fails twice in one run still counts once.
-        { gh run view "$id" --log-failed 2>/dev/null || true; } |
+        # Once per attempt, so a spec that fails twice in one attempt still counts once.
+        { gh run view "$id" --attempt "$attempt" --log-failed 2>/dev/null || true; } |
           { grep -oE 'rspec \./spec/[^ ]+' || true; } | sort -u | sed 's/^rspec //' >>"$tmp/specs.txt"
       fi
     done
@@ -128,6 +146,12 @@ else
     exit 1
   }
 fi
+
+runs="$(jq 'map(.run_attempt //= 1)' <<<"$runs")"
+runs="$(add_earlier_attempts "$runs")" || {
+  echo "ci-digest: could not read the earlier attempts of re-run workflows, so there is no digest" >&2
+  exit 1
+}
 
 result="$(jq --argjson now "$now" --argjson weeks "$weeks" --arg branch "$branch" --arg repo "$GH_REPO" \
   -f "$script_dir/ci-digest.jq" <<<"$runs")"

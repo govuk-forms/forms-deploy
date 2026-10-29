@@ -109,6 +109,6 @@ def kind:
     # Main and the merge queue first, then the newest, so that a limit on how many
     # runs we look into keeps the failures that matter most.
     failed: ([ $runs[] | select(.recent and failed) ]
-             | sort_by([.kind != "main", -.created_at, .id])
-             | map({id, workflow, kind, event, branch, url, conclusion}))
+             | sort_by([.kind != "main", -.created_at, .id, .run_attempt])
+             | map({id, run_attempt, workflow, kind, event, branch, url, conclusion}))
   }

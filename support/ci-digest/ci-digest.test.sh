@@ -9,7 +9,7 @@
 # the script's own --jq filters to canned API responses. They cover timed-out
 # jobs, a run whose jobs cannot be read, a spec name that tries to mention the
 # whole channel, thousands of failing specs, a limit on the runs explained, and
-# the GitHub API failing part way through.
+# the GitHub API failing part way through, and runs that were re-run.
 
 set -euo pipefail
 
@@ -31,6 +31,7 @@ check() {
 }
 
 export GH_REPO=example/repo RUNS_FILE="$dir/testdata/runs.json" NOW=1793275200
+export STUB_RUNS="$RUNS_FILE"
 
 scratch="$(mktemp -d)"
 trap 'rm -rf "$scratch"' EXIT
@@ -39,6 +40,7 @@ export STUB_DIR="$scratch"
 # --- a stand-in for gh ---------------------------------------------------------
 cat >"$scratch/gh" <<'STUB'
 #!/usr/bin/env bash
+echo "$*" >>"${STUB_CALLS:-/dev/null}"
 filter=""
 args=("$@")
 for ((i = 0; i < ${#args[@]}; i++)); do
@@ -65,15 +67,25 @@ case "$*" in
     if [ "${STUB_SPLIT:-0}" = 1 ] && [ "$seconds" -gt 345600 ]; then total=1500; fi
     echo "{\"total_count\": $total, \"workflow_runs\": []}" | jq -r "$filter"
     ;;
-  *"/actions/runs/340/jobs"*)
+  *"/actions/runs/340/"*"jobs"*)
     echo "gh: HTTP 502" >&2
     exit 1
     ;;
-  *"/actions/runs/341/jobs"*)
+  *"/actions/runs/341/"*"jobs"*)
     echo '{"jobs":[]}' | jq -r "$filter"
     ;;
   *"/jobs"*)
     jq -r "$filter" "$STUB_DIR/jobs.json"
+    ;;
+  *"/actions/runs/"*"/attempts/"*)
+    # An earlier attempt of a run. Always a failure: that is why it was re-run.
+    if [ "${STUB_FAIL_ATTEMPT:-0}" = 1 ]; then
+      echo "gh: HTTP 502" >&2
+      exit 1
+    fi
+    id="$(sed -E 's#.*/runs/([0-9]+)/attempts/([0-9]+).*#\1#' <<<"$2")"
+    attempt="$(sed -E 's#.*/runs/([0-9]+)/attempts/([0-9]+).*#\2#' <<<"$2")"
+    jq -c --argjson id "$id" --argjson attempt "$attempt" '.[] | select(.id == $id) | {id, name: .workflow, event, head_branch: .branch, conclusion: "failure", created_at: .created, run_started_at: .started, updated_at: .ended, html_url: "\(.url)/attempts/\($attempt)", run_attempt: $attempt}' "$STUB_RUNS" | jq -c "$filter"
     ;;
   "run view"*"--log-failed"*)
     if [ "${STUB_MANY_SPECS:-0}" = 1 ]; then
@@ -195,6 +207,75 @@ elif [ -n "$out" ] || ! grep -q 'more than 1000' "$scratch/dense.err"; then
   fail "expected no report and an explanation when a window cannot be split further"
 else
   echo "ci-digest: stops without a report when runs would be missing from the count"
+fi
+
+# Runs that failed and then passed when they were re-run. GitHub lists a run once,
+# as its last attempt, so the failures would vanish. Every attempt counts: run 1
+# passed on its second attempt and run 2 on its third, so this week there are
+# 2 + 3 + 1 + 1 = 7 attempts of which 1 + 2 = 3 failed; before that, run 5 passed
+# on its second attempt and run 6 first time, which is 1 failure in 3 attempts.
+rerun() { # id attempts created
+  printf '{"id":%s,"workflow":"Flaky","event":"push","branch":"main","conclusion":"success","created":"%s","started":"%s","ended":"%s","url":"https://example.test/runs/%s","run_attempt":%s}' \
+    "$1" "$3" "$3" "$3" "$1" "$2"
+}
+{
+  echo "["
+  rerun 1 2 2026-10-28T10:00:00Z
+  echo ","
+  rerun 2 3 2026-10-27T10:00:00Z
+  echo ","
+  rerun 3 1 2026-10-26T10:00:00Z
+  echo ","
+  rerun 4 1 2026-10-25T10:00:00Z
+  echo ","
+  rerun 5 2 2026-10-10T10:00:00Z
+  echo ","
+  rerun 6 1 2026-10-09T10:00:00Z
+  echo "]"
+} >"$scratch/rerun.json"
+cat >"$scratch/rerun.txt" <<'EXPECTED'
+*example/repo: CI digest* (22 Oct 2026 to 29 Oct 2026)
+
+*Main and merge queue*
+• Flaky: 3 of 7 failed (43%); previous 12 weeks: 1 of 3 failed (33%)
+
+*Why runs failed this week*
+• Flaky › slow_job › no failed step (timed_out) (3 runs)
+• Flaky › build_and_test › Run Ruby tests (3 runs)
+
+*Specs failing most often this week*
+• `./spec/b&lt;!channel&gt;_spec.rb:2` (3 runs)
+• `./spec/a_spec.rb:1` (3 runs)
+
+*Failures on main and in the merge queue*
+• Flaky (push to main): <https://example.test/runs/1/attempts/1|run>
+• Flaky (push to main): <https://example.test/runs/2/attempts/1|run>
+• Flaky (push to main): <https://example.test/runs/2/attempts/2|run>
+EXPECTED
+: >"$scratch/rerun-calls"
+rerun_out="$(RUNS_FILE="$scratch/rerun.json" STUB_RUNS="$scratch/rerun.json" STUB_CALLS="$scratch/rerun-calls" with_stub "$dir/ci-digest.sh")"
+check "runs that passed on a re-run" "$scratch/rerun.txt" "$rerun_out"
+
+# Only what is needed is read: the earlier attempts of re-run runs (four of them,
+# the latest attempt is already known), and the jobs and logs of the three failed
+# attempts, each for its own attempt.
+runs_read="$(grep -cE 'actions/runs/[0-9]+/attempts/[0-9]+ --jq' "$scratch/rerun-calls" || true)"
+jobs_read="$(grep -cE 'actions/runs/[0-9]+/attempts/[0-9]+/jobs' "$scratch/rerun-calls" || true)"
+logs_read="$(grep -cE '^run view [0-9]+ --attempt [0-9]+ --log-failed' "$scratch/rerun-calls" || true)"
+if [ "$runs_read" = 4 ] && [ "$jobs_read" = 3 ] && [ "$logs_read" = 3 ]; then
+  echo "ci-digest: reads only the attempts it needs (4 runs, 3 sets of jobs, 3 logs)"
+else
+  fail "expected 4 earlier attempts, 3 sets of jobs and 3 logs to be read, got $runs_read, $jobs_read and $logs_read"
+fi
+
+# If an earlier attempt cannot be read, report nothing rather than counts that
+# leave a failure out.
+if out="$(RUNS_FILE="$scratch/rerun.json" STUB_RUNS="$scratch/rerun.json" STUB_FAIL_ATTEMPT=1 with_stub "$dir/ci-digest.sh" 2>/dev/null)"; then
+  fail "the digest succeeded although an earlier attempt could not be read"
+elif [ -n "$out" ]; then
+  fail "the digest printed a report although an earlier attempt could not be read"
+else
+  echo "ci-digest: stops without a report when an earlier attempt cannot be read"
 fi
 
 # A quiet week: nothing failed, so pull requests collapse to a single line.
