@@ -1,0 +1,33 @@
+name: "CI digest"
+
+# Weekly summary of how often this repo's workflows fail and how long they take,
+# compared with the previous 12 weeks. The logic is in support/ci-digest.
+#
+# For now it is a dry run: the digest goes to the job summary and nothing is
+# posted to Slack. See reusable-ci-digest.yml for how to go live.
+#
+# It also runs on pull requests that change the digest, using the pull request's
+# own version, so changes are tried out before they are merged. Those runs never
+# post to Slack.
+
+on:
+  schedule:
+    - cron: "7 8 * * 1" # Mondays, around 09:00 UK time
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/ci-digest.yml"
+      - ".github/workflows/reusable-ci-digest.yml"
+      - "support/ci-digest/**"
+
+permissions: {}
+
+jobs:
+  digest:
+    name: "CI digest"
+    permissions:
+      actions: read
+      contents: read
+    uses: ./.github/workflows/reusable-ci-digest.yml
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_GOVUK_FORMS_DEPLOYMENTS }}
