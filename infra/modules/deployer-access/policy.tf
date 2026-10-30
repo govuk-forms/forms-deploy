@@ -1351,7 +1351,6 @@ data "aws_iam_policy_document" "sns" {
       "arn:aws:sns:eu-west-2:${var.account_id}:alert_zendesk_${var.environment_name}",
       "arn:aws:sns:eu-west-2:${var.account_id}:slo-alerts",
       "arn:aws:sns:us-east-1:${var.account_id}:cloudwatch-alarms",
-      "arn:aws:sns:eu-west-2:${var.account_id}:ses_bounces_and_complaints", # TODO: remove me once all envs use the new queues https://trello.com/c/BCDU9U7N/3456-remove-sesbouncesandcomplaints-sns-resource-if-all-environments-are-using-the-new-queues
       "arn:aws:sns:eu-west-2:${var.account_id}:auth0_ses_bounces_and_complaints",
       "arn:aws:sns:eu-west-2:${var.account_id}:submission_email_ses_bounces_and_complaints",
       "arn:aws:sns:eu-west-2:${var.account_id}:submission_email_ses_successful_deliveries",
