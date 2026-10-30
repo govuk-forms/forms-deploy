@@ -1232,6 +1232,7 @@ data "aws_iam_policy_document" "secretsmanager" {
     ]
     effect = "Allow"
     resources = [
+      # TODO: remove `data-api/*` once forms/rds has been applied in every environment, which deletes these secrets.
       "arn:aws:secretsmanager:eu-west-2:${var.account_id}:secret:data-api/${var.environment_name}/*",
       "arn:aws:secretsmanager:eu-west-2:${var.account_id}:secret:rds-db-credentials/cluster-*"
     ]
