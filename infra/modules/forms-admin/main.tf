@@ -4,6 +4,8 @@ locals {
   internal_sub_domain         = "admin.internal.${var.root_domain}"
   image                       = var.image_tag == null ? null : "${var.container_registry}/forms-admin-deploy:${var.image_tag}"
   maintenance_mode_bypass_ips = join(", ", module.common_values.vpn_ip_addresses)
+  # Created by the analytics module in the health root
+  form_snapshots_stream_name = "form-snapshots-${var.env_name}"
   auth_credentials = {
     _ = [], # just in case we have a "null" previous auth provider
     basic_auth = [
@@ -77,6 +79,15 @@ data "aws_iam_policy_document" "ecs_task_role_permissions" {
       variable = "s3:prefix"
       values   = ["assets/brands/*"]
     }
+  }
+
+  # The stream is created by the analytics module in the health root. The ARN
+  # is built from its name so this root doesn't need the health root's state.
+  statement {
+    sid       = "PutFormSnapshots"
+    actions   = ["firehose:PutRecordBatch"]
+    resources = ["arn:aws:firehose:eu-west-2:${data.aws_caller_identity.current.account_id}:deliverystream/${local.form_snapshots_stream_name}"]
+    effect    = "Allow"
   }
 }
 
@@ -182,6 +193,10 @@ module "ecs_service" {
     {
       name  = "SETTINGS__AWS__ASSETS_S3_BUCKET_NAME",
       value = var.assets_bucket_name
+    },
+    {
+      name  = "SETTINGS__ANALYTICS__FORM_SNAPSHOTS_STREAM_NAME",
+      value = local.form_snapshots_stream_name
     },
   ]
 
