@@ -31,26 +31,6 @@ resource "aws_ssm_parameter" "database_password" {
   }
 }
 
-# TODO: delete `data_api_credentials` secrets after migrating to autolocate secrets.
-resource "aws_secretsmanager_secret" "data_api_credentials" {
-  #checkov:skip=CKV_AWS_149:The secret is already using the default key, which is sufficient
-  #checkov:skip=CKV2_AWS_57:We're setting this manually from an authoritative source, so rotation would be actively harmful
-  for_each = var.apps_list
-
-  name        = "data-api/${var.env_name}/${each.key}/rds-credentials"
-  description = "Data API credentials for ${each.key} in ${var.env_name} environment"
-}
-
-resource "aws_secretsmanager_secret_version" "data_api_credentials" {
-  for_each = var.apps_list
-
-  secret_id = aws_secretsmanager_secret.data_api_credentials[each.key].id
-  secret_string = jsonencode({
-    username = each.value.username
-    password = aws_ssm_parameter.database_password[each.key].value
-  })
-}
-
 locals {
   force_ssl_connections = var.force_ssl_connections ? "verify-full" : "prefer"
 }
@@ -89,6 +69,8 @@ locals {
   )
 }
 
+# The Query Editor console only finds secrets named `rds-db-credentials/cluster-*/<credential-reference>`.
+# The forms CLI and the engineer IAM policy also rely on this name format.
 resource "aws_secretsmanager_secret" "data_api_credentials_autolocate" {
   #checkov:skip=CKV_AWS_149:The secret is already using the default key, which is sufficient
   #checkov:skip=CKV2_AWS_57:We're setting this manually from an authoritative source, so rotation would be actively harmful
