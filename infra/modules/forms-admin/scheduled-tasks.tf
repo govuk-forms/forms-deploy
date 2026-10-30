@@ -50,6 +50,18 @@ locals {
     EOF
       }
     }
+    # No failure_alert: a missed day shows up as a gap in the data, and the
+    # task can be rerun by hand
+    form_snapshots = {
+      enabled                   = true
+      task_family               = "forms-admin-form-snapshots"
+      schedule_expression       = "cron(0 22 * * ? *)"
+      command                   = ["rake", "analytics:snapshot_forms"]
+      container_name            = "forms-admin-form-snapshots"
+      log_stream_prefix         = "forms-admin-form-snapshots"
+      schedule_rule_name        = "forms-admin-form-snapshots-cron"
+      schedule_rule_description = "Put a daily snapshot of every form to the analytics table"
+    }
   }
 }
 
