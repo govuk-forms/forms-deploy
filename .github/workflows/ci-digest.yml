@@ -1,0 +1,27 @@
+name: "CI digest"
+
+# Weekly CI digest. A dry run for now: see reusable-ci-digest.yml and
+# support/ci-digest/README.md. Pull requests that change the digest run it with
+# their own version, and never post to Slack.
+
+on:
+  schedule:
+    - cron: "7 8 * * 1" # Mondays, around 09:00 UK time
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/ci-digest.yml"
+      - ".github/workflows/reusable-ci-digest.yml"
+      - "support/ci-digest/**"
+
+permissions: {}
+
+jobs:
+  digest:
+    name: "CI digest"
+    permissions:
+      actions: read
+      contents: read
+    uses: ./.github/workflows/reusable-ci-digest.yml
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_GOVUK_FORMS_DEPLOYMENTS }}
