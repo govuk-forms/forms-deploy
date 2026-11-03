@@ -67,6 +67,15 @@ You need `gh` (logged in, or with `GH_TOKEN` set) and `jq`.
 It takes a few minutes for a busy repo, because it reads 13 weeks of runs. See the
 top of `ci-digest.sh` for the options.
 
+## Tests
+
+    support/ci-digest/ci-digest.test.sh
+
+This runs the script over fixed sets of runs, using a stand-in for `gh`, and
+compares the result with digests worked out by hand (`testdata/expected*.txt`).
+Shell script CI runs it. When you change how the digest is worked out, change the
+fixtures to cover the new behaviour too.
+
 ## Trying the workflow
 
 In forms-deploy, a pull request that changes the digest runs it on the pull
