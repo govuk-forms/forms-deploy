@@ -11,6 +11,7 @@ on:
 jobs:
   trello-poster:
     runs-on: ubuntu-slim
+    timeout-minutes: 10
     steps:
       - uses: lfdebrux/trello-poster-action@b37b5c112f8d22338922dd1e226709de7f9bd5af # v1.4.0
         with:

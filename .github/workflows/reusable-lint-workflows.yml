@@ -6,6 +6,7 @@ on:
 jobs:
   actionlint:
     runs-on: ubuntu-slim
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Download actionlint
@@ -17,4 +18,23 @@ jobs:
         shell: bash
       - name: Check workflow files
         run: actionlint -color
+        shell: bash
+      - name: Check jobs have a timeout
+        # Without timeout-minutes, a hung job runs for up to 6 hours before
+        # GitHub fails it. Jobs that call a reusable workflow cannot set one.
+        run: |
+          if ! command -v yq >/dev/null; then
+            sudo curl -fsSL -o /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/v4.54.1/yq_linux_amd64"
+            sudo chmod +x /usr/local/bin/yq
+          fi
+
+          status=0
+          for file in .github/workflows/*.y*ml; do
+            missing="$(yq '.jobs | to_entries | .[] | select(.value."runs-on" != null and .value."timeout-minutes" == null) | .key' "$file")"
+            for job in $missing; do
+              echo "::error file=${file}::Job '${job}' has no timeout-minutes"
+              status=1
+            done
+          done
+          exit "$status"
         shell: bash
