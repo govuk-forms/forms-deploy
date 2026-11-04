@@ -5,13 +5,20 @@ locals {
       action-type = ["PUSH"]
     }
   })
+
+  ecr_forwarded_events_pattern = jsonencode({
+    source = ["aws.ecr"]
+    detail = {
+      action-type = ["PUSH"]
+    }
+  })
 }
 
 resource "aws_cloudwatch_event_rule" "distribute_ecr_events" {
   name          = "send-ecr-events-to-other-acounts"
   description   = "Send ECR events to the event buses of the other accounts"
   role_arn      = aws_iam_role.eventbridge_actor.arn
-  event_pattern = local.ecr_push_events_pattern
+  event_pattern = local.ecr_forwarded_events_pattern
 }
 
 resource "aws_cloudwatch_event_rule" "log_ecr_events" {
