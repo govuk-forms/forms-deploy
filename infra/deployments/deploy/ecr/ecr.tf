@@ -217,22 +217,4 @@ data "aws_iam_policy_document" "aws_ecr_repository_policy_end_to_end_tests" {
       ]
     }
   }
-
-  statement {
-    sid    = "AllowDeployerRolesToPushImages"
-    effect = "Allow"
-    actions = [
-      "ecr:CompleteLayerUpload",
-      "ecr:GetAuthorizationToken",
-      "ecr:UploadLayerPart",
-      "ecr:InitiateLayerUpload",
-      "ecr:BatchCheckLayerAvailability",
-      "ecr:PutImage"
-    ]
-    principals {
-      type        = "AWS"
-      identifiers = local.promoting_deployer_roles
-    }
-  }
-
 }
