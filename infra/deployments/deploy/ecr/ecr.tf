@@ -3,9 +3,13 @@ module "all_accounts" {
 }
 
 locals {
-  deployer_roles = [
+  # Staging and production promote images by retagging them. Development
+  # deploys images but never promotes them, so it must not be able to push
+  # tags that staging or production deploy.
+  promoting_deployer_roles = [
     for acct, id in module.all_accounts.environment_accounts_id :
-    "arn:aws:iam::${id}:role/deployer-${acct == "development" ? "dev" : acct}"
+    "arn:aws:iam::${id}:role/deployer-${acct}"
+    if acct != "development"
   ]
 }
 
@@ -99,7 +103,7 @@ data "aws_iam_policy_document" "aws_ecr_repository_policy_admin" {
     ]
     principals {
       type        = "AWS"
-      identifiers = local.deployer_roles
+      identifiers = local.promoting_deployer_roles
     }
   }
 }
@@ -142,7 +146,7 @@ data "aws_iam_policy_document" "aws_ecr_repository_policy_runner_document" {
     ]
     principals {
       type        = "AWS"
-      identifiers = local.deployer_roles
+      identifiers = local.promoting_deployer_roles
     }
   }
 }
@@ -184,7 +188,7 @@ data "aws_iam_policy_document" "aws_ecr_repository_policy_product_page_document"
     ]
     principals {
       type        = "AWS"
-      identifiers = local.deployer_roles
+      identifiers = local.promoting_deployer_roles
     }
   }
 }
@@ -227,7 +231,8 @@ data "aws_iam_policy_document" "aws_ecr_repository_policy_end_to_end_tests" {
     ]
     principals {
       type        = "AWS"
-      identifiers = local.deployer_roles
+      identifiers = local.promoting_deployer_roles
     }
   }
+
 }
