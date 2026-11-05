@@ -35,7 +35,6 @@ repos:
           - terraform
         language: golang
         # Keep in step with the tflint pin in .mise.toml.
-        # TODO: add a guardrail for keeping versions in sync
         additional_dependencies:
           - github.com/terraform-linters/tflint@v0.64.0
         files: ^(infra/|\.tflint\.hcl$)
@@ -47,7 +46,6 @@ repos:
         entry: ./support/run-checkov.sh
         language: python
         # Keep in step with the checkov pin in .mise.toml.
-        # TODO: add a guardrail for keeping versions in sync
         additional_dependencies:
           - checkov==3.2.470
         require_serial: true
@@ -63,7 +61,6 @@ repos:
 
   # Keep in step with the jactionlint pins in .mise.toml and
   # .github/workflows/reusable-lint-workflows.yml.
-  # TODO: add a guardrail for keeping versions in sync
   - repo: https://github.com/jdx/jactionlint
     rev: v2.4.0
     hooks:
