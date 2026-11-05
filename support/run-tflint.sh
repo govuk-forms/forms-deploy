@@ -14,7 +14,6 @@ cd "$(dirname "$0")/.."
 tflint --init
 
 config="$(pwd)/.tflint.hcl"
-given=("$@")
 changed=("$@")
 failed=false
 
@@ -64,19 +63,19 @@ lint_roots() {
     -not -path "*/tfvars" -not -path "*/.terraform" | sort)
 }
 
-# Modules only get linted when one of their files changed. They have
-# existing findings, so linting them all would fail every run.
 # Some rules don't apply because modules don't declare the things they check.
 module_args=(
   --disable-rule terraform_required_version
   --disable-rule terraform_required_providers
 )
-if [ "${#given[@]}" -gt 0 ]; then
+if [ "${#changed[@]}" -eq 0 ]; then
+  run_tflint infra/modules --recursive "${module_args[@]}"
+else
   while IFS= read -r dir; do
     if [ -d "$dir" ]; then
       run_tflint "$dir" "${module_args[@]}"
     fi
-  done < <(for f in "${given[@]}"; do
+  done < <(for f in "${changed[@]}"; do
     case "$f" in
       infra/modules/*) dirname "$f" ;;
     esac
