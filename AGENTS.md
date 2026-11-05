@@ -19,6 +19,8 @@ GOV.UK Forms repo, so keep them general and keep this file at this path.
 ## Pull requests
 
 - Use `.github/PULL_REQUEST_TEMPLATE.md`.
+- If there's no Trello card, remove the `Trello card:` line so the description
+  sits directly under the first heading. Don't write "none".
 - Keep descriptions to a few short paragraphs, with only context a reviewer
   can't see in the diff.
 - Don't mention AI tooling in pull request descriptions.
