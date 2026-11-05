@@ -53,8 +53,6 @@ jobs:
         with:
           push: true
           tags: ${{ steps.generate_image_uri.outputs.URI }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: Deploy review app via CodeBuild
         id: codebuild
