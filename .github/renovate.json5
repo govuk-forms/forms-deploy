@@ -18,10 +18,14 @@
   // One pull request per tool, so every copy of a pin changes together and
   // the versions-in-sync check passes.
   packageRules: [
+    // Public ECR publishes no release dates, so the age check could never pass
+    // and the update would wait forever.
+    { matchDatasources: ["docker"], minimumReleaseAgeBehaviour: "timestamp-optional" },
     { matchPackageNames: ["terraform-linters/tflint"], groupName: "tflint" },
     { matchPackageNames: ["checkov"], groupName: "checkov" },
     { matchPackageNames: ["jdx/jactionlint"], groupName: "jactionlint" },
     { matchPackageNames: ["tmccombs/hcl2json"], groupName: "hcl2json" },
+    { matchPackageNames: ["public.ecr.aws/codebuild/**"], groupName: "CodeBuild images" },
 
     // A major release of these changes what the checks report, so it should be
     // a deliberate change.
@@ -45,6 +49,21 @@
       matchStrings: [
         "# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>\\S+)(?: extractVersion=(?<extractVersion>\\S+))?\\n[^\\n]*?[=@:]\\s*\\\\*\"?(?<currentValue>v?\\d[\\w.+-]*)",
       ],
+    },
+    {
+      customType: "regex",
+      managerFilePatterns: ["/^infra/.*\\.tf$/"],
+      matchStrings: ["\"(?<depName>(?:public\\.ecr\\.aws|docker\\.io)/[\\w./-]+):(?<currentValue>v?\\d[\\w.-]*)\""],
+      datasourceTemplate: "docker",
+    },
+    {
+      // CodeBuild images are published to the public ECR "codebuild" namespace.
+      customType: "regex",
+      managerFilePatterns: ["/^infra/.*\\.tf$/"],
+      matchStrings: ["\"aws/codebuild/(?<image>[\\w-]+):(?<currentValue>[\\d.]+)\""],
+      datasourceTemplate: "docker",
+      depNameTemplate: "aws/codebuild/{{{image}}}",
+      packageNameTemplate: "public.ecr.aws/codebuild/{{{image}}}",
     },
   ],
 }
