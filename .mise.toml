@@ -2,6 +2,8 @@
 _.path = "support/forms-cli/bin"
 
 [tools]
+# Needed to build the go: tools below.
+go = "1.25.3"
 # Pinned to a commit pseudo-version: this module has no tagged releases, and
 # mise's minimum_release_age filter rejects "latest" whenever the newest
 # upstream commit is under 24h old. Find newer versions at
@@ -18,7 +20,7 @@ tflint = "0.64.0"
 # Installed from PyPI rather than as the standalone binary, which takes ~13s to start.
 # Keep in step with the checkov pin in .pre-commit-config.yaml.
 "pipx:checkov" = "3.2.470"
-tfupdate = "latest"
+tfupdate = "0.10.2"
 
 [settings]
 idiomatic_version_file_enable_tools = ["terraform", "ruby"]
