@@ -178,6 +178,7 @@ variable "forms_runner_settings" {
     govuk_one_login_base_url                                        = string
     queue_worker_capacity                                           = string
     disable_builtin_solidqueue_worker                               = bool
+    pin_form_version                                                = bool
   })
 }
 

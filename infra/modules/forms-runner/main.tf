@@ -234,6 +234,10 @@ module "ecs_service" {
       name  = "DISABLE_SOLID_QUEUE",
       value = tostring(var.disable_builtin_solidqueue_worker)
     },
+    {
+      name  = "SETTINGS__FEATURES__PIN_FORM_VERSION",
+      value = var.pin_form_version
+    },
   ]
 
   secrets = [

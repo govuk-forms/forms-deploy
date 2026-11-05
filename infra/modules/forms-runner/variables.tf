@@ -249,3 +249,9 @@ variable "opentelemetry_head_sampler_ratio" {
   description = "Sampling ratio configuration in OpenTelemetry. This tells the Ruby SDK to sample spans such that only this ratio of traces gets exported. This assumes we are using a `TraceIdRatioBased` sampler. By default all spans are sampled"
   default     = "1"
 }
+
+variable "pin_form_version" {
+  type        = bool
+  description = "If enabled, a form filler will complete the version of the form they started even if a new version is made live."
+  default     = false
+}
