@@ -8,6 +8,11 @@ on:
         required: true
   pull_request:
     types: [opened, edited]
+
+concurrency:
+  group: trello-poster-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   trello-poster:
     runs-on: ubuntu-slim
