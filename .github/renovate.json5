@@ -3,11 +3,17 @@
   // Dependabot keeps actions, bundler, terraform and the other pre-commit hooks
   // up to date. Renovate only handles the pins Dependabot can't see, and the
   // pins that are duplicated across files, which have to move together.
-  enabledManagers: ["mise", "custom.regex"],
+  enabledManagers: ["mise", "custom.regex", "terraform", "terraform-version"],
   minimumReleaseAge: "7 days",
+
   // One pull request per tool, so every copy of a pin changes together and
   // the versions-in-sync check passes.
   packageRules: [
+    // Only the required_version in infra/shared/versions.tf. Dependabot owns the
+    // providers in the same file, and the other versions.tf files are symlinks.
+    { matchManagers: ["terraform"], matchPackageNames: ["!hashicorp/terraform"], enabled: false },
+    { matchManagers: ["terraform"], matchFileNames: ["!infra/shared/versions.tf"], enabled: false },
+    { matchPackageNames: ["hashicorp/terraform"], groupName: "Terraform" },
     { matchPackageNames: ["terraform-linters/tflint"], groupName: "tflint" },
     { matchPackageNames: ["checkov"], groupName: "checkov" },
     { matchPackageNames: ["jdx/jactionlint"], groupName: "jactionlint" },
