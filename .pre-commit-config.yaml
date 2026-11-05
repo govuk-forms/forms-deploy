@@ -40,14 +40,14 @@ repos:
 
       - id: checkov
         name: checkov
-        entry: ./pre-commit-checkov.sh
+        entry: ./support/run-checkov.sh
         language: python
+        # Keep in step with the checkov pin in .mise.toml.
+        # TODO: add a guardrail for keeping versions in sync
         additional_dependencies:
           - checkov==3.2.470
         require_serial: true
-        types_or:
-          - hcl
-          - terraform
+        files: ^infra/(checkov/|.*\.(tf|tfvars|hcl)$)
         pass_filenames: true
 
       - id: rubocop
