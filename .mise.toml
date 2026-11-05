@@ -4,10 +4,7 @@ _.path = "support/forms-cli/bin"
 [tools]
 # Needed to build the go: tools below.
 go = "1.25.3"
-# Pinned to a commit pseudo-version: this module has no tagged releases, and
-# mise's minimum_release_age filter rejects "latest" whenever the newest
-# upstream commit is under 24h old. Find newer versions at
-# https://proxy.golang.org/github.com/hashicorp/terraform-config-inspect/@latest
+# This module has no tagged releases, so the pin is a commit pseudo-version.
 "go:github.com/hashicorp/terraform-config-inspect" = "v0.0.0-20260709150029-2fb54c236733"
 # Keep in step with HCL2JSON_VERSION (and its SHA256) in
 # infra/modules/drift-detection/main.tf.

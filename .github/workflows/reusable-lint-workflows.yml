@@ -11,6 +11,7 @@ on:
 env:
   # Not the version of the action, which is updated separately. Keep it in
   # step with the jactionlint pins in .mise.toml and .pre-commit-config.yaml.
+  # renovate: datasource=github-releases depName=jdx/jactionlint extractVersion=^v(?<version>.+)$
   JACTIONLINT_VERSION: "2.4.0"
 
 jobs:

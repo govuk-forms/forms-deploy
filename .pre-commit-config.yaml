@@ -36,6 +36,7 @@ repos:
         language: golang
         # Keep in step with the tflint pin in .mise.toml.
         additional_dependencies:
+          # renovate: datasource=github-releases depName=terraform-linters/tflint
           - github.com/terraform-linters/tflint@v0.64.0
         files: ^(infra/|\.tflint\.hcl$)
         pass_filenames: true
@@ -47,6 +48,7 @@ repos:
         language: python
         # Keep in step with the checkov pin in .mise.toml.
         additional_dependencies:
+          # renovate: datasource=pypi depName=checkov
           - checkov==3.2.470
         require_serial: true
         files: ^infra/(checkov/|.*\.(tf|tfvars|hcl)$)
@@ -59,9 +61,20 @@ repos:
         language: system
         entry: bundle exec rubocop --force-exclusion
 
+      - id: renovate-config-validator
+        name: renovate config
+        language: docker_image
+        # The image the Renovate runner uses, so the config is checked by the
+        # release that will read it.
+        # renovate: datasource=docker depName=ghcr.io/renovatebot/renovate
+        entry: --entrypoint renovate-config-validator ghcr.io/renovatebot/renovate:44.199.2 --strict
+        files: ^\.github/renovate.*\.json5$
+        pass_filenames: true
+
   # Keep in step with the jactionlint pins in .mise.toml and
   # .github/workflows/reusable-lint-workflows.yml.
   - repo: https://github.com/jdx/jactionlint
+    # renovate: datasource=github-releases depName=jdx/jactionlint
     rev: v2.4.0
     hooks:
       - id: jactionlint

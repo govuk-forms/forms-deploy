@@ -1,0 +1,50 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  // Dependabot keeps actions, bundler, terraform and the other pre-commit hooks
+  // up to date. Renovate only handles the pins Dependabot can't see, and the
+  // pins that are duplicated across files, which have to move together.
+  enabledManagers: ["mise", "custom.regex"],
+  minimumReleaseAge: "7 days",
+  // Schedules are read in this timezone, so a slot doesn't move an hour when
+  // the clocks change.
+  timezone: "Europe/London",
+  // Lists everything Renovate has found, including updates waiting on the
+  // release age, as an issue in the repository.
+  dependencyDashboard: true,
+  prConcurrentLimit: 5,
+
+  // When more than one rule sets the same option, the last matching rule wins,
+  // so keep the general rules above the specific ones.
+  // One pull request per tool, so every copy of a pin changes together and
+  // the versions-in-sync check passes.
+  packageRules: [
+    { matchPackageNames: ["terraform-linters/tflint"], groupName: "tflint" },
+    { matchPackageNames: ["checkov"], groupName: "checkov" },
+    { matchPackageNames: ["jdx/jactionlint"], groupName: "jactionlint" },
+    { matchPackageNames: ["tmccombs/hcl2json"], groupName: "hcl2json" },
+
+    // A major release of these changes what the checks report, so it should be
+    // a deliberate change.
+    { matchPackageNames: ["terraform-linters/tflint", "checkov"], matchUpdateTypes: ["major"], enabled: false },
+  ],
+  customManagers: [
+    {
+      // "# renovate: datasource=x depName=y" on the line above a pin, which can
+      // be NAME=version, NAME: version, name==version, name@version or a
+      // version inside escaped quotes. The version is the first number-led
+      // token after the = @ or : on the next line. Add
+      // extractVersion=^v(?<version>.+)$ when the pin leaves off a "v" that
+      // the release tag has.
+      customType: "regex",
+      managerFilePatterns: [
+        "/^\\.pre-commit-config\\.yaml$/",
+        "/^\\.mise\\.toml$/",
+        "/^\\.github/workflows/reusable-lint-workflows\\.yml$/",
+        "/^infra/.*\\.tf$/",
+      ],
+      matchStrings: [
+        "# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>\\S+)(?: extractVersion=(?<extractVersion>\\S+))?\\n[^\\n]*?[=@:]\\s*\\\\*\"?(?<currentValue>v?\\d[\\w.+-]*)",
+      ],
+    },
+  ],
+}
