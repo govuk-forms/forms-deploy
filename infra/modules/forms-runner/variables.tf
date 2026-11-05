@@ -141,6 +141,11 @@ variable "confirmation_bounces_and_complaints_sqs_queue_name" {
   description = "The name of the SQS queue to which SES sends notifications of bounces and complaints for confirmation emails"
 }
 
+variable "govuk_one_login_domain" {
+  type        = string
+  description = "The domain for the GOV.UK One Login environment to use"
+}
+
 variable "govuk_one_login_base_url" {
   type        = string
   description = "The base URL for GOV.UK One Login authentication requests"
