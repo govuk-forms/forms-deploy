@@ -12,6 +12,7 @@
     { matchPackageNames: ["checkov"], groupName: "checkov" },
     { matchPackageNames: ["jdx/jactionlint"], groupName: "jactionlint" },
     { matchPackageNames: ["tmccombs/hcl2json"], groupName: "hcl2json" },
+    { matchPackageNames: ["public.ecr.aws/codebuild/**"], groupName: "CodeBuild images" },
   ],
   customManagers: [
     {
@@ -49,6 +50,21 @@
       matchStrings: ["HCL2JSON_VERSION=\\\\\"(?<currentValue>v[\\d.]+)\\\\\""],
       datasourceTemplate: "github-releases",
       depNameTemplate: "tmccombs/hcl2json",
+    },
+    {
+      customType: "regex",
+      managerFilePatterns: ["/^infra/.*\\.tf$/"],
+      matchStrings: ["\"(?<depName>(?:public\\.ecr\\.aws|docker\\.io)/[\\w./-]+):(?<currentValue>v?[\\d.]+)\""],
+      datasourceTemplate: "docker",
+    },
+    {
+      // CodeBuild images are published to the public ECR "codebuild" namespace.
+      customType: "regex",
+      managerFilePatterns: ["/^infra/.*\\.tf$/"],
+      matchStrings: ["\"aws/codebuild/(?<image>[\\w-]+):(?<currentValue>[\\d.]+)\""],
+      datasourceTemplate: "docker",
+      depNameTemplate: "aws/codebuild/{{{image}}}",
+      packageNameTemplate: "public.ecr.aws/codebuild/{{{image}}}",
     },
   ],
 }
