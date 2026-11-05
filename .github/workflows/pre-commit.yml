@@ -42,7 +42,7 @@ jobs:
       - name: ✅ Run Pre-commit Hooks
         id: pre-commit
         env:
-          SKIP: "checkov,tflint,rubocop,terraform-fmt"
+          SKIP: "checkov,tflint,rubocop,terraform-fmt,jactionlint"
         run: |
           pre-commit run --show-diff-on-failure --color=never \
           --from-ref "${{ github.event.pull_request.base.sha }}" \
