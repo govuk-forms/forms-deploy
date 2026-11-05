@@ -49,7 +49,7 @@ jobs:
           fi
 
       - name: Handle Dependabot PR - commit lock files
-        if: steps.git-check.outputs.changed == 'true' && github.actor == 'dependabot[bot]'
+        if: steps.git-check.outputs.changed == 'true' && github.event.pull_request.user.login == 'dependabot[bot]'
         env:
           PUSH_REF: ${{ github.head_ref }}
         run: |
@@ -69,7 +69,7 @@ jobs:
           fi
 
       - name: Check for uncommitted changes (Dependabot PR)
-        if: github.actor == 'dependabot[bot]'
+        if: github.event.pull_request.user.login == 'dependabot[bot]'
         run: |
           # After committing lock files, check if there are still any changes
           if ! git diff --quiet || ! git diff --cached --quiet; then
@@ -92,7 +92,7 @@ jobs:
           fi
 
       - name: Check for missing lock updates (Non-Dependabot PR)
-        if: steps.git-check.outputs.changed == 'true' && github.actor != 'dependabot[bot]'
+        if: steps.git-check.outputs.changed == 'true' && github.event.pull_request.user.login != 'dependabot[bot]'
         env:
           COMMENT_MARKER: "<!-- provider-locks: missing updates -->"
           GH_TOKEN: ${{ github.token }}
@@ -136,7 +136,7 @@ jobs:
           exit 1
 
       - name: Comment on Dependabot PR success
-        if: steps.git-check.outputs.changed == 'true' && github.actor == 'dependabot[bot]'
+        if: steps.git-check.outputs.changed == 'true' && github.event.pull_request.user.login == 'dependabot[bot]'
         env:
           COMMENT_MARKER: "<!-- provider-locks: dependabot updated -->"
           GH_TOKEN: ${{ github.token }}
