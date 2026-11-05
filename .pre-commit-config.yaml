@@ -61,7 +61,10 @@ repos:
         language: system
         entry: bundle exec rubocop --force-exclusion
 
-  - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.12
+  # Keep in step with the jactionlint pins in .mise.toml and
+  # .github/workflows/reusable-lint-workflows.yml.
+  # TODO: add a guardrail for keeping versions in sync
+  - repo: https://github.com/jdx/jactionlint
+    rev: v2.4.0
     hooks:
-      - id: actionlint
+      - id: jactionlint
