@@ -72,13 +72,14 @@ jobs:
         id: outputs
         env:
           BUILD_ID: ${{ steps.codebuild.outputs.aws-build-id }}
+          APP_NAME: ${{ inputs.app-name }}
         run: |
           # Extract build UUID from ARN (format: arn:aws:codebuild:region:account:build/project:uuid)
           # shellcheck disable=SC2153 # BUILD_ID is set in env, but shellcheck doesn't recognize it
           BUILD_UUID="${BUILD_ID##*:}"
 
           # Download artifact
-          aws s3 cp "s3://forms-review-codebuild-artifacts/${BUILD_UUID}/review-${{ inputs.app-name }}-deploy/outputs.json" outputs.json
+          aws s3 cp "s3://forms-review-codebuild-artifacts/${BUILD_UUID}/review-${APP_NAME}-deploy/outputs.json" outputs.json
 
           # Parse outputs
           {
@@ -89,7 +90,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
           # Clean up artifact
-          aws s3 rm "s3://forms-review-codebuild-artifacts/${BUILD_UUID}/review-${{ inputs.app-name }}-deploy/outputs.json"
+          aws s3 rm "s3://forms-review-codebuild-artifacts/${BUILD_UUID}/review-${APP_NAME}-deploy/outputs.json"
 
       - name: Wait for AWS ECS deployments to finish
         run: |
