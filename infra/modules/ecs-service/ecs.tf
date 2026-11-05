@@ -128,7 +128,7 @@ locals {
     # the config template produces a different container_definitions JSON, which forces a
     # new task definition revision and triggers an ECS redeployment automatically.
     dockerLabels = {
-      "adot-config-hash" = sha256(aws_ssm_parameter.adot_collector_config[0].value)
+      "adot-config-hash" = sha256(aws_ssm_parameter.adot_collector_config[0].insecure_value)
     },
     secrets = [
       {

@@ -140,7 +140,7 @@ locals {
     # the config template produces a different container_definitions JSON, which forces a
     # new task definition revision and triggers an ECS redeployment automatically.
     dockerLabels = {
-      "adot-config-hash" = sha256(aws_ssm_parameter.queue_worker_adot_collector_config[0].value)
+      "adot-config-hash" = sha256(aws_ssm_parameter.queue_worker_adot_collector_config[0].insecure_value)
     },
     secrets = [
       {
@@ -334,7 +334,7 @@ resource "aws_ssm_parameter" "queue_worker_adot_collector_config" {
 
   name = "/${local.queue_worker_name}-${var.env_name}/adot-collector-config"
   type = "String"
-  value = templatefile("${path.module}/../ecs-service/adot-collector-config.yaml.tpl", {
+  insecure_value = templatefile("${path.module}/../ecs-service/adot-collector-config.yaml.tpl", {
     aws_region = data.aws_region.current.region
     env_name   = var.env_name
     drop_spans = local.queue_worker_drop_span_expressions

@@ -8,7 +8,7 @@ resource "aws_ssm_parameter" "adot_collector_config" {
 
   name = "/${var.application}-${var.env_name}/adot-collector-config"
   type = "String"
-  value = templatefile("${path.module}/adot-collector-config.yaml.tpl", {
+  insecure_value = templatefile("${path.module}/adot-collector-config.yaml.tpl", {
     aws_region = data.aws_region.current.region
     env_name   = var.env_name
     drop_spans = var.adot_drop_span_expressions
