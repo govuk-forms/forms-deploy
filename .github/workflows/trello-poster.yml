@@ -9,6 +9,8 @@ on:
   pull_request:
     types: [opened, edited]
 
+permissions: {}
+
 concurrency:
   group: trello-poster-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
