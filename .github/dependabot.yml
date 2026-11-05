@@ -60,3 +60,6 @@ updates:
       pre-commit-all-dependencies:
         patterns:
           - "*"
+    ignore:
+      # Renovate updates this together with the other jactionlint pins.
+      - dependency-name: "https://github.com/jdx/jactionlint"

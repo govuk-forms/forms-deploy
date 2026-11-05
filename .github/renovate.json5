@@ -1,0 +1,54 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  // Dependabot keeps actions, bundler, terraform and the other pre-commit hooks
+  // up to date. Renovate only handles the pins Dependabot can't see, and the
+  // pins that are duplicated across files, which have to move together.
+  enabledManagers: ["mise", "custom.regex"],
+  minimumReleaseAge: "7 days",
+  // One pull request per tool, so every copy of a pin changes together and
+  // the versions-in-sync check passes.
+  packageRules: [
+    { matchPackageNames: ["terraform-linters/tflint"], groupName: "tflint" },
+    { matchPackageNames: ["checkov"], groupName: "checkov" },
+    { matchPackageNames: ["jdx/jactionlint"], groupName: "jactionlint" },
+    { matchPackageNames: ["tmccombs/hcl2json"], groupName: "hcl2json" },
+  ],
+  customManagers: [
+    {
+      customType: "regex",
+      managerFilePatterns: ["/^\\.pre-commit-config\\.yaml$/"],
+      matchStrings: ["github\\.com/terraform-linters/tflint@(?<currentValue>v[\\d.]+)"],
+      datasourceTemplate: "github-releases",
+      depNameTemplate: "terraform-linters/tflint",
+    },
+    {
+      customType: "regex",
+      managerFilePatterns: ["/^\\.pre-commit-config\\.yaml$/"],
+      matchStrings: ["checkov==(?<currentValue>[\\d.]+)"],
+      datasourceTemplate: "pypi",
+      depNameTemplate: "checkov",
+    },
+    {
+      customType: "regex",
+      managerFilePatterns: ["/^\\.pre-commit-config\\.yaml$/"],
+      matchStrings: ["repo: https://github\\.com/jdx/jactionlint\\s+rev: (?<currentValue>v[\\d.]+)"],
+      datasourceTemplate: "github-releases",
+      depNameTemplate: "jdx/jactionlint",
+    },
+    {
+      customType: "regex",
+      managerFilePatterns: ["/^\\.github/workflows/reusable-lint-workflows\\.yml$/"],
+      matchStrings: ["JACTIONLINT_VERSION: \"(?<currentValue>[\\d.]+)\""],
+      datasourceTemplate: "github-releases",
+      depNameTemplate: "jdx/jactionlint",
+      extractVersionTemplate: "^v?(?<version>.+)$",
+    },
+    {
+      customType: "regex",
+      managerFilePatterns: ["/^infra/modules/drift-detection/main\\.tf$/"],
+      matchStrings: ["HCL2JSON_VERSION=\\\\\"(?<currentValue>v[\\d.]+)\\\\\""],
+      datasourceTemplate: "github-releases",
+      depNameTemplate: "tmccombs/hcl2json",
+    },
+  ],
+}
