@@ -7,6 +7,10 @@ on:
       - "infra/scripts/upgrade_tf_version.sh"
       - ".github/workflows/update-provider-locks.yml"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   update-locks:
     runs-on: ubuntu-24.04
