@@ -6,6 +6,12 @@ on:
     paths:
       - '.github/workflows/*.yml'
       - '.github/workflows/*.yaml'
+      - '.github/dependabot.yml'
+      - '.github/dependabot.yaml'
+      - '**/action.yml'
+      - '**/action.yaml'
+      - '.github/jactionlint.yaml'
+      - '.github/jactionlint.yml'
   merge_group:
 
 permissions: {}
