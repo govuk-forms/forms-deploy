@@ -225,11 +225,11 @@ jobs:
         uses: jdx/mise-action@6be3c7ed4c21d4f76b208d351d95aac273ebb76d # v5.2.4
         with:
           github_token: ${{ secrets.MISE_PAT }}
-          install_args: checkov
+          install_args: pipx:checkov
 
       - name: Run Checkov against Terraform
         run: |
-          checkov -d infra/ --external-checks-dir infra/checkov/ --framework terraform --quiet --skip-download
+          ./support/run-checkov.sh
 
   report:
     # Required, for 'required PR status checks' on GitHub.

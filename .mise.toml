@@ -9,7 +9,10 @@ _.path = "support/forms-cli/bin"
 "go:github.com/hashicorp/terraform-config-inspect" = "v0.0.0-20260709150029-2fb54c236733"
 hcl2json = "0.6.9"
 tflint = "0.64.0"
-checkov = "3.2.470"
+# Installed from PyPI rather than as the standalone binary, which takes ~13s to start.
+# Keep in step with the checkov pin in .pre-commit-config.yaml.
+# TODO: add a guardrail for keeping versions in sync
+"pipx:checkov" = "3.2.470"
 tfupdate = "latest"
 
 [settings]
