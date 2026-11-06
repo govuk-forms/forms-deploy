@@ -4,6 +4,14 @@ on:
   pull_request:
     branches: [main]
 
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   guardrail_unique_job_names:
     name: "Guardrail: Ensure unique workflow job names"
@@ -24,10 +32,10 @@ jobs:
         run: |
           # fetch legacy branch protection required checks
           branch_protection_checks=$(gh api "repos/${GITHUB_REPOSITORY}/branches/${TARGET_BRANCH}/protection/required_status_checks" 2>/dev/null | \
-            jq --argjson INTEGRATION_ID "$GHA_INTEGRATION_ID" '[.checks[] | select(.integration_id==$INTEGRATION_ID)]? // []')
+            jq --argjson INTEGRATION_ID "$GHA_INTEGRATION_ID" '[.checks[] | select(.integration_id==$INTEGRATION_ID)]? // []') || true
           # fetch ruleset required checks
           ruleset_checks=$(gh api "repos/${GITHUB_REPOSITORY}/rules/branches/${TARGET_BRANCH}" 2>/dev/null | \
-            jq --argjson INTEGRATION_ID "$GHA_INTEGRATION_ID" '[.[] | select(.type=="required_status_checks") | .parameters.required_status_checks[] | select(.integration_id==$INTEGRATION_ID)]? // []')
+            jq --argjson INTEGRATION_ID "$GHA_INTEGRATION_ID" '[.[] | select(.type=="required_status_checks") | .parameters.required_status_checks[] | select(.integration_id==$INTEGRATION_ID)]? // []') || true
 
           # Combine and deduplicate both sources of required checks
           required_checks="$(jq -n --argjson bp "$branch_protection_checks" --argjson rs "$ruleset_checks" \
@@ -41,10 +49,10 @@ jobs:
             echo ""
             echo "It's also possible that the integration ID for GitHub Actions status checks has changed from ${GHA_INTEGRATION_ID}."
             echo "Legacy branch protection checks:"
-            gh api "repos/${GITHUB_REPOSITORY}/branches/${TARGET_BRANCH}/protection/required_status_checks" | jq '.checks[]? // []'
+            gh api "repos/${GITHUB_REPOSITORY}/branches/${TARGET_BRANCH}/protection/required_status_checks" | jq '.checks[]? // []' || true
             echo ""
             echo "Ruleset checks:"
-            gh api "repos/${GITHUB_REPOSITORY}/rules/branches/${TARGET_BRANCH}" | jq '[.[] | select(.type=="required_status_checks") | .parameters.required_status_checks[]]? // []'
+            gh api "repos/${GITHUB_REPOSITORY}/rules/branches/${TARGET_BRANCH}" | jq '[.[] | select(.type=="required_status_checks") | .parameters.required_status_checks[]]? // []' || true
             echo ""
             echo "If you see checks above but they are not being picked up, please update the GHA_INTEGRATION_ID in this workflow file."
             exit 2

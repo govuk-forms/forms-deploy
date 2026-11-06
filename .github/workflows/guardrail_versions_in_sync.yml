@@ -12,6 +12,10 @@ on:
       - "support/check-versions-in-sync.sh"
       - ".github/workflows/guardrail_versions_in_sync.yml"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   check_versions_in_sync:
     runs-on: ubuntu-24.04-arm
