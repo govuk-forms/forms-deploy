@@ -1,0 +1,35 @@
+*example/repo: CI digest* (22 Oct 2026 to 29 Oct 2026)
+
+*Main and merge queue*
+• Build image: 0 of 4 failed (0%); previous 12 weeks: 0 of 40 failed (0%)
+• New workflow: 2 of 2 failed (100%); no earlier runs to compare with
+• Rare failures: 2 of 4 failed (50%); previous 12 weeks: 0 of 40 failed (0%)
+• Tests: 3 of 8 failed (38%); previous 12 weeks: 1 of 48 failed (2%) :warning:
+
+*Pull requests*
+• Tests: 1 of 10 failed (10%); previous 12 weeks: 6 of 60 failed (10%)
+• 5 other workflows had no failures
+
+*Run times* (successful runs)
+• Build image: median 1m0s (usual 1m40s), p95 1m0s (usual 1m40s) :zap: faster
+• Even split: median 2m30s (usual 1m40s) :warning: slower
+• Steady: median 2m40s (usual 3m20s)
+• Tests: median 5m0s (usual 3m20s) :warning: slower
+
+*Why runs failed this week*
+• Tests › slow_job › no failed step (timed_out) (4 runs)
+• Tests › build_and_test › Run Ruby tests (4 runs)
+• Rare failures › slow_job › no failed step (timed_out) (2 runs)
+• Rare failures › build_and_test › Run Ruby tests (2 runs)
+• New workflow › no failed job found (failure) (1 run)
+
+*Specs failing most often this week*
+• `./spec/b&lt;!channel&gt;_spec.rb:2` (8 runs)
+• `./spec/a_spec.rb:1` (8 runs)
+
+*Failures on main and in the merge queue*
+• Tests (push to main): <https://example.test/runs/1/attempts/1|run>
+• New workflow (push to main): <https://example.test/runs/340/attempts/1|run>
+• Rare failures (push to main): <https://example.test/runs/350/attempts/1|run>
+• Tests (push to main): <https://example.test/runs/2/attempts/1|run>
+• Rare failures (push to main): <https://example.test/runs/351/attempts/1|run>
