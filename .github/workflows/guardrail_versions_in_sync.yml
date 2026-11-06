@@ -1,0 +1,97 @@
+name: "Guardrail: Versions in sync"
+
+on:
+  pull_request:
+    paths:
+      - ".mise.toml"
+      - ".pre-commit-config.yaml"
+      - ".github/workflows/reusable-lint-workflows.yml"
+      - "infra/modules/drift-detection/main.tf"
+      - "**/.ruby-version"
+      - "support/pipeline-visualiser/Dockerfile"
+      - "support/check-versions-in-sync.sh"
+      - ".github/workflows/guardrail_versions_in_sync.yml"
+
+jobs:
+  check_versions_in_sync:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    name: Check ${{ matrix.tool }} versions are in sync
+    strategy:
+      # Each tool is its own job, so a PR that breaks several pins reports all
+      # of them.
+      fail-fast: false
+      matrix:
+        # To cover another tool, add an entry, and add each file it reads to
+        # the paths this workflow runs on, or a change to that file won't run
+        # it. Each place is a file and either a sed pattern (an extended
+        # regular expression whose first group is the version) or a yq
+        # expression that prints the version.
+        include:
+          - tool: Checkov
+            places:
+              - file: .mise.toml
+                sed: '^"pipx:checkov" *= *"([^"]+)".*'
+              - file: .pre-commit-config.yaml
+                yq: '.repos[].hooks[] | select(.id == "checkov") | .additional_dependencies[] | select(test("^checkov==")) | sub("^checkov==", "")'
+
+          - tool: tflint
+            places:
+              - file: .mise.toml
+                sed: '^tflint *= *"([^"]+)".*'
+              - file: .pre-commit-config.yaml
+                yq: '.repos[].hooks[] | select(.id == "tflint") | .additional_dependencies[] | select(test("^github.com/terraform-linters/tflint@v")) | sub("^.*@v", "")'
+
+          - tool: hcl2json
+            places:
+              - file: .mise.toml
+                sed: '^hcl2json *= *"([^"]+)".*'
+              - file: infra/modules/drift-detection/main.tf
+                sed: '.*HCL2JSON_VERSION=[^v]*v([0-9.]+).*'
+
+          - tool: jactionlint
+            places:
+              - file: .mise.toml
+                sed: '^jactionlint *= *"([^"]+)".*'
+              - file: .pre-commit-config.yaml
+                yq: '.repos[] | select(.repo == "https://github.com/jdx/jactionlint") | (.rev // "") | sub("^v", "")'
+              - file: .github/workflows/reusable-lint-workflows.yml
+                yq: '.on.workflow_call.inputs.version.default // ""'
+
+          - tool: Ruby
+            places:
+              - file: .ruby-version
+                sed: '^ *([0-9.]+) *$'
+              - file: infra/deployments/forms/pipelines/pipeline-invoker/.ruby-version
+                sed: '^ *([0-9.]+) *$'
+              - file: infra/modules/analytics/lambda/.ruby-version
+                sed: '^ *([0-9.]+) *$'
+              - file: support/pipeline-visualiser/.ruby-version
+                sed: '^ *([0-9.]+) *$'
+              - file: support/pipeline-visualiser/Dockerfile
+                sed: '^ARG RUBY_VERSION=([0-9.]+)$'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Compare the versions
+        env:
+          TOOL: ${{ matrix.tool }}
+          PLACES: ${{ toJSON(matrix.places) }}
+        run: |
+          args=("${TOOL}")
+          while IFS= read -r place; do
+            file="$(jq -r '.file' <<< "${place}")"
+            if jq -e 'has("yq")' <<< "${place}" > /dev/null; then
+              version="$(yq "$(jq -r '.yq' <<< "${place}")" "${file}")"
+            else
+              version="$(sed -nE "s/$(jq -r '.sed' <<< "${place}")/\1/p" "${file}")"
+            fi
+            args+=("${file}" "${version}")
+          done < <(jq -c '.[]' <<< "${PLACES}")
+
+          ./support/check-versions-in-sync.sh "${args[@]}"
