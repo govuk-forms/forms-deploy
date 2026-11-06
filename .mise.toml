@@ -20,6 +20,7 @@ tflint = "0.64.0"
 # Installed from PyPI rather than as the standalone binary, which takes ~13s to start.
 # Keep in step with the checkov pin in .pre-commit-config.yaml.
 "pipx:checkov" = "3.2.470"
+pre-commit = "4.7.0"
 tfupdate = "0.10.2"
 
 [settings]
