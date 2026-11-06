@@ -56,11 +56,10 @@ repos:
 
       - id: rubocop
         name: lint ruby
-        require_serial: true
         types:
           - ruby
         language: system
-        entry: make lint_ruby
+        entry: bundle exec rubocop --force-exclusion
 
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.12
