@@ -1,3 +1,5 @@
+allow_custom_deploy_event_source = false
+
 deploy-forms-product-page-container = {
   trigger_on_tag_patterns  = ["stg-*"]
   retag_image_on_success   = false
