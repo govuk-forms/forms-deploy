@@ -62,6 +62,12 @@
       datasourceTemplate: "docker",
     },
     {
+      customType: "regex",
+      managerFilePatterns: ["/^infra/modules/renovate/variables\\.tf$/"],
+      matchStrings: ["\"(?<depName>ghcr\\.io/renovatebot/renovate):(?<currentValue>[\\d.]+)@(?<currentDigest>sha256:[a-f0-9]{64})\""],
+      datasourceTemplate: "docker",
+    },
+    {
       // CodeBuild images are published to the public ECR "codebuild" namespace.
       customType: "regex",
       managerFilePatterns: ["/^infra/.*\\.tf$/"],
