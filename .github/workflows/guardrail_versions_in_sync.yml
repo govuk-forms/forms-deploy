@@ -78,7 +78,7 @@ jobs:
               - file: support/pipeline-visualiser/.ruby-version
                 sed: '^ *([0-9.]+) *$'
               - file: support/pipeline-visualiser/Dockerfile
-                sed: '^ARG RUBY_VERSION=([0-9.]+)$'
+                sed: '^FROM ruby:([0-9.]+)-alpine.*'
 
     steps:
       - name: Checkout code
