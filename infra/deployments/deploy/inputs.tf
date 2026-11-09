@@ -21,3 +21,9 @@ variable "drift_detection_schedule" {
   type        = string
   default     = "cron(0 9 ? * MON *)"
 }
+
+variable "renovate_schedule" {
+  description = "EventBridge schedule expression for the Renovate run"
+  type        = string
+  default     = "cron(0 7 ? * MON-FRI *)"
+}
