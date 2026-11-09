@@ -1,23 +1,17 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  // Dependabot keeps actions, bundler, terraform and the other pre-commit hooks
-  // up to date. Renovate only handles the pins Dependabot can't see, and the
-  // pins that are duplicated across files, which have to move together.
-  enabledManagers: ["mise", "custom.regex", "terraform", "terraform-version"],
-  minimumReleaseAge: "7 days",
+  extends: ["github>govuk-forms/forms-deploy//.github/renovate-shared.json5"],
 
-  // One pull request per tool, so every copy of a pin changes together and
-  // the versions-in-sync check passes.
   packageRules: [
-    // Only the required_version in the real versions.tf files. Dependabot owns
-    // the providers in them, and the other versions.tf files are symlinks.
-    { matchManagers: ["terraform"], matchPackageNames: ["!hashicorp/terraform"], enabled: false },
+    // Only the required_version in the real versions.tf files. The other
+    // versions.tf files are symlinks.
     {
       matchManagers: ["terraform"],
       matchFileNames: ["!infra/shared/versions.tf", "!infra/deployments/forms/dns/versions.tf"],
       enabled: false,
     },
-    { matchPackageNames: ["hashicorp/terraform"], groupName: "Terraform" },
+    // One pull request per tool, so every copy of a pin changes together and
+    // the versions-in-sync check passes.
     { matchPackageNames: ["terraform-linters/tflint"], groupName: "tflint" },
     { matchPackageNames: ["checkov"], groupName: "checkov" },
     { matchPackageNames: ["jdx/jactionlint"], groupName: "jactionlint" },

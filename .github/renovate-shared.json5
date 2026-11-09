@@ -1,0 +1,25 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  // Shared by every GOV.UK Forms repo. Dependabot keeps actions, bundler, npm
+  // and the other ecosystems up to date. Renovate only handles the pins that
+  // are duplicated across files or repos, which have to move together.
+  //
+  // Repos extend this as `github>govuk-forms/forms-deploy//.github/renovate-shared.json5` (the extension has to be spelled out).
+  enabledManagers: ["ruby-version", "dockerfile", "terraform", "terraform-version", "mise", "custom.regex"],
+  minimumReleaseAge: "7 days",
+  internalChecksFilter: "strict",
+
+  // The same group names in every repo give the same pull request title and
+  // branch name, so each repo opens its update in the same run.
+  packageRules: [
+    // Dependabot owns the providers until we have seen how Renovate treats the
+    // lock files, which list five platforms.
+    { matchManagers: ["terraform"], matchPackageNames: ["!hashicorp/terraform"], enabled: false },
+    { matchPackageNames: ["hashicorp/terraform"], groupName: "Terraform" },
+
+    // .ruby-version and the Dockerfile base image move together. Lambda runtimes
+    // are pinned to a minor version, so only patch releases are automatic.
+    { matchPackageNames: ["ruby"], groupName: "Ruby" },
+    { matchPackageNames: ["ruby"], matchUpdateTypes: ["major", "minor"], enabled: false },
+  ],
+}
