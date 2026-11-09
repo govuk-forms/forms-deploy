@@ -17,6 +17,10 @@
     { matchPackageNames: ["jdx/jactionlint"], groupName: "jactionlint" },
     { matchPackageNames: ["tmccombs/hcl2json"], groupName: "hcl2json" },
     { matchPackageNames: ["public.ecr.aws/codebuild/**"], groupName: "CodeBuild images" },
+    // Renovate releases several times a day, and every bump is a manual apply of
+    // deploy/tools, so take it once a month. The first week gives the weekday
+    // runs a few chances to open it.
+    { matchPackageNames: ["ghcr.io/renovatebot/renovate"], schedule: ["* * 1-7 * *"] },
   ],
   customManagers: [
     {
