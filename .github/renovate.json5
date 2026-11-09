@@ -17,6 +17,16 @@
     { matchPackageNames: ["jdx/jactionlint"], groupName: "jactionlint" },
     { matchPackageNames: ["tmccombs/hcl2json"], groupName: "hcl2json" },
     { matchPackageNames: ["public.ecr.aws/codebuild/**"], groupName: "CodeBuild images" },
+    // The runner image and the image pre-commit validates the config with are
+    // the same pin in two files, so they move together. Renovate releases
+    // several times a day, and every bump is a manual apply of deploy/tools, so
+    // take it once a month. The first week gives the weekday runs a few chances
+    // to open it.
+    {
+      matchPackageNames: ["ghcr.io/renovatebot/renovate"],
+      groupName: "Renovate",
+      schedule: ["* * 1-7 * *"],
+    },
 
     // A major release of these changes what the checks report, so it should be
     // a deliberate change.
