@@ -12,6 +12,10 @@
   // The same group names in every repo give the same pull request title and
   // branch name, so each repo opens its update in the same run.
   packageRules: [
+    // Container registries other than Docker Hub publish no release dates, so
+    // the age check could never pass and the update would wait forever.
+    { matchDatasources: ["docker"], minimumReleaseAgeBehaviour: "timestamp-optional" },
+
     // Dependabot owns the providers until we have seen how Renovate treats the
     // lock files, which list five platforms.
     { matchManagers: ["terraform"], matchPackageNames: ["!hashicorp/terraform"], enabled: false },
