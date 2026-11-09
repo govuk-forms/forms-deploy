@@ -8,6 +8,8 @@ on:
       - ".github/workflows/reusable-lint-workflows.yml"
       - "infra/modules/drift-detection/main.tf"
       - "**/.ruby-version"
+      - ".terraform-version"
+      - "**/versions.tf"
       - "support/pipeline-visualiser/Dockerfile"
       - "support/check-versions-in-sync.sh"
       - ".github/workflows/guardrail_versions_in_sync.yml"
@@ -97,5 +99,34 @@ jobs:
             fi
             args+=("${file}" "${version}")
           done < <(jq -c '.[]' <<< "${PLACES}")
+
+          ./support/check-versions-in-sync.sh "${args[@]}"
+
+  check_terraform_version_in_sync:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    name: Check Terraform versions are in sync
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install `hcl2json` with mise
+        uses: jdx/mise-action@82a612c5ab8bcda7cc5db6b7e81a8e7584c3dc6e # v5.2.3
+        with:
+          install_args: hcl2json
+
+      # Every root has to run the same Terraform, and the root files are
+      # separate (or symlinks to a shared one), so compare them all.
+      - name: Compare the versions
+        shell: bash
+        run: |
+          args=("Terraform" ".terraform-version" "$(sed -nE 's/^ *([0-9.]+) *$/\1/p' .terraform-version)")
+          while IFS= read -r file; do
+            version="$(hcl2json "${file}" | jq -r '.terraform[0].required_version // ""')"
+            args+=("${file}" "${version}")
+          done < <(git ls-files '*versions.tf')
 
           ./support/check-versions-in-sync.sh "${args[@]}"
