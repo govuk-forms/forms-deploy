@@ -37,7 +37,9 @@ updates:
           - "*"
 
   - package-ecosystem: terraform
-    directory: "/infra/shared"
+    directories:
+      - "/infra/shared"
+      - "/infra/deployments/forms/dns"
     schedule:
       interval: weekly
     cooldown:
