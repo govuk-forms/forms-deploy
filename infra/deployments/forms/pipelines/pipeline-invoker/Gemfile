@@ -2,7 +2,7 @@
 
 source "https://rubygems.org"
 
-gem "aws-sdk-codepipeline", "~> 1.125"
+gem "aws-sdk-codepipeline", "~> 1.126"
 
 group :development, :test do
   gem "rspec", "~> 3.13"
