@@ -4,7 +4,7 @@ source "https://rubygems.org"
 
 gem "activesupport", "~> 8.1"
 gem "activesupport-duration-human_string", "~> 1.0"
-gem "aws-sdk-codepipeline", "~> 1.125"
+gem "aws-sdk-codepipeline", "~> 1.126"
 gem "concurrent-ruby", require: "concurrent"
 gem "puma", "~> 8.0"
 gem "rackup", "~> 2.3"
