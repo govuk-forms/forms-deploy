@@ -7,6 +7,14 @@ on:
       - ".github/workflows/pipeline-visualiser.yml"
   merge_group:
     types: [checks_requested]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build_container:
     runs-on: ubuntu-24.04-arm # The container will ultimately be built for arm64 and run on arm64, so we should test it on arm64.

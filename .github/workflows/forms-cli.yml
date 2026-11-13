@@ -11,6 +11,14 @@ on:
       - "support/forms-cli/**"
   merge_group:
     types: [checks_requested]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build_and_test:
     runs-on: ubuntu-24.04-arm
