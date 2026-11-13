@@ -7,17 +7,16 @@ _.path = "support/forms-cli/bin"
 # upstream commit is under 24h old. Find newer versions at
 # https://proxy.golang.org/github.com/hashicorp/terraform-config-inspect/@latest
 "go:github.com/hashicorp/terraform-config-inspect" = "v0.0.0-20260709150029-2fb54c236733"
+# Keep in step with HCL2JSON_VERSION (and its SHA256) in
+# infra/modules/drift-detection/main.tf.
 hcl2json = "0.6.9"
 # Keep in step with the jactionlint pins in .pre-commit-config.yaml and
 # .github/workflows/reusable-lint-workflows.yml.
-# TODO: add a guardrail for keeping versions in sync
 jactionlint = "2.4.0"
 # Keep in step with the tflint pin in .pre-commit-config.yaml.
-# TODO: add a guardrail for keeping versions in sync
 tflint = "0.64.0"
 # Installed from PyPI rather than as the standalone binary, which takes ~13s to start.
 # Keep in step with the checkov pin in .pre-commit-config.yaml.
-# TODO: add a guardrail for keeping versions in sync
 "pipx:checkov" = "3.2.470"
 tfupdate = "latest"
 
