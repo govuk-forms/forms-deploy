@@ -21,7 +21,7 @@ resource "aws_cloudwatch_event_rule" "drift_check_failure" {
     source      = ["custom"]
     detail-type = ["Terraform Drift Detection Result"]
     detail = {
-      deployment-name = ["${var.deployment_name}"]
+      deployment-name = [var.deployment_name]
       drift-status    = ["FAILED"]
     }
   })

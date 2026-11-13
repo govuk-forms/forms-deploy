@@ -6,8 +6,8 @@
 data "aws_iam_policy_document" "forms_infra" {
   source_policy_documents = [
     data.aws_iam_policy_document.acm.json,
-    data.aws_iam_policy_document.application-autoscaling.json,
-    data.aws_iam_policy_document.application-signals.json,
+    data.aws_iam_policy_document.application_autoscaling.json,
+    data.aws_iam_policy_document.application_signals.json,
     data.aws_iam_policy_document.athena.json,
     data.aws_iam_policy_document.cloudformation.json,
     data.aws_iam_policy_document.cloudfront.json,
@@ -145,7 +145,7 @@ data "aws_iam_policy_document" "acm" {
   }
 }
 
-data "aws_iam_policy_document" "application-autoscaling" {
+data "aws_iam_policy_document" "application_autoscaling" {
   #checkov:skip=CKV_AWS_111: allow write access without constraint when needed
   #checkov:skip=CKV_AWS_356: allow resource * when needed
   statement {
@@ -160,7 +160,7 @@ data "aws_iam_policy_document" "application-autoscaling" {
   }
 }
 
-data "aws_iam_policy_document" "application-signals" {
+data "aws_iam_policy_document" "application_signals" {
   statement {
     actions = [
       "application-signals:BatchUpdateExclusionWindows",
