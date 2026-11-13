@@ -5,8 +5,6 @@ on:
     types: [checks_requested]
   push:
     branches: [main]
-env:
-  GO_VERSION: "1.21"
 jobs:
   setup:
     name: "Setup and build matrix"
@@ -27,7 +25,7 @@ jobs:
         uses: jdx/mise-action@f5be966e4a917d54244728e6a5fdcd1d93a35e6c # v5.2.6
         with:
           github_token: ${{ secrets.MISE_PAT }} # As this is a private repo, we can get API rate limit issues. Use a PAT to avoid this. (The token needs no special permissions.)
-          install_args: go:github.com/hashicorp/terraform-config-inspect
+          install_args: go go:github.com/hashicorp/terraform-config-inspect
 
       - name: Check for Terraform changes
         id: check-changes
