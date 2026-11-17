@@ -122,6 +122,10 @@ locals {
         {
           name      = "QUEUE_DATABASE_URL",
           valueFrom = "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/forms-runner-queue-${var.env_name}/database/url"
+        },
+        {
+          name      = "SETTINGS__INCOMPLETE_SUBMISSIONS__EMAIL_HMAC_KEY"
+          valueFrom = "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/forms-runner-${var.env_name}/incomplete-submissions/email-hmac-key"
         }
       ]
     }
