@@ -81,3 +81,20 @@ resource "aws_ssm_parameter" "govuk_one_login_private_key" {
     ]
   }
 }
+
+# Incomplete submissions email HMAC key
+# The key used to HMAC email addresses for incomplete submissions
+resource "aws_ssm_parameter" "incomplete_submissions_email_hmac_key" {
+  #checkov:skip=CKV_AWS_337:KMS managed key is fine
+
+  name        = "/forms-runner-${var.env_name}/incomplete-submissions/email-hmac-key"
+  description = "The key used to HMAC email addresses for incomplete submissions for forms-runner in the ${var.env_name} environment"
+  type        = "SecureString"
+  value       = "dummy-value"
+
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+}
