@@ -191,6 +191,10 @@ module "ecs_service" {
       value = var.act_as_user_enabled
     },
     {
+      name  = "SETTINGS__FEATURES__SAVE_AND_RETURN",
+      value = var.save_and_return_enabled
+    },
+    {
       name  = "SETTINGS__AWS__ASSETS_S3_BUCKET_NAME",
       value = var.assets_bucket_name
     },
