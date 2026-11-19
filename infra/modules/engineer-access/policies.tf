@@ -183,10 +183,7 @@ resource "aws_iam_policy" "manage_dashboards_and_maintenance_page" {
         ]
         Effect   = "Allow"
         Resource = ["*"]
-      }
-    ]
-
-    Statement = [
+      },
       {
         Action = [
           "ecs:DeregisterTaskDefinition",
