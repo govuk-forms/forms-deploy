@@ -33,10 +33,14 @@ repos:
         types_or:
           - hcl
           - terraform
-        language: system
-        files: ^infra/
+        language: golang
+        # Keep in step with the tflint pin in .mise.toml.
+        # TODO: add a guardrail for keeping versions in sync
+        additional_dependencies:
+          - github.com/terraform-linters/tflint@v0.64.0
+        files: ^(infra/|\.tflint\.hcl$)
         pass_filenames: true
-        entry: ./pre-commit-tflint.sh
+        entry: ./support/run-tflint.sh
 
       - id: checkov
         name: checkov

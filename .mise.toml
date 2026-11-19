@@ -8,6 +8,8 @@ _.path = "support/forms-cli/bin"
 # https://proxy.golang.org/github.com/hashicorp/terraform-config-inspect/@latest
 "go:github.com/hashicorp/terraform-config-inspect" = "v0.0.0-20260709150029-2fb54c236733"
 hcl2json = "0.6.9"
+# Keep in step with the tflint pin in .pre-commit-config.yaml.
+# TODO: add a guardrail for keeping versions in sync
 tflint = "0.64.0"
 # Installed from PyPI rather than as the standalone binary, which takes ~13s to start.
 # Keep in step with the checkov pin in .pre-commit-config.yaml.
