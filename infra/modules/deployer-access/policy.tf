@@ -441,7 +441,13 @@ data "aws_iam_policy_document" "ec2" {
 data "aws_iam_policy_document" "ecr" {
   statement {
     actions = [
-      "ecr:*"
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:BatchGetImage",
+      "ecr:CompleteLayerUpload",
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:InitiateLayerUpload",
+      "ecr:PutImage",
+      "ecr:UploadLayerPart"
     ]
     effect = "Allow"
     resources = [

@@ -48,14 +48,14 @@ GIT_SHA="$(git --git-dir "${APP_DIR}/.git" describe --always --dirty)"
 DEFAULT_TAG_SUFFIX="${GIT_SHA}"
 
 echo "
-All development image tags begin 'dev_'. You can choose the suffix. Image
+All development image tags begin 'dev-'. You can choose the suffix. Image
 tags are immutable and no two images can have the same tag. Images with tags
-beginning 'dev_' will be periodically deleted from ECR.
+beginning 'dev-' will be periodically deleted from ECR.
 "
 
 read -rp "Enter tag suffix (defaults to abbreviated GIT SHA): [${DEFAULT_TAG_SUFFIX}]: " TAG_SUFFIX
 TAG_SUFFIX=${TAG_SUFFIX:-${DEFAULT_TAG_SUFFIX}}
-TAG="dev_${TAG_SUFFIX}"
+TAG="dev-${TAG_SUFFIX}"
 
 docker build "${APP_DIR}" -t "${APP}:${TAG}"
 
