@@ -209,8 +209,7 @@ lint_ruby:
 
 .PHONY: checkov
 checkov:
-	$(if ${CHANGED_FILES}, $(eval CHANGED_FILES_ARGS := --file $(foreach f,$(CHANGED_FILES),$(f))), $(eval CHANGED_FILES_ARGS := --directory infra/))
-	checkov --external-checks-dir infra/checkov/ --framework terraform --quiet --download-external-modules false $(CHANGED_FILES_ARGS)
+	./support/run-checkov.sh $(CHANGED_FILES)
 
 .PHONY: spec
 spec:
