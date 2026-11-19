@@ -1,13 +1,3 @@
-variable "allow_custom_deploy_event_source" {
-  description = "Whether the rules that start deploy pipelines also match events from the custom uk.gov.service.forms source"
-  type        = bool
-  default     = true
-}
-
-locals {
-  deploy_trigger_event_sources = var.allow_custom_deploy_event_source ? ["aws.ecr", "uk.gov.service.forms"] : ["aws.ecr"]
-}
-
 variable "deploy-forms-product-page-container" {
   description = "Configuration options for the deploy-forms-product-page-container pipeline"
   type = object({
