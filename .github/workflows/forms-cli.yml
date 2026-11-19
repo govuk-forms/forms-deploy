@@ -9,6 +9,7 @@ on:
     branches: [main]
     paths:
       - "support/forms-cli/**"
+      - ".github/workflows/forms-cli.yml"
   merge_group:
     types: [checks_requested]
 jobs:
@@ -21,10 +22,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Initialise mise
+        uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+        with:
+          install: false
       - name: Determine Ruby version
         id: determine-ruby-version
         run: |
-          echo "RUBY_VERSION=$(cat ../../.ruby-version)" >> "$GITHUB_OUTPUT"
+          echo "RUBY_VERSION=$(mise current ruby)" >> "$GITHUB_OUTPUT"
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@f9c4492e86def3e644ab32a0ef185eda5b0c20d0 # v1.342.0
         with:
