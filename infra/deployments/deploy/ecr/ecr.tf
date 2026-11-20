@@ -16,9 +16,13 @@ locals {
 
 resource "aws_ecr_repository" "forms_runner" {
   #checkov:skip=CKV_AWS_136:AWS Managed SSE is sufficient.
-  #checkov:skip=CKV_AWS_51:Permit mutable tags on application images
+  #checkov:skip=CKV_AWS_51:Tags are immutable except latest*, which checkov does not recognise
   name                 = "forms-runner-deploy"
-  image_tag_mutability = "MUTABLE"
+  image_tag_mutability = "IMMUTABLE_WITH_EXCLUSION"
+  image_tag_mutability_exclusion_filter {
+    filter      = "latest*"
+    filter_type = "WILDCARD"
+  }
   image_scanning_configuration {
     scan_on_push = true
   }
@@ -26,9 +30,13 @@ resource "aws_ecr_repository" "forms_runner" {
 
 resource "aws_ecr_repository" "forms_admin" {
   #checkov:skip=CKV_AWS_136:AWS Managed SSE is sufficient.
-  #checkov:skip=CKV_AWS_51:Permit mutable tags on application images
+  #checkov:skip=CKV_AWS_51:Tags are immutable except latest*, which checkov does not recognise
   name                 = "forms-admin-deploy"
-  image_tag_mutability = "MUTABLE"
+  image_tag_mutability = "IMMUTABLE_WITH_EXCLUSION"
+  image_tag_mutability_exclusion_filter {
+    filter      = "latest*"
+    filter_type = "WILDCARD"
+  }
   image_scanning_configuration {
     scan_on_push = true
   }
@@ -36,9 +44,13 @@ resource "aws_ecr_repository" "forms_admin" {
 
 resource "aws_ecr_repository" "forms_product_page" {
   #checkov:skip=CKV_AWS_136:AWS Managed SSE is sufficient.
-  #checkov:skip=CKV_AWS_51:Permit mutable tags on application images
+  #checkov:skip=CKV_AWS_51:Tags are immutable except latest*, which checkov does not recognise
   name                 = "forms-product-page-deploy"
-  image_tag_mutability = "MUTABLE"
+  image_tag_mutability = "IMMUTABLE_WITH_EXCLUSION"
+  image_tag_mutability_exclusion_filter {
+    filter      = "latest*"
+    filter_type = "WILDCARD"
+  }
   image_scanning_configuration {
     scan_on_push = true
   }
@@ -46,9 +58,13 @@ resource "aws_ecr_repository" "forms_product_page" {
 
 resource "aws_ecr_repository" "end_to_end_tests" {
   #checkov:skip=CKV_AWS_136:AWS Managed SSE is sufficient.
-  #checkov:skip=CKV_AWS_51:Permit mutable tags on pipeline images
+  #checkov:skip=CKV_AWS_51:Tags are immutable except latest*, which checkov does not recognise
   name                 = "end-to-end-tests"
-  image_tag_mutability = "MUTABLE"
+  image_tag_mutability = "IMMUTABLE_WITH_EXCLUSION"
+  image_tag_mutability_exclusion_filter {
+    filter      = "latest*"
+    filter_type = "WILDCARD"
+  }
   image_scanning_configuration {
     scan_on_push = true
   }
@@ -56,9 +72,13 @@ resource "aws_ecr_repository" "end_to_end_tests" {
 
 resource "aws_ecr_repository" "pipeline_visualiser" {
   #checkov:skip=CKV_AWS_136:AWS Managed SSE is sufficient.
-  #checkov:skip=CKV_AWS_51:Permit mutable tags on pipeline images
+  #checkov:skip=CKV_AWS_51:Tags are immutable except latest*, which checkov does not recognise
   name                 = "pipeline-visualiser"
-  image_tag_mutability = "MUTABLE"
+  image_tag_mutability = "IMMUTABLE_WITH_EXCLUSION"
+  image_tag_mutability_exclusion_filter {
+    filter      = "latest*"
+    filter_type = "WILDCARD"
+  }
   image_scanning_configuration {
     scan_on_push = true
   }
