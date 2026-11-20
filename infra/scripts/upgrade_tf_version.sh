@@ -128,7 +128,8 @@ update_terraform() {
 	if [[ "$TF_VERSION" != "latest" ]]; then
 		echo "Updating terraform to specific version: $TF_VERSION"
 	fi
-	tfupdate terraform --version "$TF_VERSION" .
+	# Recursive, so the roots with their own versions.tf move with the shared one
+	tfupdate terraform --version "$TF_VERSION" -r "${GIT_DIR}/infra"
 
 	# Get the version after update
 	local post_version

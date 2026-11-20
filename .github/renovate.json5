@@ -13,10 +13,14 @@
     // and the update would wait forever.
     { matchDatasources: ["docker"], minimumReleaseAgeBehaviour: "timestamp-optional" },
 
-    // Only the required_version in infra/shared/versions.tf. Dependabot owns the
-    // providers in the same file, and the other versions.tf files are symlinks.
+    // Only the required_version in the real versions.tf files. Dependabot owns
+    // the providers in them, and the other versions.tf files are symlinks.
     { matchManagers: ["terraform"], matchPackageNames: ["!hashicorp/terraform"], enabled: false },
-    { matchManagers: ["terraform"], matchFileNames: ["!infra/shared/versions.tf"], enabled: false },
+    {
+      matchManagers: ["terraform"],
+      matchFileNames: ["!infra/shared/versions.tf", "!infra/deployments/forms/dns/versions.tf"],
+      enabled: false,
+    },
     { matchPackageNames: ["hashicorp/terraform"], groupName: "Terraform" },
     { matchPackageNames: ["terraform-linters/tflint"], groupName: "tflint" },
     { matchPackageNames: ["checkov"], groupName: "checkov" },
