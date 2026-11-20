@@ -59,6 +59,26 @@ processors:
       - key: deployment.environment.name
         value: ${env_name}
         action: upsert
+%{ if single_writer_meter_name != "" ~}
+  # Metrics from the single writer meter are recorded by a scheduled job that runs once
+  # across all tasks, so there is only ever one writer. They go through their own pipeline,
+  # which leaves out the per-task and per-process resource attributes, so that each one is a
+  # single series rather than a new series for each task that happened to run the job.
+  filter/exclude_single_writer_metrics:
+    error_mode: ignore
+    metrics:
+      metric:
+        - 'instrumentation_scope.name == "${single_writer_meter_name}"'
+  filter/include_single_writer_metrics:
+    error_mode: ignore
+    metrics:
+      metric:
+        - 'instrumentation_scope.name != "${single_writer_meter_name}"'
+  resource/drop_process_identity:
+    attributes:
+      - pattern: '^(process|telemetry\.sdk)\.'
+        action: delete
+%{ endif ~}
 
 exporters:
   awsxray:
@@ -78,5 +98,11 @@ service:
       exporters: [awsxray]
     metrics:
       receivers: [otlp]
-      processors: [resourcedetection/ecs, resource/env, batch/metrics]
+      processors: [${single_writer_meter_name != "" ? "filter/exclude_single_writer_metrics, " : ""}resourcedetection/ecs, resource/env, batch/metrics]
       exporters: [otlphttp]
+%{ if single_writer_meter_name != "" ~}
+    metrics/single_writer:
+      receivers: [otlp]
+      processors: [filter/include_single_writer_metrics, resource/drop_process_identity, resource/env, batch/metrics]
+      exporters: [otlphttp]
+%{ endif ~}

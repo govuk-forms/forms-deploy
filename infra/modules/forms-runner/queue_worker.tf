@@ -17,6 +17,12 @@ locals {
     "IsMatch(name, \"(BEGIN|COMMIT|SELECT|INSERT|UPDATE|DELETE|EXECUTE) forms-runner-queue\")",
   ]
 
+  # The OpenTelemetry meter that forms-runner uses for metrics recorded by scheduled jobs, such as
+  # DeliveryMetricsJob, which run once across all queue worker tasks. The ADOT collector strips the
+  # per-task and per-process resource attributes from metrics recorded with this meter, to give a
+  # single series for each set of datapoint attributes. Must match Metrics::SINGLE_WRITER_METER_NAME.
+  queue_worker_single_writer_meter_name = "forms-runner.single-writer"
+
   # Round up CPU/memory to next valid Fargate tier when OTEL is enabled,
   # mirroring the logic in the ecs-service module.
   queue_worker_total_cpu    = var.cpu + module.ecs_service.adot_sidecar_cpu
@@ -342,6 +348,8 @@ resource "aws_ssm_parameter" "queue_worker_adot_collector_config" {
     aws_region = data.aws_region.current.region
     env_name   = var.env_name
     drop_spans = local.queue_worker_drop_span_expressions
+
+    single_writer_meter_name = local.queue_worker_single_writer_meter_name
   })
 
   description = "OpenTelemetry collector configuration for the ${local.queue_worker_name} ADOT sidecar in ${var.env_name}"

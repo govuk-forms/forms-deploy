@@ -12,6 +12,8 @@ resource "aws_ssm_parameter" "adot_collector_config" {
     aws_region = data.aws_region.current.region
     env_name   = var.env_name
     drop_spans = var.adot_drop_span_expressions
+
+    single_writer_meter_name = ""
   })
 
   description = "OpenTelemetry collector configuration for the ${var.application} ADOT sidecar in ${var.env_name}"
