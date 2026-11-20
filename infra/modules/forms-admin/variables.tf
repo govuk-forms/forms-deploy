@@ -89,6 +89,11 @@ variable "act_as_user_enabled" {
   default     = false
 }
 
+variable "save_and_return_enabled" {
+  type        = bool
+  description = "Enables the feature to allow users to save their progress and return later"
+  default     = false
+}
 
 variable "enable_mailchimp_sync" {
   type        = bool
