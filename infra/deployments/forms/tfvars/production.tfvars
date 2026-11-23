@@ -146,6 +146,7 @@ forms_admin_settings = {
   govuk_app_domain                 = "publishing.service.gov.uk"
   synchronize_to_mailchimp         = true
   synchronize_orgs_from_govuk      = true
+  save_and_return_enabled          = true
 }
 forms_product_page_settings = {
   cpu          = 256
