@@ -68,24 +68,26 @@ jobs:
               ;;
           esac
 
-          # A new branch has a before of all zeros, and a force push can leave
-          # one that isn't in the history we fetched. Compare with the parent.
-          if ! git cat-file -e "${from}^{commit}" 2> /dev/null; then
-            from="${to}~1"
+          # A new branch has a before of all zeros, and a force push can leave one
+          # that isn't in the history we fetched. Then the changes can't be
+          # worked out, so everything is treated as changed and every check runs,
+          # which is safer than guessing from the last commit alone.
+          if git cat-file -e "${from}^{commit}" 2> /dev/null; then
+            echo "Comparing ${from} with ${to}"
+            echo "diff=${from}...${to}" >> "$GITHUB_OUTPUT"
+          else
+            echo "Can't find ${from}, so treating every file as changed"
+            echo "diff=4b825dc642cb6eb9a060e54bf8d69288fbee4904 ${to}" >> "$GITHUB_OUTPUT"
           fi
-
-          echo "Comparing ${from} with ${to}"
-          echo "from=${from}" >> "$GITHUB_OUTPUT"
-          echo "to=${to}" >> "$GITHUB_OUTPUT"
 
       - name: Check for Terraform changes
         id: check-changes
         env:
-          GIT_FROM: ${{ steps.range.outputs.from }}
-          GIT_TO: ${{ steps.range.outputs.to }}
+          DIFF: ${{ steps.range.outputs.diff }}
         run: |
           set -e -u -o pipefail
-          if [[ $(git diff "${GIT_FROM}"..."${GIT_TO}" --name-only -- "*.tf" "*.tf.json" | wc -l) -eq 0 ]]; then
+          read -r -a range <<< "${DIFF}"
+          if [[ $(git diff "${range[@]}" --name-only -- "*.tf" "*.tf.json" | wc -l) -eq 0 ]]; then
             echo "No Terraform files have changed."
             echo "has-changes=false" >> "$GITHUB_OUTPUT"
           else
@@ -98,11 +100,11 @@ jobs:
       - name: Check for linter changes
         id: check-lint-tools
         env:
-          GIT_FROM: ${{ steps.range.outputs.from }}
-          GIT_TO: ${{ steps.range.outputs.to }}
+          DIFF: ${{ steps.range.outputs.diff }}
         run: |
           set -e -u -o pipefail
-          if [[ $(git diff "${GIT_FROM}"..."${GIT_TO}" --name-only -- \
+          read -r -a range <<< "${DIFF}"
+          if [[ $(git diff "${range[@]}" --name-only -- \
             .mise.toml .tflint.hcl infra/checkov support/run-checkov.sh support/run-tflint.sh \
             .github/workflows/terraform-ci.yml | wc -l) -eq 0 ]]; then
             echo "has-changes=false" >> "$GITHUB_OUTPUT"
@@ -115,13 +117,13 @@ jobs:
         id: build-matrix
         if: steps.check-changes.outputs.has-changes == 'true'
         env:
-          GIT_FROM: ${{ steps.range.outputs.from }}
-          GIT_TO: ${{ steps.range.outputs.to }}
+          DIFF: ${{ steps.range.outputs.diff }}
         run: |
           set -e -u -o pipefail
 
           # Get modified directories
-          git diff "${GIT_FROM}"..."${GIT_TO}" --name-only -- "*.tf" "*.tf.json" \
+          read -r -a range <<< "${DIFF}"
+          git diff "${range[@]}" --name-only -- "*.tf" "*.tf.json" \
           | xargs dirname \
           | sort \
           | uniq \
