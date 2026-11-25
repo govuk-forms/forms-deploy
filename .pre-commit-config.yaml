@@ -62,6 +62,6 @@ repos:
   # Keep in step with the jactionlint pins in .mise.toml and
   # .github/workflows/reusable-lint-workflows.yml.
   - repo: https://github.com/jdx/jactionlint
-    rev: v2.4.0
+    rev: v2.6.0
     hooks:
       - id: jactionlint
