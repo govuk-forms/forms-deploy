@@ -21,6 +21,7 @@ jobs:
     outputs:
       validation-matrix: ${{ steps.build-matrix.outputs.validation-matrix }}
       has-terraform-changes: ${{ steps.check-changes.outputs.has-changes }}
+      has-lint-tool-changes: ${{ steps.check-lint-tools.outputs.has-changes }}
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -35,14 +36,58 @@ jobs:
           github_token: ${{ secrets.MISE_PAT }} # As this is a private repo, we can get API rate limit issues. Use a PAT to avoid this. (The token needs no special permissions.)
           install_args: go go:github.com/hashicorp/terraform-config-inspect
 
+      # The commits to compare depend on the event. A pull request has a base and
+      # a head. The merge queue has its own, and a push to main has the commit
+      # before it and the one after. Without this the SHAs are empty outside a
+      # pull request, the diff is HEAD against itself and every job below is
+      # skipped.
+      - name: Work out the commits to compare
+        id: range
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          MERGE_GROUP_BASE: ${{ github.event.merge_group.base_sha }}
+          MERGE_GROUP_HEAD: ${{ github.event.merge_group.head_sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          PUSH_AFTER: ${{ github.sha }}
+        run: |
+          set -e -u -o pipefail
+          case "${EVENT}" in
+            pull_request)
+              from="${PR_BASE}"
+              to="${PR_HEAD}"
+              ;;
+            merge_group)
+              from="${MERGE_GROUP_BASE}"
+              to="${MERGE_GROUP_HEAD}"
+              ;;
+            *)
+              from="${PUSH_BEFORE}"
+              to="${PUSH_AFTER}"
+              ;;
+          esac
+
+          # A new branch has a before of all zeros, and a force push can leave one
+          # that isn't in the history we fetched. Then the changes can't be
+          # worked out, so everything is treated as changed and every check runs,
+          # which is safer than guessing from the last commit alone.
+          if git cat-file -e "${from}^{commit}" 2> /dev/null; then
+            echo "Comparing ${from} with ${to}"
+            echo "diff=${from}...${to}" >> "$GITHUB_OUTPUT"
+          else
+            echo "Can't find ${from}, so treating every file as changed"
+            echo "diff=4b825dc642cb6eb9a060e54bf8d69288fbee4904 ${to}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Check for Terraform changes
         id: check-changes
         env:
-          GIT_FROM: ${{github.event.pull_request.base.sha}}
-          GIT_TO: ${{github.event.pull_request.head.sha}}
+          DIFF: ${{ steps.range.outputs.diff }}
         run: |
           set -e -u -o pipefail
-          if [[ $(git diff "${GIT_FROM}"..."${GIT_TO}" --name-only -- "*.tf" "*.tf.json" | wc -l) -eq 0 ]]; then
+          read -r -a range <<< "${DIFF}"
+          if [[ $(git diff "${range[@]}" --name-only -- "*.tf" "*.tf.json" | wc -l) -eq 0 ]]; then
             echo "No Terraform files have changed."
             echo "has-changes=false" >> "$GITHUB_OUTPUT"
           else
@@ -50,17 +95,35 @@ jobs:
             echo "has-changes=true" >> "$GITHUB_OUTPUT"
           fi
 
+      # Checkov and tflint scan all of infra/ whatever changed, so a new version
+      # of either, or a change to a check or its config, has to run them too.
+      - name: Check for linter changes
+        id: check-lint-tools
+        env:
+          DIFF: ${{ steps.range.outputs.diff }}
+        run: |
+          set -e -u -o pipefail
+          read -r -a range <<< "${DIFF}"
+          if [[ $(git diff "${range[@]}" --name-only -- \
+            .mise.toml .tflint.hcl infra/checkov support/run-checkov.sh support/run-tflint.sh \
+            .github/workflows/terraform-ci.yml | wc -l) -eq 0 ]]; then
+            echo "has-changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "The linters or their configuration have changed."
+            echo "has-changes=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build validation matrix
         id: build-matrix
         if: steps.check-changes.outputs.has-changes == 'true'
         env:
-          GIT_FROM: ${{github.event.pull_request.base.sha}}
-          GIT_TO: ${{github.event.pull_request.head.sha}}
+          DIFF: ${{ steps.range.outputs.diff }}
         run: |
           set -e -u -o pipefail
 
           # Get modified directories
-          git diff "${GIT_FROM}"..."${GIT_TO}" --name-only -- "*.tf" "*.tf.json" \
+          read -r -a range <<< "${DIFF}"
+          git diff "${range[@]}" --name-only -- "*.tf" "*.tf.json" \
           | xargs dirname \
           | sort \
           | uniq \
@@ -186,7 +249,7 @@ jobs:
   tflint:
     name: "tflint"
     needs: setup
-    if: needs.setup.outputs.has-terraform-changes == 'true'
+    if: needs.setup.outputs.has-terraform-changes == 'true' || needs.setup.outputs.has-lint-tool-changes == 'true'
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 20
     steps:
@@ -220,7 +283,7 @@ jobs:
   checkov:
     name: "Checkov"
     needs: setup
-    if: needs.setup.outputs.has-terraform-changes == 'true'
+    if: needs.setup.outputs.has-terraform-changes == 'true' || needs.setup.outputs.has-lint-tool-changes == 'true'
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 20
     steps:
