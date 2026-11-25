@@ -15,7 +15,7 @@ terraform {
     }
     auth0 = {
       source  = "auth0/auth0"
-      version = "1.61.0"
+      version = "1.62.0"
     }
     random = {
       source  = "hashicorp/random"
