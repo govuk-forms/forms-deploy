@@ -9,6 +9,7 @@ on:
       - ".github/workflows/ruby-ci.yml"
       - "infra/**"
       - ".mise.toml"
+      - "**/.ruby-version"
   merge_group:
     types: [checks_requested]
   push:
