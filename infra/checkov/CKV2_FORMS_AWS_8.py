@@ -16,8 +16,7 @@ class CKV2_FORMS_AWS_8(BaseResourceCheck):
         # Valid CheckCategories are defined in checkov/common/models/enums.py
         categories = [CheckCategories.NETWORKING]
 
-        # Hash of encountered_priorities
-        # [directory] => [listener_arn] => string array
+        # [directory] => [listener_arn] => [priority] => entity_path of the rule
         self.encountered_priorities = {}
 
         super().__init__(name=description, id=id, categories=categories, supported_resources=supported_resources)
@@ -28,25 +27,17 @@ class CKV2_FORMS_AWS_8(BaseResourceCheck):
         priority = conf["priority"][0]
         listener_arn = conf["listener_arn"][0]
 
-        existing_modules = self.encountered_priorities.get(dir_name)
+        seen = self.encountered_priorities.setdefault(dir_name, {}).setdefault(listener_arn, {})
+        owner = seen.setdefault(priority, self.entity_path)
 
-        if existing_modules == None:
-            self.encountered_priorities[dir_name] = {listener_arn: [priority]}
-            return CheckResult.PASSED
-        else:
-            existing_listener_priorities = existing_modules.get(listener_arn)
-            if existing_listener_priorities == None:
-                self.encountered_priorities[dir_name][listener_arn] = [priority]
-                return CheckResult.PASSED
-            else:
-                if priority in existing_listener_priorities:
-                    self.details.append(f"Priority value {priority} is not unique for {listener_arn} in {dir_name}")
-                    self.details.append(f"Previously seen values are: {existing_listener_priorities}")
-                    return CheckResult.FAILED
-                else:
-                    self.encountered_priorities[dir_name][listener_arn].append(priority)
-                    return CheckResult.PASSED
+        # Checkov evaluates a resource again when a run scans more than one
+        # directory that reaches it, and that mustn't count as a clash.
+        if owner != self.entity_path:
+            self.details.append(f"Priority value {priority} is not unique for {listener_arn} in {dir_name}")
+            self.details.append(f"Previously seen values are: {list(seen)}")
+            return CheckResult.FAILED
 
+        return CheckResult.PASSED
 
 
 check = CKV2_FORMS_AWS_8()
