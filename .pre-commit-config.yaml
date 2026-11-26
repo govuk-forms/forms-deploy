@@ -47,7 +47,7 @@ repos:
         language: python
         # Keep in step with the checkov pin in .mise.toml.
         additional_dependencies:
-          - checkov==3.4.5
+          - checkov==3.4.6
         require_serial: true
         files: ^infra/(checkov/|.*\.(tf|tfvars|hcl)$)
         pass_filenames: true
