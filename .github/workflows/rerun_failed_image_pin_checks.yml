@@ -1,0 +1,45 @@
+name: "Re-run failed image pin checks"
+
+# An image that Renovate proposes is often on Docker Hub before it reaches ECR.
+# The pin check fails until the mirror catches up, and a failed check doesn't
+# run again by itself, so this runs it again for open pull requests.
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  rerun:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
+    permissions:
+      actions: write
+      pull-requests: read
+
+    name: Re-run failed image pin checks
+    steps:
+      - name: Re-run the failed checks on open pull requests
+        # Explicitly bash, so the pipeline below fails when `gh run list` does.
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          open_heads=$(gh pr list --state open --limit 200 --json headRefOid --jq '.[].headRefOid')
+          # After three days it is not the mirror, so leave it to a person.
+          oldest=$(date -u -d '3 days ago' +%s)
+
+          # Only the newest run for a commit counts. An older failure doesn't
+          # matter once a later run for the same commit has passed.
+          gh run list --workflow guardrail_image_pins.yml --event pull_request --limit 100 \
+            --json databaseId,headSha,createdAt,status,conclusion \
+            --jq 'group_by(.headSha) | map(max_by(.createdAt)) | .[] | select(.status == "completed" and .conclusion == "failure") | [.databaseId, .headSha, .createdAt] | @tsv' |
+            while IFS=$'\t' read -r run_id head_sha created_at; do
+              grep -qx "${head_sha}" <<<"${open_heads}" || continue
+              [ "$(date -u -d "${created_at}" +%s)" -ge "${oldest}" ] || continue
+              echo "Re-running ${run_id} for ${head_sha}"
+              gh run rerun "${run_id}" --failed
+            done

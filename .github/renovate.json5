@@ -34,6 +34,16 @@
       schedule: ["* * 1-7 * *"],
     },
 
+    // ECR publishes no tag dates, but these images are mirrors of Docker Hub
+    // images, which have them. The two managers below look them up on Docker
+    // Hub, so switch off the lookup on ECR or each would be found twice. (A
+    // negative lookahead isn't available here: Renovate uses the RE2 engine.)
+    {
+      matchDatasources: ["docker"],
+      matchPackageNames: ["public.ecr.aws/docker/library/**", "public.ecr.aws/aws-observability/aws-otel-collector"],
+      enabled: false,
+    },
+
     // The mise manager drops the v from these pins, which would no longer match
     // the ones in pre-commit and Terraform. The annotations in .mise.toml cover
     // them instead.
@@ -74,6 +84,26 @@
       matchStrings: ["\"(?<depName>(?:public\\.ecr\\.aws|docker\\.io)/[\\w./-]+):(?<currentValue>v?\\d[\\w.-]*)\""],
       datasourceTemplate: "docker",
       depTypeTemplate: "image",
+    },
+    {
+      // Mirrors of Docker Official Images. The lookup goes to Docker Hub for the
+      // dates and the pin stays on ECR, which serves the same digests.
+      customType: "regex",
+      managerFilePatterns: ["/^infra/.*\\.tf$/"],
+      matchStrings: ["\"public\\.ecr\\.aws/docker/library/(?<image>[\\w.-]+):(?<currentValue>v?\\d[\\w.-]*)\""],
+      datasourceTemplate: "docker",
+      depTypeTemplate: "image",
+      depNameTemplate: "public.ecr.aws/docker/library/{{{image}}}",
+      packageNameTemplate: "docker.io/library/{{{image}}}",
+    },
+    {
+      customType: "regex",
+      managerFilePatterns: ["/^infra/.*\\.tf$/"],
+      matchStrings: ["\"public\\.ecr\\.aws/aws-observability/aws-otel-collector:(?<currentValue>v?\\d[\\w.-]*)\""],
+      datasourceTemplate: "docker",
+      depTypeTemplate: "image",
+      depNameTemplate: "public.ecr.aws/aws-observability/aws-otel-collector",
+      packageNameTemplate: "docker.io/amazon/aws-otel-collector",
     },
     {
       managerFilePatterns: ["/^infra/modules/renovate/variables\\.tf$/"],
