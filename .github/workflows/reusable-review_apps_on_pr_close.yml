@@ -12,6 +12,8 @@ on:
         type: string
         description: "The name of the application, used for the ECR repository and CodeBuild project. eg. forms-product-page"
 
+permissions: {}
+
 jobs:
   delete-review-app:
     runs-on: ubuntu-24.04-arm

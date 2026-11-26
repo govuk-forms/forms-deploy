@@ -21,7 +21,7 @@ jobs:
     # Runs on pull requests, in the merge queue and on pushes to main. The queue
     # checks a change as it will land, with whatever is ahead of it in the queue,
     # and a push to main also keeps pre-commit's cache up to date.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     # Required, for 'required PR status checks' on GitHub, so the name has to stay.
     # It runs on every event, so a failure here fails the required check itself.
