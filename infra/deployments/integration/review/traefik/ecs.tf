@@ -65,6 +65,7 @@ resource "aws_ecs_task_definition" "traefik" {
 resource "aws_ecs_service" "traefik" {
   #checkov:skip=CKV_AWS_332:We don't want to target "LATEST" and get a surprise when a new version is released.
   #checkov:skip=CKV2_FORMS_AWS_2:We will not be autoscaling this service
+  #checkov:skip=CKV2_FORMS_AWS_10:Review apps are disposable, so downtime from replacing this service does not matter
   name                               = "traefik"
   cluster                            = var.ecs_cluster_arn
   task_definition                    = aws_ecs_task_definition.traefik.arn

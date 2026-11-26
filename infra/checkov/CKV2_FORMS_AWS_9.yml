@@ -1,0 +1,22 @@
+---
+metadata:
+  name: "Check that ECR repositories make image tags immutable"
+  id: "CKV2_FORMS_AWS_9"
+  category: "CONVENTION"
+  guideline: |
+    Pipelines promote an image by its tag, so a tag must always mean the same
+    image. Repositories use IMMUTABLE, or IMMUTABLE_WITH_EXCLUSION to leave
+    moving tags such as latest* mutable.
+
+    Checkov's built-in CKV_AWS_51 doesn't recognise IMMUTABLE_WITH_EXCLUSION.
+scope:
+  provider: "AWS"
+definition:
+  cond_type: "attribute"
+  resource_types:
+    - "aws_ecr_repository"
+  attribute: "image_tag_mutability"
+  operator: "within"
+  value:
+    - "IMMUTABLE"
+    - "IMMUTABLE_WITH_EXCLUSION"
