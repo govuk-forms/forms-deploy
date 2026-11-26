@@ -22,6 +22,7 @@ jobs:
       validation-matrix: ${{ steps.build-matrix.outputs.validation-matrix }}
       has-terraform-changes: ${{ steps.check-changes.outputs.has-changes }}
       has-lint-tool-changes: ${{ steps.check-lint-tools.outputs.has-changes }}
+      has-renovate-lambda-changes: ${{ steps.check-renovate-lambda.outputs.has-changes }}
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -110,6 +111,23 @@ jobs:
             echo "has-changes=false" >> "$GITHUB_OUTPUT"
           else
             echo "The linters or their configuration have changed."
+            echo "has-changes=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # The Renovate Lambdas are packaged by Terraform and have their own tests.
+      - name: Check for Renovate Lambda changes
+        id: check-renovate-lambda
+        env:
+          DIFF: ${{ steps.range.outputs.diff }}
+        run: |
+          set -e -u -o pipefail
+          read -r -a range <<< "${DIFF}"
+          if [[ $(git diff "${range[@]}" --name-only -- \
+            infra/modules/renovate/lambda infra/modules/renovate/tests \
+            .github/workflows/terraform-ci.yml | wc -l) -eq 0 ]]; then
+            echo "has-changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "The Renovate Lambdas or their tests have changed."
             echo "has-changes=true" >> "$GITHUB_OUTPUT"
           fi
 
@@ -300,12 +318,32 @@ jobs:
         run: |
           ./support/run-checkov.sh
 
+  renovate-lambda-tests:
+    name: "Renovate Lambda tests"
+    needs: setup
+    if: needs.setup.outputs.has-renovate-lambda-changes == 'true'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Initialise mise
+        uses: jdx/mise-action@d5574b52816a478f9d4e6529a3f6ff17a8a36785 # v5.2.8
+        with:
+          github_token: ${{ secrets.MISE_PAT }}
+          install_args: node
+
+      # Glob, because Node 22 treats a directory argument as a module to load.
+      - name: Run tests
+        run: node --test 'infra/modules/renovate/tests/*.test.js'
+
   report:
     # Required, for 'required PR status checks' on GitHub.
     name: "Run terraform tests"
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 20
-    needs: [setup, terraform-fmt, terraform-validate, tflint, checkov]
+    needs: [setup, terraform-fmt, terraform-validate, tflint, checkov, renovate-lambda-tests]
     if: ${{ always() }}
     steps:
       # A job that is skipped is reported to GitHub as a success, which satisfies a

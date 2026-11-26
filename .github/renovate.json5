@@ -44,6 +44,9 @@
     // find them again under other names.
     { matchManagers: ["pre-commit"], matchDepTypes: ["pre-commit-golang", "pre-commit-python"], enabled: false },
 
+    // The Lambda runtime sets the Node major.
+    { matchManagers: ["mise"], matchDepNames: ["node"], matchUpdateTypes: ["major"], enabled: false },
+
     // A major release of these changes what the checks report, so it should be
     // a deliberate change.
     { matchPackageNames: ["terraform-linters/tflint", "checkov"], matchUpdateTypes: ["major"], enabled: false },

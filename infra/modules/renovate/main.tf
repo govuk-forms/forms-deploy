@@ -4,6 +4,9 @@ data "aws_region" "current" {}
 locals {
   aws_account_id = data.aws_caller_identity.current.account_id
   aws_region     = data.aws_region.current.region
+
+  # Where the orchestrator leaves each build's token, one parameter per repo.
+  token_parameter_prefix = "/renovate/token"
 }
 
 resource "aws_cloudwatch_log_group" "renovate" {
@@ -51,10 +54,7 @@ locals {
 
     phases = {
       build = {
-        commands = [
-          "echo '${base64encode(file("${path.module}/mint-token.js"))}' | base64 -d > /tmp/mint-token.js",
-          file("${path.module}/run-renovate.sh"),
-        ]
+        commands = [file("${path.module}/run-renovate.sh")]
       }
     }
   }
@@ -63,13 +63,17 @@ locals {
 resource "aws_codebuild_project" "renovate" {
   #checkov:skip=CKV_AWS_147:Amazon Managed SSE is sufficient
   name          = "renovate"
-  description   = "Runs Renovate against ${join(", ", var.repositories)}"
+  description   = "Runs Renovate against the repositories the GitHub App is installed on"
   service_role  = aws_iam_role.codebuild.arn
   build_timeout = 30
 
-  # The cache below is one object, overwritten by each build, which is only safe
-  # while builds run one at a time.
-  concurrent_build_limit = 1
+  # A token lasts an hour from when the orchestrator mints it, so a build that
+  # waits in the queue has to start well inside that.
+  queued_timeout = 15
+
+  # A start beyond the limit is rejected, not queued. The orchestrator holds
+  # requests until a build ends, so this is a backstop for builds started by hand.
+  concurrent_build_limit = var.concurrent_builds
 
   source {
     type      = "NO_SOURCE"
@@ -99,35 +103,8 @@ resource "aws_codebuild_project" "renovate" {
     type                        = "LINUX_CONTAINER"
 
     environment_variable {
-      name  = "GITHUB_APP_ID"
-      type  = "PARAMETER_STORE"
-      value = aws_ssm_parameter.github_app_id.name
-    }
-
-    environment_variable {
-      name  = "GITHUB_APP_PRIVATE_KEY"
-      type  = "PARAMETER_STORE"
-      value = aws_ssm_parameter.github_app_private_key.name
-    }
-
-    environment_variable {
-      name  = "GITHUB_ORG"
-      value = var.github_organisation
-    }
-
-    environment_variable {
-      name  = "GITHUB_REPOSITORIES"
-      value = join(",", var.repositories)
-    }
-
-    environment_variable {
       name  = "RENOVATE_PLATFORM"
       value = "github"
-    }
-
-    environment_variable {
-      name  = "RENOVATE_REPOSITORIES"
-      value = join(",", var.repositories)
     }
 
     environment_variable {
