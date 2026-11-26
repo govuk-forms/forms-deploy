@@ -6,6 +6,8 @@ concurrency:
   group: require-pinned-github-actions-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+permissions: {}
+
 jobs:
   check-actions-sha:
     name: Check actions are pinned to SHAs

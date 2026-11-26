@@ -2,6 +2,9 @@ name: "Build image"
 on:
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
   build-image:
     runs-on: ubuntu-24.04-arm

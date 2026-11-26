@@ -13,6 +13,9 @@ env:
   # step with the jactionlint pins in .mise.toml and .pre-commit-config.yaml.
   JACTIONLINT_VERSION: "2.6.0"
 
+permissions:
+  contents: read
+
 jobs:
   jactionlint:
     runs-on: ubuntu-slim
