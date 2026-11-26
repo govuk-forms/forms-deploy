@@ -92,6 +92,8 @@ The module's `dry_run` variable defaults to `full`: Renovate logs what it would 
 
 Renovate keeps two caches in the module's S3 bucket. The package cache (lookup results and release notes) is a directory that CodeBuild archives between builds. The repository cache is written by Renovate itself, one object per repo under `repository-cache/`. A build that fails contributes nothing to the package cache, and a cold run after any change of cache prefix is slow.
 
+The runner lets a repo's config run exactly one command: `support/update-hcl2json-sha.sh`, which Renovate runs after bumping `HCL2JSON_VERSION` to write the matching `HCL2JSON_SHA256` into the same commit. The build removes the App's private key from the environment once it has minted the installation token, so the command doesn't see it. The token itself, scoped to the listed repos and valid for about an hour, is still in the environment, and the allow-list applies to every repo the runner serves.
+
 #### Logs and metrics
 
 Renovate logs one JSON object per line at debug level. Metric filters turn the build log into metrics in the `Renovate` namespace: `LogErrors` and `LogWarnings`, and, per repository, `PullRequestsCreated`, `PullRequestsUpdated` and `AbandonedDependencies`. The `renovate-log-errors` alarm notifies the failure topic when a run logs an error, which a build that still succeeds would not report. A dependency counts as abandoned when its last release is more than a year old, and Renovate only logs it, so the metric is the way to see it.

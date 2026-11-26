@@ -11,7 +11,18 @@
     { matchPackageNames: ["terraform-linters/tflint"], groupName: "tflint", addLabels: ["tools"] },
     { matchPackageNames: ["checkov"], groupName: "checkov", addLabels: ["tools"] },
     { matchPackageNames: ["jdx/jactionlint"], groupName: "jactionlint", addLabels: ["tools"] },
-    { matchPackageNames: ["tmccombs/hcl2json"], groupName: "hcl2json", addLabels: ["tools"] },
+    {
+      matchPackageNames: ["tmccombs/hcl2json"],
+      groupName: "hcl2json",
+      addLabels: ["tools"],
+      // The drift detection image checks the download against a hash, which
+      // has to move with the version. The runner allows this one command.
+      postUpgradeTasks: {
+        commands: ["./support/update-hcl2json-sha.sh {{{newVersion}}}"],
+        fileFilters: ["infra/modules/drift-detection/main.tf"],
+        executionMode: "branch",
+      },
+    },
     { matchPackageNames: ["public.ecr.aws/codebuild/**"], groupName: "CodeBuild images" },
     // The runner image and the pre-commit validator image are one pin in two
     // files. Renovate releases several times a day and each bump is a manual

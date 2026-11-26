@@ -165,6 +165,13 @@ resource "aws_codebuild_project" "renovate" {
       value = "10"
     }
 
+    # The only command a repository's config may ask Renovate to run. It refreshes
+    # the hash that sits next to the hcl2json version.
+    environment_variable {
+      name  = "RENOVATE_ALLOWED_COMMANDS"
+      value = jsonencode(["^\\./support/update-hcl2json-sha\\.sh v[0-9]+\\.[0-9]+\\.[0-9]+$"])
+    }
+
     environment_variable {
       name  = "RENOVATE_CACHE_DIR"
       value = local.cache_dir
