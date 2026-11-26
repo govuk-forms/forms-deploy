@@ -49,6 +49,10 @@
     // dashboard. Renovate sets no renovate/stability-days status on these, so
     // the label is how the release age check tells them from a missing status.
     //
+    // This matches the name Renovate looks an image up by. Images that we pull
+    // from ECR or ghcr but look up on Docker Hub (see renovate.json5) are named
+    // after Docker Hub, so they don't match. They have dates, and open a pull
+    // request on their own once the update is 7 days old.
     {
       matchDatasources: ["docker"],
       matchPackageNames: ["public.ecr.aws/**", "ghcr.io/**"],
