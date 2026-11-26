@@ -61,6 +61,15 @@ repos:
         language: system
         entry: bundle exec rubocop --force-exclusion
 
+      - id: renovate-config-validator
+        name: renovate config
+        language: docker_image
+        # Looked up on Docker Hub, because ghcr has no release dates.
+        # renovate: datasource=docker depName=ghcr.io/renovatebot/renovate packageName=docker.io/renovate/renovate depType=image
+        entry: --entrypoint renovate-config-validator ghcr.io/renovatebot/renovate:44.199.2 --strict
+        files: ^\.github/renovate.*\.json5$
+        pass_filenames: true
+
   # Keep in step with the jactionlint pins in .mise.toml and the action in
   # .github/workflows/reusable-lint-workflows.yml.
   - repo: https://github.com/jdx/jactionlint
