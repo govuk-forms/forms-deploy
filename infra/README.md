@@ -82,6 +82,41 @@ To recreate the `deploy` environment, apply the following roots:
 The `forms.service.gov.uk` domain is delegated to a Route53 Hosted Zone in our production environment. The `production` configuration of the `forms/account` root manages records to delegate the `dev.`, `staging.`, and `research.` subdomains to Route53 Hosted Zones in their respective environments. This is achieved by creating `NS` records within the production Hosted Zone which point to the name server addresses output when applying the `forms/account` root in each environment.
 
 
+### Renovate
+
+Dependabot keeps actions, bundler, npm and the Terraform providers up to date. [Renovate](https://docs.renovatebot.com/) handles the pins that are duplicated across files or repos and have to move together: Ruby, Alpine, Terraform and the tool versions. The shared rules are in `.github/renovate-shared.json5`, and each repo extends them with `github>govuk-forms/forms-deploy//.github/renovate-shared.json5`.
+
+Renovate runs as the `renovate` CodeBuild project in the deploy account, defined by `modules/renovate` and called from the `deploy/tools` root. EventBridge starts it on `renovate_schedule`, and you can start it by hand with `aws codebuild start-build --project-name renovate`. Logs are in the `/aws/codebuild/renovate` log group.
+
+The module's `dry_run` variable defaults to `full`: Renovate logs what it would do and opens no branches or pull requests. Set `dry_run = null` in `deploy/tools/renovate.tf` to run it for real.
+
+Renovate keeps two caches in the module's S3 bucket. The package cache (lookup results and release notes) is a directory that CodeBuild archives between builds. The repository cache is written by Renovate itself, one object per repo under `repository-cache/`. A build that fails contributes nothing to the package cache, and a cold run after any change of cache prefix is slow.
+
+The runner lets a repo's config run exactly one command: `support/update-hcl2json-sha.sh`, which Renovate runs after bumping `HCL2JSON_VERSION` to write the matching `HCL2JSON_SHA256` into the same commit. The build removes the App's private key from the environment once it has minted the installation token, so the command doesn't see it. The token itself, scoped to the listed repos and valid for about an hour, is still in the environment, and the allow-list applies to every repo the runner serves.
+
+#### Logs and metrics
+
+Renovate logs one JSON object per line at debug level. Metric filters turn the build log into metrics in the `Renovate` namespace: `LogErrors` and `LogWarnings`, and, per repository, `PullRequestsCreated`, `PullRequestsUpdated` and `AbandonedDependencies`. The `renovate-log-errors` alarm notifies the failure topic when a run logs an error, which a build that still succeeds would not report. A dependency counts as abandoned when its last release is more than a year old, and Renovate only logs it, so the metric is the way to see it.
+
+#### The GitHub App
+
+Renovate signs in as an organisation-owned GitHub App, because pull requests opened with a workflow's own token don't trigger CI. The build mints a short-lived installation token from the App's private key at the start of each run.
+
+The App needs these repository permissions: Contents, Issues, Pull requests, Workflows, Checks and Commit statuses (read and write), and Metadata and Dependabot alerts (read). Install it only on the repos Renovate runs against.
+
+Terraform creates the two SSM parameters with a dummy value. Set the real values by hand:
+
+```sh
+aws ssm put-parameter --name /renovate/github-app-id --type SecureString --overwrite --value "<app id>"
+aws ssm put-parameter --name /renovate/github-app-private-key --type SecureString --overwrite --value file://private-key.pem
+```
+
+#### Adding a repo
+
+1. Install the GitHub App on the repo.
+2. Add the repo to `repositories` in `deploy/tools/renovate.tf`.
+3. Add a `renovate.json5` to the repo that extends the shared preset.
+
 ### Linting and Static Analysis
 
 [pre-commit](https://pre-commit.com/) runs checks on the Terraform code each time a developer runs `git commit`. The checks are defined within `forms-deploy/pre-commit-config.yaml` and include the following:

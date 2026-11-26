@@ -11,7 +11,18 @@
     { matchPackageNames: ["terraform-linters/tflint"], groupName: "tflint", addLabels: ["tools"] },
     { matchPackageNames: ["checkov"], groupName: "checkov", addLabels: ["tools"] },
     { matchPackageNames: ["jdx/jactionlint"], groupName: "jactionlint", addLabels: ["tools"] },
-    { matchPackageNames: ["tmccombs/hcl2json"], groupName: "hcl2json", addLabels: ["tools"] },
+    {
+      matchPackageNames: ["tmccombs/hcl2json"],
+      groupName: "hcl2json",
+      addLabels: ["tools"],
+      // The drift detection image checks the download against a hash, which
+      // has to move with the version. The runner allows this one command.
+      postUpgradeTasks: {
+        commands: ["./support/update-hcl2json-sha.sh {{{newVersion}}}"],
+        fileFilters: ["infra/modules/drift-detection/main.tf"],
+        executionMode: "branch",
+      },
+    },
     { matchPackageNames: ["public.ecr.aws/codebuild/**"], groupName: "CodeBuild images" },
     // The runner image and the pre-commit validator image are one pin in two
     // files. Renovate releases several times a day and each bump is a manual
@@ -60,6 +71,16 @@
       matchStrings: ["\"(?<depName>(?:public\\.ecr\\.aws|docker\\.io)/[\\w./-]+):(?<currentValue>v?\\d[\\w.-]*)\""],
       datasourceTemplate: "docker",
       depTypeTemplate: "image",
+    },
+    {
+      managerFilePatterns: ["/^infra/modules/renovate/variables\\.tf$/"],
+      customType: "regex",
+      matchStrings: ["\"(?<depName>ghcr\\.io/renovatebot/renovate):(?<currentValue>[\\d.]+)@(?<currentDigest>sha256:[a-f0-9]{64})\""],
+      datasourceTemplate: "docker",
+      depTypeTemplate: "image",
+      // ghcr publishes no tag dates. Docker Hub has the same image with the same
+      // digests, so the lookup goes there and the pin stays on ghcr.
+      packageNameTemplate: "docker.io/renovate/renovate",
     },
     {
       // CodeBuild images are published to the public ECR "codebuild" namespace.
