@@ -1,0 +1,100 @@
+name: "Renovate release age"
+on:
+  pull_request:
+    # Renovate adds the labels after it opens the pull request.
+    types: [opened, reopened, synchronize, labeled, unlabeled]
+  # Renovate setting renovate/stability-days to success is the only sign that an
+  # update has aged. A workflow for this event runs from the default branch, so
+  # it can't report the check itself and re-runs the pull request's run instead.
+  status:
+  # A required check has to report on the merge queue's commit as well. The job
+  # below is skipped there, which counts as a pass: no Renovate status exists
+  # on that commit.
+  merge_group:
+    types: [checks_requested]
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+# Every status event starts a run of this workflow, and a queued run replaces
+# an earlier queued one in its group. Keying status events by commit, context
+# and state stops an unrelated status from displacing the pending run for
+# renovate/stability-days, and two pull requests turning green at once can't
+# cancel each other's re-run.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || (github.event_name == 'status' && format('{0}-{1}-{2}', github.event.sha, github.event.context, github.event.state)) || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    # The ruleset requires this job and not renovate/stability-days. See
+    # support/check-renovate-release-age.sh.
+    name: "Renovate release age"
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      statuses: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check the update has met the minimum release age
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+        run: ./support/check-renovate-release-age.sh "${REPO}" "${SHA}" "${HEAD_REF}" "${AUTHOR}" "${LABELS}"
+
+  rerun:
+    name: "Re-run Renovate release age"
+    if: >-
+      github.event_name == 'status'
+      && github.event.context == 'renovate/stability-days'
+      && github.event.state == 'success'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 5
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      # The success can arrive while the pull request's own run is still going,
+      # and a run with no conclusion yet can't be judged, so wait for it. Only the
+      # newest run for the commit counts, so an old failure is never re-run once
+      # a later run has passed.
+      - name: Re-run the failed check on the pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.sha }}
+        run: |
+          for attempt in $(seq 1 16); do
+            run="$(gh run list --repo "${REPO}" --workflow renovate_release_age.yml \
+              --commit "${SHA}" --event pull_request --limit 1 \
+              --json databaseId,status,conclusion --jq '.[0] // empty')"
+            if [[ -z "${run}" ]]; then
+              echo "No run to re-run for ${SHA}."
+              exit 0
+            fi
+            [[ "$(jq -r .status <<<"${run}")" == "completed" ]] && break
+            echo "The run hasn't finished (${attempt}/16)"
+            sleep 15
+          done
+
+          if [[ "$(jq -r .status <<<"${run}")" != "completed" ]]; then
+            echo "The run is still going, so there is nothing to re-run yet."
+            exit 0
+          fi
+          if [[ "$(jq -r .conclusion <<<"${run}")" != "failure" ]]; then
+            echo "The newest run didn't fail."
+            exit 0
+          fi
+          gh run rerun "$(jq -r .databaseId <<<"${run}")" --repo "${REPO}" --failed
