@@ -7,6 +7,7 @@ on:
       - ".pre-commit-config.yaml"
       - ".github/workflows/reusable-lint-workflows.yml"
       - "infra/modules/drift-detection/main.tf"
+      - "infra/modules/renovate/variables.tf"
       - "**/.ruby-version"
       - "support/pipeline-visualiser/Dockerfile"
       - "support/check-versions-in-sync.sh"
@@ -64,6 +65,13 @@ jobs:
                 yq: '.repos[] | select(.repo == "https://github.com/jdx/jactionlint") | (.rev // "")'
               - file: .github/workflows/reusable-lint-workflows.yml
                 sed: '.*uses: jdx\/jactionlint@[0-9a-f]+ # (v[0-9.]+).*'
+
+          - tool: Renovate
+            places:
+              - file: .pre-commit-config.yaml
+                sed: '.*ghcr\.io\/renovatebot\/renovate:([0-9.]+) .*'
+              - file: infra/modules/renovate/variables.tf
+                sed: '.*ghcr\.io\/renovatebot\/renovate:([0-9.]+)@.*'
 
           - tool: Ruby
             places:

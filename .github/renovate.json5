@@ -62,6 +62,16 @@
       depTypeTemplate: "image",
     },
     {
+      managerFilePatterns: ["/^infra/modules/renovate/variables\\.tf$/"],
+      customType: "regex",
+      matchStrings: ["\"(?<depName>ghcr\\.io/renovatebot/renovate):(?<currentValue>[\\d.]+)@(?<currentDigest>sha256:[a-f0-9]{64})\""],
+      datasourceTemplate: "docker",
+      depTypeTemplate: "image",
+      // ghcr publishes no tag dates. Docker Hub has the same image with the same
+      // digests, so the lookup goes there and the pin stays on ghcr.
+      packageNameTemplate: "docker.io/renovate/renovate",
+    },
+    {
       // CodeBuild images are published to the public ECR "codebuild" namespace.
       customType: "regex",
       managerFilePatterns: ["/^infra/.*\\.tf$/"],
