@@ -1,0 +1,32 @@
+name: "Report: Pins across the forms repos"
+
+on:
+  schedule:
+    - cron: "30 7 * * 1"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "support/cross-repo-pin-report.sh"
+      - ".github/workflows/cross_repo_pin_report.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  report_pins:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    name: Report pins across the forms repos
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # The repos are public, so the workflow's own token can read them.
+      - name: Compare the pins
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./support/cross-repo-pin-report.sh
