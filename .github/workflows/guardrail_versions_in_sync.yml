@@ -8,6 +8,7 @@ on:
       - ".github/workflows/reusable-lint-workflows.yml"
       - "infra/modules/drift-detection/main.tf"
       - "infra/modules/renovate/variables.tf"
+      - "infra/modules/renovate/orchestrator.tf"
       - "**/.ruby-version"
       - "support/pipeline-visualiser/Dockerfile"
       - "support/check-versions-in-sync.sh"
@@ -72,6 +73,13 @@ jobs:
                 sed: '.*ghcr\.io\/renovatebot\/renovate:([0-9.]+) .*'
               - file: infra/modules/renovate/variables.tf
                 sed: '.*ghcr\.io\/renovatebot\/renovate:([0-9.]+)@.*'
+
+          - tool: Node major
+            places:
+              - file: .mise.toml
+                sed: '^node *= *"([0-9]+)\..*'
+              - file: infra/modules/renovate/orchestrator.tf
+                sed: '.*runtime *= *"nodejs([0-9]+)\.x".*'
 
           - tool: Ruby
             places:
