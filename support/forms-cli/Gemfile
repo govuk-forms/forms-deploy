@@ -9,7 +9,7 @@ gem "rexml", "~> 3.4" # aws-sdk-secretsmanager requires an xml library
 
 group :development, :test do
   gem "rspec"
-  gem "rubocop-govuk", "~> 5.2"
+  gem "rubocop-govuk", "~> 6.0"
 end
 
 group :development do
