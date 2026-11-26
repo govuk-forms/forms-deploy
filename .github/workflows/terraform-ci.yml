@@ -305,8 +305,20 @@ jobs:
     name: "Run terraform tests"
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 20
-    needs: [terraform-fmt, terraform-validate, tflint, checkov]
-    if: ${{ always() && !failure() && !cancelled() }}
+    needs: [setup, terraform-fmt, terraform-validate, tflint, checkov]
+    if: ${{ always() }}
     steps:
-      - name: No checks failed
-        run: echo "No terraform issues found."
+      # A job that is skipped is reported to GitHub as a success, which satisfies a
+      # required check. When a check failed, this job used to be skipped by its own
+      # condition for that reason, so a failing check never blocked a merge. It runs
+      # whatever happened, and fails if a check it waits for failed or was cancelled.
+      - name: Fail if a check did not pass
+        env:
+          RESULTS: ${{ toJSON(needs.*.result) }}
+        run: |
+          echo "Results of the checks this job waits for: ${RESULTS}"
+          if jq -e 'any(. == "failure" or . == "cancelled")' <<< "${RESULTS}" > /dev/null; then
+            echo "A check did not pass."
+            exit 1
+          fi
+          echo "No terraform issues found."
