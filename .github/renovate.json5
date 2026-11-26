@@ -1,0 +1,75 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["github>govuk-forms/forms-deploy//.github/renovate-shared.json5"],
+
+  packageRules: [
+    // Only the required_version in the real versions.tf file. The other
+    // versions.tf files are symlinks.
+    { matchManagers: ["terraform"], matchFileNames: ["!infra/shared/versions.tf"], enabled: false },
+    // One pull request per tool, so every copy of a pin changes together and
+    // the versions-in-sync check passes.
+    { matchPackageNames: ["terraform-linters/tflint"], groupName: "tflint", addLabels: ["tools"] },
+    { matchPackageNames: ["checkov"], groupName: "checkov", addLabels: ["tools"] },
+    { matchPackageNames: ["jdx/jactionlint"], groupName: "jactionlint", addLabels: ["tools"] },
+    { matchPackageNames: ["tmccombs/hcl2json"], groupName: "hcl2json", addLabels: ["tools"] },
+    { matchPackageNames: ["public.ecr.aws/codebuild/**"], groupName: "CodeBuild images" },
+    // The runner image and the pre-commit validator image are one pin in two
+    // files. Renovate releases several times a day and each bump is a manual
+    // apply of deploy/tools, so take it in the first week of the month. Matched
+    // on the name in the file, because the lookup goes to Docker Hub.
+    {
+      matchDepNames: ["ghcr.io/renovatebot/renovate"],
+      groupName: "Renovate",
+      schedule: ["* * 1-7 * *"],
+    },
+
+    // The mise manager drops the v from these pins, which would no longer match
+    // the ones in pre-commit and Terraform. The annotations in .mise.toml cover
+    // them instead.
+    { matchManagers: ["mise"], matchDepNames: ["tflint", "hcl2json", "jactionlint"], enabled: false },
+
+    // The annotations in .pre-commit-config.yaml cover the tools that hooks
+    // install, in the same version style as the other pins. The manager would
+    // find them again under other names.
+    { matchManagers: ["pre-commit"], matchDepTypes: ["pre-commit-golang", "pre-commit-python"], enabled: false },
+
+    // A major release of these changes what the checks report, so it should be
+    // a deliberate change.
+    { matchPackageNames: ["terraform-linters/tflint", "checkov"], matchUpdateTypes: ["major"], enabled: false },
+  ],
+  customManagers: [
+    {
+      // "# renovate: datasource=x depName=y [packageName=z] [extractVersion=r]
+      // [depType=t]" on the line above a pin. The version is the first
+      // number-led token after an = @ or : on the next line. Set packageName
+      // to look the pin up under another name, and depType so the pull
+      // request's table has a Type.
+      customType: "regex",
+      managerFilePatterns: [
+        "/^\\.pre-commit-config\\.yaml$/",
+        "/^\\.mise\\.toml$/",
+        "/^infra/.*\\.tf$/",
+      ],
+      matchStrings: [
+        "# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>\\S+)(?: packageName=(?<packageName>\\S+))?(?: extractVersion=(?<extractVersion>\\S+))?(?: depType=(?<depType>\\S+))?\\n[^\\n]*?[=@:]\\s*\\\\*\"?(?<currentValue>v?\\d[\\w.+-]*)",
+      ],
+    },
+    {
+      customType: "regex",
+      managerFilePatterns: ["/^infra/.*\\.tf$/"],
+      matchStrings: ["\"(?<depName>(?:public\\.ecr\\.aws|docker\\.io)/[\\w./-]+):(?<currentValue>v?\\d[\\w.-]*)\""],
+      datasourceTemplate: "docker",
+      depTypeTemplate: "image",
+    },
+    {
+      // CodeBuild images are published to the public ECR "codebuild" namespace.
+      customType: "regex",
+      managerFilePatterns: ["/^infra/.*\\.tf$/"],
+      matchStrings: ["\"aws/codebuild/(?<image>[\\w-]+):(?<currentValue>[\\d.]+)\""],
+      datasourceTemplate: "docker",
+      depTypeTemplate: "image",
+      depNameTemplate: "aws/codebuild/{{{image}}}",
+      packageNameTemplate: "public.ecr.aws/codebuild/{{{image}}}",
+    },
+  ],
+}

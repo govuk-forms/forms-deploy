@@ -51,18 +51,3 @@ updates:
         patterns:
           - "*"
     target-branch: main
-
-  - package-ecosystem: "pre-commit"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    cooldown:
-      default-days: 7
-    open-pull-requests-limit: 10
-    groups:
-      pre-commit-all-dependencies:
-        patterns:
-          - "*"
-    ignore:
-      # Renovate updates this together with the other jactionlint pins.
-      - dependency-name: "https://github.com/jdx/jactionlint"
