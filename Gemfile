@@ -3,5 +3,5 @@
 source "https://rubygems.org"
 
 group :development, :test do
-  gem "rubocop-govuk", "~> 5.2"
+  gem "rubocop-govuk", "~> 6.0"
 end

@@ -2,9 +2,9 @@
 
 source "https://rubygems.org"
 
-gem "aws-sdk-codepipeline", "~> 1.130"
+gem "aws-sdk-codepipeline", "~> 1.132"
 
 group :development, :test do
   gem "rspec", "~> 3.13"
-  gem "rubocop-govuk", "~> 5.2"
+  gem "rubocop-govuk", "~> 6.0"
 end
