@@ -26,6 +26,23 @@ variable "renovate_image" {
   default     = "ghcr.io/renovatebot/renovate:44.199.2@sha256:0538f498be1b074e2434f8449cab7b2be30f8c0d0baf3b72814010f19db5bcfb"
 }
 
+variable "webhook_enabled" {
+  description = "Whether to create the endpoint that starts a Renovate run when a Dependency Dashboard or Renovate pull request checkbox is edited"
+  type        = bool
+  default     = false
+}
+
+variable "github_app_slug" {
+  description = "Slug of the Renovate GitHub App. The webhook uses it to recognise the App's own issues, pull requests and edits."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = !var.webhook_enabled || var.github_app_slug != null
+    error_message = "github_app_slug must be set when webhook_enabled is true."
+  }
+}
+
 variable "concurrent_builds" {
   description = "How many repos Renovate may run at once. Each repo has its own caches and never runs twice at the same time, so more than one is safe; the account's CodeBuild limit applies too"
   type        = number

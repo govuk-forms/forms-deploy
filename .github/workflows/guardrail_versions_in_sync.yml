@@ -9,6 +9,7 @@ on:
       - "infra/modules/drift-detection/main.tf"
       - "infra/modules/renovate/variables.tf"
       - "infra/modules/renovate/orchestrator.tf"
+      - "infra/modules/renovate/webhook.tf"
       - "**/.ruby-version"
       - "support/pipeline-visualiser/Dockerfile"
       - "support/check-versions-in-sync.sh"
@@ -79,6 +80,8 @@ jobs:
               - file: .mise.toml
                 sed: '^node *= *"([0-9]+)\..*'
               - file: infra/modules/renovate/orchestrator.tf
+                sed: '.*runtime *= *"nodejs([0-9]+)\.x".*'
+              - file: infra/modules/renovate/webhook.tf
                 sed: '.*runtime *= *"nodejs([0-9]+)\.x".*'
 
           - tool: Ruby
