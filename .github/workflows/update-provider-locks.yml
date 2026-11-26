@@ -5,6 +5,7 @@ on:
     paths:
       - "infra/shared/versions.tf"
       - "infra/scripts/upgrade_tf_version.sh"
+      - ".mise.toml"
       - ".github/workflows/update-provider-locks.yml"
 
 concurrency:

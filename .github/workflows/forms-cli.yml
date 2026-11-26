@@ -9,6 +9,7 @@ on:
     branches: [main]
     paths:
       - "support/forms-cli/**"
+      - "**/.ruby-version"
       - ".github/workflows/forms-cli.yml"
   merge_group:
     types: [checks_requested]

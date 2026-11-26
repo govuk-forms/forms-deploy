@@ -23,6 +23,7 @@ locals {
     phases = {
       install = {
         commands = [
+          # renovate: datasource=github-releases depName=tmccombs/hcl2json depType=tools
           "HCL2JSON_VERSION=\"v0.6.9\"",
           "HCL2JSON_SHA256=\"b609e37094948c0b77cd8c6c0baaf8af2bd168c685c6e3334d671cc9692c34a5\"",
           "curl https://github.com/tmccombs/hcl2json/releases/download/$${HCL2JSON_VERSION}/hcl2json_linux_amd64 -L -o hcl2json",
