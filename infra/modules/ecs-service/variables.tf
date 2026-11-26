@@ -133,6 +133,11 @@ variable "scaling_rules" {
     scale_in_cooldown                           = number
     scale_out_cooldown                          = number
   })
+
+  validation {
+    condition     = var.scaling_rules.min_capacity > 0
+    error_message = "scaling_rules.min_capacity must be greater than zero, so the service always has a task running."
+  }
 }
 
 variable "vpc_id" {
