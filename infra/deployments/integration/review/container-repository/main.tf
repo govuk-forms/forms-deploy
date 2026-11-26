@@ -3,6 +3,7 @@ data "aws_caller_identity" "caller" {}
 resource "aws_ecr_repository" "repository" {
   #checkov:skip=CKV_AWS_136:AWS Managed SSE is sufficient.
   #checkov:skip=CKV_AWS_51:We will want mutable tags in this environment
+  #checkov:skip=CKV2_FORMS_AWS_9:Review apps push to the same tag on every commit
   name = var.repository_name
 
   image_scanning_configuration {

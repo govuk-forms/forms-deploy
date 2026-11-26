@@ -1,0 +1,18 @@
+---
+metadata:
+  name: "Check that ECS services cannot be destroyed by a Terraform plan"
+  id: "CKV2_FORMS_AWS_10"
+  category: "CONVENTION"
+  guideline: |
+    ECS services cannot be destructively replaced without downtime.
+    lifecycle.prevent_destroy makes Terraform fail the plan instead of
+    replacing the service by accident.
+scope:
+  provider: "AWS"
+definition:
+  cond_type: "attribute"
+  resource_types:
+    - "aws_ecs_service"
+  attribute: "lifecycle.prevent_destroy"
+  operator: "equals"
+  value: true
