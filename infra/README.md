@@ -110,11 +110,27 @@ The runner lets a repo's config run exactly one command: `support/update-hcl2jso
 
 Renovate logs one JSON object per line at debug level. Metric filters turn the build log into metrics in the `Renovate` namespace: `LogErrors` and `LogWarnings`, and, per repository, `PullRequestsCreated`, `PullRequestsUpdated` and `AbandonedDependencies`. The `renovate-log-errors` alarm notifies the failure topic when a run logs an error, which a build that still succeeds would not report. A dependency counts as abandoned when its last release is more than a year old, and Renovate only logs it, so the metric is the way to see it.
 
+#### The webhook
+
+Ticking a box in the Dependency Dashboard or in one of Renovate's pull requests, or pushing to a repo's default branch (which can leave a Renovate pull request conflicted), asks the orchestrator for an event run, through a Lambda behind a function URL. The function ignores anything that isn't an edit to the dashboard, an edit to a `renovate/` pull request opened by the App, or a push to the default branch, and ignores the App's own edits and pushes so a run doesn't start another. CodeStar and CodeConnections can't do this: CodeBuild's GitHub webhooks have no issues event, and a pull request "updated" event means new commits, not an edited body.
+
+The webhook is off until `webhook_enabled` and `github_app_slug` are set on the module. Terraform creates the secret parameter with a placeholder, and the function answers 503 until the value is at least 32 characters. Generate one secret, store it, and paste the same value into the App's webhook settings, so GitHub and the function agree:
+
+```sh
+secret="$(openssl rand -hex 32)"
+aws ssm put-parameter --name /renovate/github-webhook-secret --type SecureString --overwrite --value "${secret}"
+echo "${secret}"
+```
+
+Then set the App's webhook up in GitHub: turn on Active, set the Webhook URL to the module's `webhook_url` output, paste the secret from above, and subscribe to the Issues, Pull request and Push events. Set the parameter before saving the webhook in the App, or expect one failed delivery.
+
+The function URL is open to the internet. It accepts a delivery only when the HMAC signature matches the secret, and caches the secret for five minutes, so a rotation takes effect on its own. The `renovate-webhook-rejected` alarm fires when five or more deliveries are refused in ten minutes, which means the secret doesn't match GitHub's or something is probing the URL. Its reserved concurrency is 30, which has to exceed the number of boxes someone might tick at once, because GitHub doesn't retry a throttled delivery.
+
 #### The GitHub App
 
 Renovate signs in as an organisation-owned GitHub App, because pull requests opened with a workflow's own token don't trigger CI. The orchestrator mints an installation token for each build, limited to the one repo, and leaves it in a SecureString parameter under `/renovate/token/<owner>/<repo>` that the build reads as `RENOVATE_TOKEN`. That keeps it out of the build's record and CloudTrail. A build that queues for longer than its `queued_timeout` of 15 minutes is dropped, so that it can't start with an expired token.
 
-The App needs these repository permissions: Contents, Issues, Pull requests, Workflows, Checks and Commit statuses (read and write), and Metadata and Dependabot alerts (read). Install it only on the repos Renovate runs against.
+The App needs these repository permissions: Contents, Issues, Pull requests, Workflows, Checks and Commit statuses (read and write), and Metadata and Dependabot alerts (read). Renovate sets `renovate/stability-days` as the App, so it needs the commit status permission. The webhook needs the Issues, Pull request and Push events. Install it only on the repos Renovate runs against.
 
 Terraform creates the two SSM parameters with a dummy value. Set the real values by hand:
 
