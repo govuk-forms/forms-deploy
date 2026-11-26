@@ -90,6 +90,11 @@ variable "root_domain" {
   description = "The root domain under which the environment will be deployed"
   type        = string
   nullable    = false
+
+  validation {
+    condition     = var.root_domain == "forms.service.gov.uk" || endswith(var.root_domain, ".forms.service.gov.uk")
+    error_message = "root_domain must be forms.service.gov.uk or a subdomain of it."
+  }
 }
 
 variable "additional_dns_records" {
@@ -126,6 +131,20 @@ EOF
 ##
 # Settings
 ##
+locals {
+  # Memory (MiB) Fargate allows for each CPU value (CPU units).
+  # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-tasks-services.html
+  fargate_memory_mib = {
+    "256"   = [512, 1024, 2048]
+    "512"   = range(1024, 4096 + 1, 1024)
+    "1024"  = range(2048, 8192 + 1, 1024)
+    "2048"  = range(4096, 16384 + 1, 1024)
+    "4096"  = range(8192, 30720 + 1, 1024)
+    "8192"  = range(16384, 61440 + 1, 4096)
+    "16384" = range(32768, 122880 + 1, 8192)
+  }
+}
+
 variable "forms_admin_settings" {
   description = "Forms Admin configuration values"
   type = object({
@@ -147,6 +166,26 @@ variable "forms_admin_settings" {
     save_and_return_enabled          = bool
   })
   nullable = false
+
+  validation {
+    condition     = contains(keys(local.fargate_memory_mib), tostring(var.forms_admin_settings.cpu))
+    error_message = "cpu must be one of ${join(", ", keys(local.fargate_memory_mib))}."
+  }
+
+  validation {
+    condition     = contains(lookup(local.fargate_memory_mib, tostring(var.forms_admin_settings.cpu), []), var.forms_admin_settings.memory)
+    error_message = "memory ${var.forms_admin_settings.memory} is not available with cpu ${var.forms_admin_settings.cpu} on Fargate."
+  }
+
+  validation {
+    condition     = var.forms_admin_settings.min_capacity % 3 == 0 && var.forms_admin_settings.max_capacity % 3 == 0
+    error_message = "min_capacity and max_capacity must be whole numbers divisible by 3, so tasks spread evenly over three availability zones."
+  }
+
+  validation {
+    condition     = var.forms_admin_settings.max_capacity >= var.forms_admin_settings.min_capacity
+    error_message = "max_capacity must be greater than or equal to min_capacity."
+  }
 }
 
 variable "forms_product_page_settings" {
@@ -157,6 +196,26 @@ variable "forms_product_page_settings" {
     min_capacity = number
     max_capacity = number
   })
+
+  validation {
+    condition     = contains(keys(local.fargate_memory_mib), tostring(var.forms_product_page_settings.cpu))
+    error_message = "cpu must be one of ${join(", ", keys(local.fargate_memory_mib))}."
+  }
+
+  validation {
+    condition     = contains(lookup(local.fargate_memory_mib, tostring(var.forms_product_page_settings.cpu), []), var.forms_product_page_settings.memory)
+    error_message = "memory ${var.forms_product_page_settings.memory} is not available with cpu ${var.forms_product_page_settings.cpu} on Fargate."
+  }
+
+  validation {
+    condition     = var.forms_product_page_settings.min_capacity % 3 == 0 && var.forms_product_page_settings.max_capacity % 3 == 0
+    error_message = "min_capacity and max_capacity must be whole numbers divisible by 3, so tasks spread evenly over three availability zones."
+  }
+
+  validation {
+    condition     = var.forms_product_page_settings.max_capacity >= var.forms_product_page_settings.min_capacity
+    error_message = "max_capacity must be greater than or equal to min_capacity."
+  }
 }
 
 variable "forms_runner_settings" {
@@ -181,6 +240,26 @@ variable "forms_runner_settings" {
     queue_worker_capacity                                           = string
     disable_builtin_solidqueue_worker                               = bool
   })
+
+  validation {
+    condition     = contains(keys(local.fargate_memory_mib), tostring(var.forms_runner_settings.cpu))
+    error_message = "cpu must be one of ${join(", ", keys(local.fargate_memory_mib))}."
+  }
+
+  validation {
+    condition     = contains(lookup(local.fargate_memory_mib, tostring(var.forms_runner_settings.cpu), []), var.forms_runner_settings.memory)
+    error_message = "memory ${var.forms_runner_settings.memory} is not available with cpu ${var.forms_runner_settings.cpu} on Fargate."
+  }
+
+  validation {
+    condition     = var.forms_runner_settings.min_capacity % 3 == 0 && var.forms_runner_settings.max_capacity % 3 == 0
+    error_message = "min_capacity and max_capacity must be whole numbers divisible by 3, so tasks spread evenly over three availability zones."
+  }
+
+  validation {
+    condition     = var.forms_runner_settings.max_capacity >= var.forms_runner_settings.min_capacity
+    error_message = "max_capacity must be greater than or equal to min_capacity."
+  }
 }
 
 variable "environmental_settings" {
