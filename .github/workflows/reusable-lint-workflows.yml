@@ -11,7 +11,7 @@ on:
 env:
   # Not the version of the action, which is updated separately. Keep it in
   # step with the jactionlint pins in .mise.toml and .pre-commit-config.yaml.
-  JACTIONLINT_VERSION: "2.4.0"
+  JACTIONLINT_VERSION: "2.6.0"
 
 jobs:
   jactionlint:
