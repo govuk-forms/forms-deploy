@@ -17,7 +17,8 @@ resource "aws_iam_role" "codebuild" {
 }
 
 # Renovate only talks to GitHub and the package registries, so the role can do
-# nothing in AWS beyond logging, reading its parameters and keeping its cache.
+# nothing in AWS beyond logging, reading its token and keeping its cache. It
+# never reads the App's key: the orchestrator mints the token.
 data "aws_iam_policy_document" "codebuild" {
   statement {
     actions = [
@@ -42,12 +43,9 @@ data "aws_iam_policy_document" "codebuild" {
   }
 
   statement {
-    actions = ["ssm:GetParameters"]
-    resources = [
-      aws_ssm_parameter.github_app_id.arn,
-      aws_ssm_parameter.github_app_private_key.arn,
-    ]
-    effect = "Allow"
+    actions   = ["ssm:GetParameters"]
+    resources = ["arn:aws:ssm:${local.aws_region}:${local.aws_account_id}:parameter${local.token_parameter_prefix}/*"]
+    effect    = "Allow"
   }
 }
 
@@ -62,7 +60,8 @@ resource "aws_iam_role_policy_attachment" "codebuild" {
   role       = aws_iam_role.codebuild.id
 }
 
-# EventBridge IAM Role and Policies
+# EventBridge IAM Role and Policies. It is only needed to publish failures, as
+# the rules that start the orchestrator use its resource policy.
 
 data "aws_iam_policy_document" "eventbridge_assume_role" {
   statement {
@@ -76,34 +75,30 @@ data "aws_iam_policy_document" "eventbridge_assume_role" {
 }
 
 resource "aws_iam_role" "eventbridge" {
+  count              = var.failure_topic_arn != null ? 1 : 0
   name               = "eventbridge-renovate"
   assume_role_policy = data.aws_iam_policy_document.eventbridge_assume_role.json
 }
 
 data "aws_iam_policy_document" "eventbridge" {
-  statement {
-    actions   = ["codebuild:StartBuild"]
-    resources = [aws_codebuild_project.renovate.arn]
-    effect    = "Allow"
-  }
+  count = var.failure_topic_arn != null ? 1 : 0
 
-  dynamic "statement" {
-    for_each = var.failure_topic_arn != null ? [1] : []
-    content {
-      actions   = ["sns:Publish"]
-      resources = [var.failure_topic_arn]
-      effect    = "Allow"
-    }
+  statement {
+    actions   = ["sns:Publish"]
+    resources = [var.failure_topic_arn]
+    effect    = "Allow"
   }
 }
 
 resource "aws_iam_policy" "eventbridge" {
+  count  = var.failure_topic_arn != null ? 1 : 0
   name   = "eventbridge-renovate"
   path   = "/"
-  policy = data.aws_iam_policy_document.eventbridge.json
+  policy = data.aws_iam_policy_document.eventbridge[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "eventbridge" {
-  policy_arn = aws_iam_policy.eventbridge.arn
-  role       = aws_iam_role.eventbridge.id
+  count      = var.failure_topic_arn != null ? 1 : 0
+  policy_arn = aws_iam_policy.eventbridge[0].arn
+  role       = aws_iam_role.eventbridge[0].id
 }

@@ -1,6 +1,7 @@
 # The package cache (lookups and release notes, which take minutes to fetch for
-# busy repos) is archived by CodeBuild. The repository cache is Renovate's own
-# objects under repository-cache/.
+# busy repos) is archived by CodeBuild, one object per repo: the orchestrator
+# starts each build with its repo's prefix (see lambda/orchestrator.js). The
+# repository cache is Renovate's own objects under repository-cache/.
 module "cache_bucket" {
   source = "../secure-bucket"
 

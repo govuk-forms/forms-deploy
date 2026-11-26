@@ -9,12 +9,6 @@ variable "github_organisation" {
   default     = "govuk-forms"
 }
 
-variable "repositories" {
-  description = "Repositories Renovate runs against, as owner/name. Add a repo here only once the GitHub App is installed on it."
-  type        = list(string)
-  default     = ["govuk-forms/forms-deploy"]
-}
-
 variable "dry_run" {
   description = "Renovate's dryRun mode: extract, lookup or full. Null makes Renovate open real branches and pull requests."
   type        = string
@@ -30,6 +24,12 @@ variable "renovate_image" {
   description = "Renovate container image, pinned by digest"
   type        = string
   default     = "ghcr.io/renovatebot/renovate:44.199.2@sha256:0538f498be1b074e2434f8449cab7b2be30f8c0d0baf3b72814010f19db5bcfb"
+}
+
+variable "concurrent_builds" {
+  description = "How many repos Renovate may run at once. Each repo has its own caches and never runs twice at the same time, so more than one is safe; the account's CodeBuild limit applies too"
+  type        = number
+  default     = 1
 }
 
 variable "failure_topic_arn" {
