@@ -10,13 +10,19 @@ go = "1.25.3"
 # https://proxy.golang.org/github.com/hashicorp/terraform-config-inspect/@latest
 "go:github.com/hashicorp/terraform-config-inspect" = "v0.0.0-20260709150029-2fb54c236733"
 # Keep in step with HCL2JSON_VERSION (and its SHA256) in
-# infra/modules/drift-detection/main.tf.
-hcl2json = "0.6.9"
-# Keep in step with the jactionlint pins in .pre-commit-config.yaml and
-# .github/workflows/reusable-lint-workflows.yml.
-jactionlint = "2.6.0"
-# Keep in step with the tflint pin in .pre-commit-config.yaml.
-tflint = "0.64.0"
+# infra/modules/drift-detection/main.tf. The annotation is there because
+# Renovate's mise manager would drop the v.
+# renovate: datasource=github-releases depName=tmccombs/hcl2json depType=tools
+hcl2json = "v0.6.9"
+# Keep in step with the jactionlint pins in .pre-commit-config.yaml and the
+# action in .github/workflows/reusable-lint-workflows.yml. The annotation is
+# there because Renovate's mise manager would drop the v.
+# renovate: datasource=github-releases depName=jdx/jactionlint depType=tools
+jactionlint = "v2.6.0"
+# Keep in step with the tflint pin in .pre-commit-config.yaml. The annotation is
+# there because Renovate's mise manager would drop the v.
+# renovate: datasource=github-releases depName=terraform-linters/tflint depType=tools
+tflint = "v0.64.0"
 # Installed from PyPI rather than as the standalone binary, which takes ~13s to start.
 # Keep in step with the checkov pin in .pre-commit-config.yaml.
 "pipx:checkov" = "3.4.6"

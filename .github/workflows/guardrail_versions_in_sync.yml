@@ -47,23 +47,23 @@ jobs:
               - file: .mise.toml
                 sed: '^tflint *= *"([^"]+)".*'
               - file: .pre-commit-config.yaml
-                yq: '.repos[].hooks[] | select(.id == "tflint") | .additional_dependencies[] | select(test("^github.com/terraform-linters/tflint@v")) | sub("^.*@v", "")'
+                yq: '.repos[].hooks[] | select(.id == "tflint") | .additional_dependencies[] | select(test("^github.com/terraform-linters/tflint@v")) | sub("^.*@", "")'
 
           - tool: hcl2json
             places:
               - file: .mise.toml
                 sed: '^hcl2json *= *"([^"]+)".*'
               - file: infra/modules/drift-detection/main.tf
-                sed: '.*HCL2JSON_VERSION=[^v]*v([0-9.]+).*'
+                sed: '.*HCL2JSON_VERSION=[^v]*(v[0-9.]+).*'
 
           - tool: jactionlint
             places:
               - file: .mise.toml
                 sed: '^jactionlint *= *"([^"]+)".*'
               - file: .pre-commit-config.yaml
-                yq: '.repos[] | select(.repo == "https://github.com/jdx/jactionlint") | (.rev // "") | sub("^v", "")'
+                yq: '.repos[] | select(.repo == "https://github.com/jdx/jactionlint") | (.rev // "")'
               - file: .github/workflows/reusable-lint-workflows.yml
-                yq: '.env.JACTIONLINT_VERSION // ""'
+                sed: '.*uses: jdx\/jactionlint@[0-9a-f]+ # (v[0-9.]+).*'
 
           - tool: Ruby
             places:

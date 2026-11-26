@@ -8,11 +8,6 @@ on:
         type: string
         default: correctness
 
-env:
-  # Not the version of the action, which is updated separately. Keep it in
-  # step with the jactionlint pins in .mise.toml and .pre-commit-config.yaml.
-  JACTIONLINT_VERSION: "2.6.0"
-
 jobs:
   jactionlint:
     runs-on: ubuntu-slim
@@ -23,10 +18,9 @@ jobs:
         # This runs in the calling repository, so its own
         # .github/jactionlint.yaml or .yml decides the profile. Passing a
         # profile overrides the file, so the input is only passed when there
-        # is none.
+        # is none. The action installs the jactionlint version it is pinned at.
         uses: jdx/jactionlint@72c00452809bcca05b8bc12acdcf15dd7a9c1c5e # v2.6.0
         with:
-          version: ${{ env.JACTIONLINT_VERSION }}
           profile: ${{ hashFiles('.github/jactionlint.yaml', '.github/jactionlint.yml') == '' && inputs.profile || '' }}
           strict-exit: true
           online: false

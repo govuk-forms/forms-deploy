@@ -36,6 +36,7 @@ repos:
         language: golang
         # Keep in step with the tflint pin in .mise.toml.
         additional_dependencies:
+          # renovate: datasource=github-releases depName=terraform-linters/tflint depType=tools
           - github.com/terraform-linters/tflint@v0.64.0
         files: ^(infra/|\.tflint\.hcl$)
         pass_filenames: true
@@ -47,6 +48,7 @@ repos:
         language: python
         # Keep in step with the checkov pin in .mise.toml.
         additional_dependencies:
+          # renovate: datasource=pypi depName=checkov depType=tools
           - checkov==3.4.6
         require_serial: true
         files: ^infra/(checkov/|.*\.(tf|tfvars|hcl)$)
@@ -59,7 +61,7 @@ repos:
         language: system
         entry: bundle exec rubocop --force-exclusion
 
-  # Keep in step with the jactionlint pins in .mise.toml and
+  # Keep in step with the jactionlint pins in .mise.toml and the action in
   # .github/workflows/reusable-lint-workflows.yml.
   - repo: https://github.com/jdx/jactionlint
     rev: v2.6.0
