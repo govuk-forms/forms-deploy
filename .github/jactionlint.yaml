@@ -5,3 +5,4 @@ rules:
     level: error
     require-workflow-permissions: true
   mutable-runner-label: error
+  cache-poisoning: error
